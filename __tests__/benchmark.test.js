@@ -51,10 +51,10 @@ const schema = Joi.object().keys({
 describe('compare benchmarks', function() {
     const {users, chars} = helpers.createTestData();
 
-    it(`is faster to use Chain for policy`, function() {
+    it(`is faster to use fence.js for policy`, function() {
         const cycles = [];
         const suite = new Benchmark.Suite()
-            .add('Chain Policy', () => users.forEach(user => {
+            .add('fence.js Policy', () => users.forEach(user => {
                 userValidation.run(user).forAll();
             }))
             .add('Validate Policy', () => users.forEach(user => {
@@ -66,16 +66,16 @@ describe('compare benchmarks', function() {
             .on('cycle', event => cycles.push(String(event.target)))
             .on('complete', () => {
                 const fastest = suite.filter('fastest').map('name');
-                assert(fastest[0] === 'Chain Policy', `Fastest is ${fastest}, cycles: ${cycles}`);
+                assert(fastest[0] === 'fence.js Policy', `Fastest is ${fastest}, cycles: ${cycles}`);
             });
 
         suite.run({async: false});
     });
 
-    it(`is faster to use Chain for strict equal`, function() {
+    it(`is faster to use fence.js for strict equal`, function() {
         const cycles = [];
         const suite = new Benchmark.Suite()
-            .add('Chain Strict Equal', () => chars.forEach(char => {
+            .add('fence.js Strict Equal', () => chars.forEach(char => {
                 letterValidation.run(char.val).forAll();
             }))
             .add('Validate Strict Equal', () => chars.forEach(char => {
@@ -87,7 +87,7 @@ describe('compare benchmarks', function() {
             .on('cycle', event => cycles.push(String(event.target)))
             .on('complete', () => {
                 const fastest = suite.filter('fastest').map('name');
-                assert(fastest[0] === 'Chain Strict Equal', `Fastest is ${fastest}, cycles: ${cycles}`);
+                assert(fastest[0] === 'fence.js Strict Equal', `Fastest is ${fastest}, cycles: ${cycles}`);
             });
 
         suite.run({async: false});

@@ -1,9 +1,9 @@
 {
-  "name": "@dotcarls/chain",
+  "name": "fence.js",
   "version": "0.3.5",
   "description": "A framework to create efficient and extensible validations",
   "main": "cjs/index.js",
-  "browser": "dist/Chain.js",
+  "browser": "dist/fence.js",
   "module": "es/index.js",
   "jsxnext:main": "es/index.js",
   "files": [
