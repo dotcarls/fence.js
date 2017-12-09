@@ -1,6 +1,6 @@
 {
   "name": "fence.js",
-  "version": "0.5.0",
+  "version": "0.5.4",
   "description": "A framework to create efficient and extensible validations",
   "main": "cjs/index.js",
   "browser": "dist/fence.js",
@@ -68,6 +68,7 @@
   "jest": {
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
+      "<rootDir>/.stage/",
       "<rootDir>/__tests__/helpers.js",
       "<rootDir>/__tests__/benchmark.test.js"
     ],
