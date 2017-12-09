@@ -3,7 +3,7 @@
     "__docId__": 0,
     "kind": "file",
     "name": "src/index.js",
-    "content": "import ValidationBuilder from './lib/ValidationBuilder';\n\nexport default ValidationBuilder;\n",
+    "content": "import FenceBuilder from './lib/FenceBuilder';\n\nexport default FenceBuilder;\n",
     "static": true,
     "longname": "/Users/tim.carlson/Dev/fence.js/src/index.js",
     "access": "public",
@@ -12,6 +12,364 @@
   },
   {
     "__docId__": 1,
+    "kind": "file",
+    "name": "src/lib/Fence.js",
+    "content": "import Result from './Result';\n\n/**\n* A 'built' FenceBuilder that can be exported for use in other functions.\n*/\nclass Fence {\n    /**\n    * @param    {array}    invokables    Array of invokable functions\n    */\n    constructor (invokables) {\n        this._invokables = invokables;\n    }\n\n    /**\n    * Iterates over an array of invokables. Each invokable is called with a subject\n    * which is the attribute value being validated.\n    *\n    * @param     {any}         subject     Some value to be validated\n    * @return    {Result}                  An object representing invoked functions\n    *                                      and their outputs\n    */\n    run (...subjects) {\n        const invokables = this._invokables;\n        const results = invokables.map(function(invokable) {\n            return invokable.invoke.apply(invokable, subjects);\n        });\n\n        return new Result(invokables, results, subjects);\n    }\n}\n\nexport default Fence;\n",
+    "static": true,
+    "longname": "/Users/tim.carlson/Dev/fence.js/src/lib/Fence.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 2,
+    "kind": "class",
+    "name": "Fence",
+    "memberof": "src/lib/Fence.js",
+    "static": true,
+    "longname": "src/lib/Fence.js~Fence",
+    "access": "public",
+    "export": true,
+    "importPath": "fence.js/src/lib/Fence.js",
+    "importStyle": "Fence",
+    "description": "A 'built' FenceBuilder that can be exported for use in other functions.",
+    "lineNumber": 6,
+    "interface": false
+  },
+  {
+    "__docId__": 3,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/lib/Fence.js~Fence",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/Fence.js~Fence#constructor",
+    "access": "public",
+    "description": "",
+    "lineNumber": 10,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "invokables",
+        "description": "Array of invokable functions"
+      }
+    ]
+  },
+  {
+    "__docId__": 4,
+    "kind": "member",
+    "name": "_invokables",
+    "memberof": "src/lib/Fence.js~Fence",
+    "static": false,
+    "longname": "src/lib/Fence.js~Fence#_invokables",
+    "access": "private",
+    "description": null,
+    "lineNumber": 11,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 5,
+    "kind": "method",
+    "name": "run",
+    "memberof": "src/lib/Fence.js~Fence",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/Fence.js~Fence#run",
+    "access": "public",
+    "description": "Iterates over an array of invokables. Each invokable is called with a subject\nwhich is the attribute value being validated.",
+    "lineNumber": 22,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "any"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "subject",
+        "description": "Some value to be validated"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "Result"
+      ],
+      "spread": false,
+      "description": "An object representing invoked functions\n                                     and their outputs"
+    }
+  },
+  {
+    "__docId__": 6,
+    "kind": "file",
+    "name": "src/lib/FenceBuilder.js",
+    "content": "import Invokable from './Invokable';\nimport Fence from './Fence';\n\n/**\n* A `FenceBuilder` is used to create an extensible `Fence`.\n*\n* An instance of `FenceBuilder` will have prototype methods that are created\n* through the `register()` method. When the `fork()` method is called all of the\n* instance's already registered methods will be transferred to a new instance of\n* `FenceBuilder` that is then returned. This is what allows you to 'extend'\n* a `Fence` as you can then continue to `register()` methods without mutating\n* the original `FenceBuilder`'s prototype.\n*\n* These prototypical methods are called `Invokable`'s. An `Invokable` is a named\n* function reference that optionally includes some predefined arguments that can\n* be used to make specific comparisons. *\n*/\nclass FenceBuilder {\n    /**\n    * @param    {Array}    invokables    A set of already defined `Invokable`'s\n    */\n    constructor (invokables) {\n        this._invokables = invokables ? invokables.slice() : [];\n    }\n\n    /**\n    * Create a clone of a `FenceBuilder` instance so that it can be extended.\n    *\n    * @return    {FenceBuilder}    a reference to a new `FenceBuilder`\n    */\n    fork (proto) {\n        // Stop any other references to this `FenceBuilder` from registering\n        // additional methods (or overwriting currently existing ones)\n        proto = proto || Object.getPrototypeOf(this);\n\n        // Create a reference to this instance's `_invokables`, use them to seed the\n        // new instance's `_invokables`\n        const invokables = this._invokables;\n\n        // Create a new `FenceBuilder` that inherits from this `FenceBuilder`\n        const FB = function() {\n            FenceBuilder.call(this, invokables);\n        };\n\n        // Set the prototype so that registered functions are available\n        FB.prototype = Object.create(proto);\n        FB.prototype.constructor = FB;\n\n        // Instantiate the new `FenceBuilder`\n        return new FB();\n    }\n\n    /**\n    * Add a named function reference to the prototype of an instance of `FenceBuilder`\n    *\n    * @param     {String}              name    A named function reference\n    * @param     {Function}            fn      A reference to a validation function\n\n    * @return    {FenceBuilder}           The `FenceBuilder` instance being\n    *                                          operated on, used for function chaining\n    */\n    register (name, fn, memoize, debug, loggers) {\n        const proto = Object.getPrototypeOf(this);\n        proto[name] = function() {\n            this._invokables.push(new Invokable(name, fn, arguments, memoize, debug, loggers));\n\n            return this;\n        };\n\n        return this.fork(proto);\n    }\n\n    /**\n    * Remove a named function reference from the prototype of an instance of `FenceBuilder`\n    * @param     {String}              name    A named function reference\n\n    * @return    {FenceBuilder}           The `FenceBuilder` instance being\n    *                                          operated on, used for function chaining\n    */\n    unregister (name) {\n        const proto = Object.getPrototypeOf(this);\n        delete proto[name];\n\n        const tmp = this.fork(proto);\n        tmp._invokables = this._invokables.filter(function(invokable) {\n            return invokable.getName() !== name;\n        });\n\n        return tmp;\n    }\n\n    /**\n    * Convert an instance of `FenceBuilder` to something that can be used to\n    * validate some value\n    *\n    * @return    {Fence}      an Object with a `run()` method that can be called\n    *                              with a value, will produce a list of `Results`\n    */\n    build () {\n        return new Fence(this._invokables);\n    }\n\n    /**\n    * Create a representation of an instance of `FenceBuilder`'s Invokable\n    * function reference names and arguments that can be persisted then later used\n    * by `hydrate()` recreate an equivalent `FenceBuilder`\n    *\n    * @return    {String}      a stringified JSON blob that can be persisted\n    */\n    serialize (returnFull) {\n        return JSON.stringify(this._invokables.map(function(invokable) {\n            return invokable.serialize(returnFull);\n        }));\n    }\n\n    /**\n    * Given a string representing a `serialize`'d `FenceBuilder`, attempt to\n    * recreate a list of `Invokables` by calling the named prototype references. If\n    * the `serialize`'d `FenceBuilder` includes a reference to an unavailable\n    * prototype method, an error is thrown.\n    *\n    * @param     {String}    invokables    A `stringify`'d JSON blob representing a\n    *                                      `FenceBuilder`'s `Invokeable`'s\n    * @return    {FenceBuilder}\n    */\n    hydrate (invokables) {\n        const tmp = this.fork();\n        tmp._invokables = [];\n\n        JSON.parse(invokables).map(JSON.parse).forEach(function(invokable) {\n            const name = invokable._name;\n            const args = invokable._args;\n            const fn = Object.getPrototypeOf(tmp)[name];\n\n            if (fn) {\n                fn.apply(tmp, args);\n            } else {\n                throw new Error(`Method ${name} missing during validation builder hydration`);\n            }\n        });\n\n        return tmp;\n    }\n}\n\nexport default FenceBuilder;\n",
+    "static": true,
+    "longname": "/Users/tim.carlson/Dev/fence.js/src/lib/FenceBuilder.js",
+    "access": "public",
+    "description": null,
+    "lineNumber": 1
+  },
+  {
+    "__docId__": 7,
+    "kind": "class",
+    "name": "FenceBuilder",
+    "memberof": "src/lib/FenceBuilder.js",
+    "static": true,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder",
+    "access": "public",
+    "export": true,
+    "importPath": "fence.js/src/lib/FenceBuilder.js",
+    "importStyle": "FenceBuilder",
+    "description": "A `FenceBuilder` is used to create an extensible `Fence`.\n\nAn instance of `FenceBuilder` will have prototype methods that are created\nthrough the `register()` method. When the `fork()` method is called all of the\ninstance's already registered methods will be transferred to a new instance of\n`FenceBuilder` that is then returned. This is what allows you to 'extend'\na `Fence` as you can then continue to `register()` methods without mutating\nthe original `FenceBuilder`'s prototype.\n\nThese prototypical methods are called `Invokable`'s. An `Invokable` is a named\nfunction reference that optionally includes some predefined arguments that can\nbe used to make specific comparisons. *",
+    "lineNumber": 18,
+    "interface": false
+  },
+  {
+    "__docId__": 8,
+    "kind": "constructor",
+    "name": "constructor",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#constructor",
+    "access": "public",
+    "description": "",
+    "lineNumber": 22,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "Array"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "invokables",
+        "description": "A set of already defined `Invokable`'s"
+      }
+    ]
+  },
+  {
+    "__docId__": 9,
+    "kind": "member",
+    "name": "_invokables",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#_invokables",
+    "access": "private",
+    "description": null,
+    "lineNumber": 23,
+    "undocument": true,
+    "type": {
+      "types": [
+        "*"
+      ]
+    }
+  },
+  {
+    "__docId__": 10,
+    "kind": "method",
+    "name": "fork",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#fork",
+    "access": "public",
+    "description": "Create a clone of a `FenceBuilder` instance so that it can be extended.",
+    "lineNumber": 31,
+    "return": {
+      "nullable": null,
+      "types": [
+        "FenceBuilder"
+      ],
+      "spread": false,
+      "description": "a reference to a new `FenceBuilder`"
+    },
+    "params": [
+      {
+        "name": "proto",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 11,
+    "kind": "method",
+    "name": "register",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#register",
+    "access": "public",
+    "description": "Add a named function reference to the prototype of an instance of `FenceBuilder`",
+    "lineNumber": 62,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "A named function reference"
+      },
+      {
+        "nullable": null,
+        "types": [
+          "Function"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "fn",
+        "description": "A reference to a validation function"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "FenceBuilder"
+      ],
+      "spread": false,
+      "description": "The `FenceBuilder` instance being\n                                         operated on, used for function chaining"
+    }
+  },
+  {
+    "__docId__": 12,
+    "kind": "method",
+    "name": "unregister",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#unregister",
+    "access": "public",
+    "description": "Remove a named function reference from the prototype of an instance of `FenceBuilder`",
+    "lineNumber": 80,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "name",
+        "description": "A named function reference"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "FenceBuilder"
+      ],
+      "spread": false,
+      "description": "The `FenceBuilder` instance being\n                                         operated on, used for function chaining"
+    }
+  },
+  {
+    "__docId__": 13,
+    "kind": "method",
+    "name": "build",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#build",
+    "access": "public",
+    "description": "Convert an instance of `FenceBuilder` to something that can be used to\nvalidate some value",
+    "lineNumber": 99,
+    "return": {
+      "nullable": null,
+      "types": [
+        "Fence"
+      ],
+      "spread": false,
+      "description": "an Object with a `run()` method that can be called\n                             with a value, will produce a list of `Results`"
+    },
+    "params": []
+  },
+  {
+    "__docId__": 14,
+    "kind": "method",
+    "name": "serialize",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#serialize",
+    "access": "public",
+    "description": "Create a representation of an instance of `FenceBuilder`'s Invokable\nfunction reference names and arguments that can be persisted then later used\nby `hydrate()` recreate an equivalent `FenceBuilder`",
+    "lineNumber": 110,
+    "return": {
+      "nullable": null,
+      "types": [
+        "String"
+      ],
+      "spread": false,
+      "description": "a stringified JSON blob that can be persisted"
+    },
+    "params": [
+      {
+        "name": "returnFull",
+        "types": [
+          "*"
+        ]
+      }
+    ]
+  },
+  {
+    "__docId__": 15,
+    "kind": "method",
+    "name": "hydrate",
+    "memberof": "src/lib/FenceBuilder.js~FenceBuilder",
+    "generator": false,
+    "async": false,
+    "static": false,
+    "longname": "src/lib/FenceBuilder.js~FenceBuilder#hydrate",
+    "access": "public",
+    "description": "Given a string representing a `serialize`'d `FenceBuilder`, attempt to\nrecreate a list of `Invokables` by calling the named prototype references. If\nthe `serialize`'d `FenceBuilder` includes a reference to an unavailable\nprototype method, an error is thrown.",
+    "lineNumber": 126,
+    "params": [
+      {
+        "nullable": null,
+        "types": [
+          "String"
+        ],
+        "spread": false,
+        "optional": false,
+        "name": "invokables",
+        "description": "A `stringify`'d JSON blob representing a\n                                     `FenceBuilder`'s `Invokeable`'s"
+      }
+    ],
+    "return": {
+      "nullable": null,
+      "types": [
+        "FenceBuilder"
+      ],
+      "spread": false,
+      "description": ""
+    }
+  },
+  {
+    "__docId__": 16,
     "kind": "file",
     "name": "src/lib/Invokable.js",
     "content": "/**\n* A validation function that will be invoked at some time\n*/\nclass Invokable {\n    /**\n    * @param    {String}       name    [required] Function Name used for prototype / lookups\n    * @param    {Function}     fn      [required] Function reference that is executed during invokation\n    * @param    {Array}        args    [optional] arguments to be applied to the function\n    */\n    constructor (name, fn, args, memoize) {\n        this._name = name;\n        this._fn = fn;\n        this._args = args ? Array.prototype.slice.call(args) : [];\n        this._memoize = memoize === true;\n\n        if (this._memoize) {\n            this.memoize();\n        }\n    }\n\n    /**\n    * Executes a validation function against a subject and any predefined arguments\n    *\n    * @param     {Any}         subject    the value to be validated\n    * @return    {Boolean}                the result of the validation\n    */\n    invoke (...subjects) {\n        let fn = this._fn;\n        let args = subjects.concat(this._args);\n\n        if (this._memoize && this._memoizedFn) {\n            fn = this._memoizedFn;\n            args = [this._fn].concat(args);\n        }\n\n        return fn.apply(this, args);\n    }\n\n    memoize () {\n        Object.defineProperty(this, '_cache', {\n            value: {},\n            writable: false,\n            configurable: true,\n            enumerable: false\n        });\n\n        const memoized = function(fn, ...args) {\n            const key = args[0];\n            const cache = memoized.cache;\n\n            if (cache[key]) {\n                return cache[key];\n            }\n\n            const result = fn.apply(fn, args);\n            cache[key] = result;\n\n            return result;\n        };\n\n        memoized.cache = this._cache;\n        this._memoizedFn = memoized;\n    }\n\n    dememoize () {\n        delete this._cache;\n        delete this._memoizedFn;\n        this._memoize = false;\n    }\n\n    serialize (returnFull) {\n        if (returnFull === true) {\n            return JSON.stringify(this);\n        }\n\n        const obj = {\n            _name: this._name,\n            _args: this._args,\n            _memoize: this._memoize\n        };\n        return JSON.stringify(obj);\n    }\n}\n\nexport default Invokable;\n",
@@ -22,7 +380,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 2,
+    "__docId__": 17,
     "kind": "class",
     "name": "Invokable",
     "memberof": "src/lib/Invokable.js",
@@ -37,7 +395,7 @@
     "interface": false
   },
   {
-    "__docId__": 3,
+    "__docId__": 18,
     "kind": "constructor",
     "name": "constructor",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -82,7 +440,7 @@
     ]
   },
   {
-    "__docId__": 4,
+    "__docId__": 19,
     "kind": "member",
     "name": "_name",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -99,7 +457,7 @@
     }
   },
   {
-    "__docId__": 5,
+    "__docId__": 20,
     "kind": "member",
     "name": "_fn",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -116,7 +474,7 @@
     }
   },
   {
-    "__docId__": 6,
+    "__docId__": 21,
     "kind": "member",
     "name": "_args",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -133,7 +491,7 @@
     }
   },
   {
-    "__docId__": 7,
+    "__docId__": 22,
     "kind": "member",
     "name": "_memoize",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -150,7 +508,7 @@
     }
   },
   {
-    "__docId__": 8,
+    "__docId__": 23,
     "kind": "method",
     "name": "invoke",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -183,7 +541,7 @@
     }
   },
   {
-    "__docId__": 9,
+    "__docId__": 24,
     "kind": "method",
     "name": "memoize",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -199,7 +557,7 @@
     "return": null
   },
   {
-    "__docId__": 10,
+    "__docId__": 25,
     "kind": "member",
     "name": "_memoizedFn",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -216,7 +574,7 @@
     }
   },
   {
-    "__docId__": 11,
+    "__docId__": 26,
     "kind": "method",
     "name": "dememoize",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -232,7 +590,7 @@
     "return": null
   },
   {
-    "__docId__": 13,
+    "__docId__": 28,
     "kind": "method",
     "name": "serialize",
     "memberof": "src/lib/Invokable.js~Invokable",
@@ -259,10 +617,10 @@
     }
   },
   {
-    "__docId__": 14,
+    "__docId__": 29,
     "kind": "file",
     "name": "src/lib/Result.js",
-    "content": "/**\n* Adapter for mapping validation invokables to their results\n*/\nclass Result {\n    /**\n    * @param    {Array}    invokables    Array of invokable validation functions\n    * @param    {Array}    results       Array of values returned from invoked validation functions\n    */\n    constructor (invokables, results, subject) {\n        this._invokables = invokables;\n        this._results = results;\n        this._subject = subject;\n    }\n\n    /**\n    * A Results summary that will return `true` if all validations passed\n    *\n    * @return    {Boolean}    `true` if all Results are also `true`, `false` otherwise\n    */\n    forAll () {\n        const results = this._results;\n\n        return results.reduce(function(acc, result) {\n            if (Array.isArray(result)) {\n                return acc && result.reduce(function(subAcc, subResult) {\n                    return subAcc && subResult.forAll();\n                }, acc);\n            }\n\n            return acc && result === true;\n        }, true);\n    }\n\n    /**\n    * A Results summary that will return `true` if any validations passed\n    * @return    {Boolean}    `true` if any one Result is also `true`, `false` if\n    *                         all results are also `false`\n    */\n    forAny () {\n        const results = this._results;\n\n        return results.reduce(function (acc, result) {\n            if (Array.isArray(result)) {\n                return acc || result.reduce(function(subAcc, subResult) {\n                    return subAcc || subResult.forAny();\n                }, acc) === true;\n            }\n\n            return acc || result === true;\n        }, false);\n    }\n\n    /**\n    * Filters results by name\n    * @param     {String}    name    The name for a specific Invokable. This value\n    *                                is set by `ValidationBuilder.register`\n    * @return    {Array}             An array of Booleans derived from specified\n    *                                Invokables\n    */\n    forOne (name) {\n        const invokables = this._invokables;\n        const results = this._results;\n\n        return results.filter(function(element, index) {\n            return invokables[index].getName() === name;\n        });\n    }\n\n    explain (logger, indent) {\n        logger = logger || console.log;\n        indent = indent || '  ';\n\n        logger(indent, 'subject:', JSON.stringify(this._subject));\n        logger(indent + indent, this.forAll() ? '[✓]' : '[x]', 'forAll');\n        logger(indent + indent, this.forAny() ? '[✓]' : '[x]', 'forAny');\n\n        logger(indent, 'tests:');\n        for (var i = 0; i < this._results.length; i++) {\n            const result = this._results[i];\n            const invokable = this._invokables[i];\n            const testName = invokable._name;\n            const testArgs = invokable._args;\n\n            let testLabel = testName;\n            if (testArgs.length > 0) {\n                testLabel += ' (' + JSON.stringify(testArgs) + ')';\n            }\n\n            logger(indent + indent, result ? '[✓]' : '[x]', testLabel);\n\n            if (Array.isArray(result)) {\n                result.forEach(function(subResult) {\n                    subResult.explain(logger, indent + indent);\n                });\n\n                continue;\n            }\n        }\n    }\n}\n\nexport default Result;\n",
+    "content": "/**\n* Adapter for mapping validation invokables to their results\n*/\nclass Result {\n    /**\n    * @param    {Array}    invokables    Array of invokable validation functions\n    * @param    {Array}    results       Array of values returned from invoked validation functions\n    */\n    constructor (invokables, results, subject) {\n        this._invokables = invokables;\n        this._results = results;\n        this._subject = subject;\n    }\n\n    /**\n    * A Results summary that will return `true` if all validations passed\n    *\n    * @return    {Boolean}    `true` if all Results are also `true`, `false` otherwise\n    */\n    forAll () {\n        const results = this._results;\n\n        return results.reduce(function(acc, result) {\n            if (Array.isArray(result)) {\n                return acc && result.reduce(function(subAcc, subResult) {\n                    return subAcc && subResult.forAll();\n                }, acc);\n            }\n\n            return acc && result === true;\n        }, true);\n    }\n\n    /**\n    * A Results summary that will return `true` if any validations passed\n    * @return    {Boolean}    `true` if any one Result is also `true`, `false` if\n    *                         all results are also `false`\n    */\n    forAny () {\n        const results = this._results;\n\n        return results.reduce(function (acc, result) {\n            if (Array.isArray(result)) {\n                return acc || result.reduce(function(subAcc, subResult) {\n                    return subAcc || subResult.forAny();\n                }, acc) === true;\n            }\n\n            return acc || result === true;\n        }, false);\n    }\n\n    /**\n    * Filters results by name\n    * @param     {String}    name    The name for a specific Invokable. This value\n    *                                is set by `FenceBuilder.register`\n    * @return    {Array}             An array of Booleans derived from specified\n    *                                Invokables\n    */\n    forOne (name) {\n        const invokables = this._invokables;\n        const results = this._results;\n\n        return results.filter(function(element, index) {\n            return invokables[index].getName() === name;\n        });\n    }\n\n    explain (logger, indent) {\n        logger = logger || console.log;\n        indent = indent || '  ';\n\n        logger(indent, 'subject:', JSON.stringify(this._subject));\n        logger(indent + indent, this.forAll() ? '[✓]' : '[x]', 'forAll');\n        logger(indent + indent, this.forAny() ? '[✓]' : '[x]', 'forAny');\n\n        logger(indent, 'tests:');\n        for (var i = 0; i < this._results.length; i++) {\n            const result = this._results[i];\n            const invokable = this._invokables[i];\n            const testName = invokable._name;\n            const testArgs = invokable._args;\n\n            let testLabel = testName;\n            if (testArgs.length > 0) {\n                testLabel += ' (' + JSON.stringify(testArgs) + ')';\n            }\n\n            logger(indent + indent, result ? '[✓]' : '[x]', testLabel);\n\n            if (Array.isArray(result)) {\n                result.forEach(function(subResult) {\n                    subResult.explain(logger, indent + indent);\n                });\n\n                continue;\n            }\n        }\n    }\n}\n\nexport default Result;\n",
     "static": true,
     "longname": "/Users/tim.carlson/Dev/fence.js/src/lib/Result.js",
     "access": "public",
@@ -270,7 +628,7 @@
     "lineNumber": 1
   },
   {
-    "__docId__": 15,
+    "__docId__": 30,
     "kind": "class",
     "name": "Result",
     "memberof": "src/lib/Result.js",
@@ -285,7 +643,7 @@
     "interface": false
   },
   {
-    "__docId__": 16,
+    "__docId__": 31,
     "kind": "constructor",
     "name": "constructor",
     "memberof": "src/lib/Result.js~Result",
@@ -320,7 +678,7 @@
     ]
   },
   {
-    "__docId__": 17,
+    "__docId__": 32,
     "kind": "member",
     "name": "_invokables",
     "memberof": "src/lib/Result.js~Result",
@@ -337,7 +695,7 @@
     }
   },
   {
-    "__docId__": 18,
+    "__docId__": 33,
     "kind": "member",
     "name": "_results",
     "memberof": "src/lib/Result.js~Result",
@@ -354,7 +712,7 @@
     }
   },
   {
-    "__docId__": 19,
+    "__docId__": 34,
     "kind": "member",
     "name": "_subject",
     "memberof": "src/lib/Result.js~Result",
@@ -371,7 +729,7 @@
     }
   },
   {
-    "__docId__": 20,
+    "__docId__": 35,
     "kind": "method",
     "name": "forAll",
     "memberof": "src/lib/Result.js~Result",
@@ -393,7 +751,7 @@
     "params": []
   },
   {
-    "__docId__": 21,
+    "__docId__": 36,
     "kind": "method",
     "name": "forAny",
     "memberof": "src/lib/Result.js~Result",
@@ -415,7 +773,7 @@
     "params": []
   },
   {
-    "__docId__": 22,
+    "__docId__": 37,
     "kind": "method",
     "name": "forOne",
     "memberof": "src/lib/Result.js~Result",
@@ -435,7 +793,7 @@
         "spread": false,
         "optional": false,
         "name": "name",
-        "description": "The name for a specific Invokable. This value\n                               is set by `ValidationBuilder.register`"
+        "description": "The name for a specific Invokable. This value\n                               is set by `FenceBuilder.register`"
       }
     ],
     "return": {
@@ -448,7 +806,7 @@
     }
   },
   {
-    "__docId__": 23,
+    "__docId__": 38,
     "kind": "method",
     "name": "explain",
     "memberof": "src/lib/Result.js~Result",
@@ -475,364 +833,6 @@
       }
     ],
     "return": null
-  },
-  {
-    "__docId__": 24,
-    "kind": "file",
-    "name": "src/lib/Validation.js",
-    "content": "import Result from './Result';\n\n/**\n* A 'built' ValidationBuilder that can be exported for use in other functions.\n*/\nclass Validation {\n    /**\n    * @param    {array}    invokables    Array of invokable functions\n    */\n    constructor (invokables) {\n        this._invokables = invokables;\n    }\n\n    /**\n    * Iterates over an array of invokables. Each invokable is called with a subject\n    * which is the attribute value being validated.\n    *\n    * @param     {any}         subject     Some value to be validated\n    * @return    {Result}                  An object representing invoked functions\n    *                                      and their outputs\n    */\n    run (...subjects) {\n        const invokables = this._invokables;\n        const results = invokables.map(function(invokable) {\n            return invokable.invoke.apply(invokable, subjects);\n        });\n\n        return new Result(invokables, results, subjects);\n    }\n}\n\nexport default Validation;\n",
-    "static": true,
-    "longname": "/Users/tim.carlson/Dev/fence.js/src/lib/Validation.js",
-    "access": "public",
-    "description": null,
-    "lineNumber": 1
-  },
-  {
-    "__docId__": 25,
-    "kind": "class",
-    "name": "Validation",
-    "memberof": "src/lib/Validation.js",
-    "static": true,
-    "longname": "src/lib/Validation.js~Validation",
-    "access": "public",
-    "export": true,
-    "importPath": "fence.js/src/lib/Validation.js",
-    "importStyle": "Validation",
-    "description": "A 'built' ValidationBuilder that can be exported for use in other functions.",
-    "lineNumber": 6,
-    "interface": false
-  },
-  {
-    "__docId__": 26,
-    "kind": "constructor",
-    "name": "constructor",
-    "memberof": "src/lib/Validation.js~Validation",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/Validation.js~Validation#constructor",
-    "access": "public",
-    "description": "",
-    "lineNumber": 10,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "invokables",
-        "description": "Array of invokable functions"
-      }
-    ]
-  },
-  {
-    "__docId__": 27,
-    "kind": "member",
-    "name": "_invokables",
-    "memberof": "src/lib/Validation.js~Validation",
-    "static": false,
-    "longname": "src/lib/Validation.js~Validation#_invokables",
-    "access": "private",
-    "description": null,
-    "lineNumber": 11,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 28,
-    "kind": "method",
-    "name": "run",
-    "memberof": "src/lib/Validation.js~Validation",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/Validation.js~Validation#run",
-    "access": "public",
-    "description": "Iterates over an array of invokables. Each invokable is called with a subject\nwhich is the attribute value being validated.",
-    "lineNumber": 22,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "any"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "subject",
-        "description": "Some value to be validated"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "Result"
-      ],
-      "spread": false,
-      "description": "An object representing invoked functions\n                                     and their outputs"
-    }
-  },
-  {
-    "__docId__": 29,
-    "kind": "file",
-    "name": "src/lib/ValidationBuilder.js",
-    "content": "import Invokable from './Invokable';\nimport Validation from './Validation';\n\n/**\n* A `ValidationBuilder` is used to create an extensible `Validation`.\n*\n* An instance of `ValidationBuilder` will have prototype methods that are created\n* through the `register()` method. When the `fork()` method is called all of the\n* instance's already registered methods will be transferred to a new instance of\n* `ValidationBuilder` that is then returned. This is what allows you to 'extend'\n* a `Validation` as you can then continue to `register()` methods without mutating\n* the original `ValidationBuilder`'s prototype.\n*\n* These prototypical methods are called `Invokable`'s. An `Invokable` is a named\n* function reference that optionally includes some predefined arguments that can\n* be used to make specific comparisons. *\n*/\nclass ValidationBuilder {\n    /**\n    * @param    {Array}    invokables    A set of already defined `Invokable`'s\n    */\n    constructor (invokables) {\n        this._invokables = invokables ? invokables.slice() : [];\n    }\n\n    /**\n    * Create a clone of a `ValidationBuilder` instance so that it can be extended.\n    *\n    * @return    {ValidationBuilder}    a reference to a new `ValidationBuilder`\n    */\n    fork (proto) {\n        // Stop any other references to this `ValidationBuilder` from registering\n        // additional methods (or overwriting currently existing ones)\n        proto = proto || Object.getPrototypeOf(this);\n\n        // Create a reference to this instance's `_invokables`, use them to seed the\n        // new instance's `_invokables`\n        const invokables = this._invokables;\n\n        // Create a new `ValidationBuilder` that inherits from this `ValidationBuilder`\n        const VB = function() {\n            ValidationBuilder.call(this, invokables);\n        };\n\n        // Set the prototype so that registered functions are available\n        VB.prototype = Object.create(proto);\n        VB.prototype.constructor = VB;\n\n        // Instantiate the new `ValidationBuilder`\n        return new VB();\n    }\n\n    /**\n    * Add a named function reference to the prototype of an instance of `ValidationBuilder`\n    *\n    * @param     {String}              name    A named function reference\n    * @param     {Function}            fn      A reference to a validation function\n\n    * @return    {ValidationBuilder}           The `ValidationBuilder` instance being\n    *                                          operated on, used for function chaining\n    */\n    register (name, fn, memoize, debug, loggers) {\n        const proto = Object.getPrototypeOf(this);\n        proto[name] = function() {\n            this._invokables.push(new Invokable(name, fn, arguments, memoize, debug, loggers));\n\n            return this;\n        };\n\n        return this.fork(proto);\n    }\n\n    /**\n    * Remove a named function reference from the prototype of an instance of `ValidationBuilder`\n    * @param     {String}              name    A named function reference\n\n    * @return    {ValidationBuilder}           The `ValidationBuilder` instance being\n    *                                          operated on, used for function chaining\n    */\n    unregister (name) {\n        const proto = Object.getPrototypeOf(this);\n        delete proto[name];\n\n        const tmp = this.fork(proto);\n        tmp._invokables = this._invokables.filter(function(invokable) {\n            return invokable.getName() !== name;\n        });\n\n        return tmp;\n    }\n\n    /**\n    * Convert an instance of `ValidationBuilder` to something that can be used to\n    * validate some value\n    *\n    * @return    {Validation}      an Object with a `run()` method that can be called\n    *                              with a value, will produce a list of `Results`\n    */\n    build () {\n        return new Validation(this._invokables);\n    }\n\n    /**\n    * Create a representation of an instance of `ValidationBuilder`'s Invokable\n    * function reference names and arguments that can be persisted then later used\n    * by `hydrate()` recreate an equivalent `ValidationBuilder`\n    *\n    * @return    {String}      a stringified JSON blob that can be persisted\n    */\n    serialize (returnFull) {\n        return JSON.stringify(this._invokables.map(function(invokable) {\n            return invokable.serialize(returnFull);\n        }));\n    }\n\n    /**\n    * Given a string representing a `serialize`'d `ValidationBuilder`, attempt to\n    * recreate a list of `Invokables` by calling the named prototype references. If\n    * the `serialize`'d `ValidationBuilder` includes a reference to an unavailable\n    * prototype method, an error is thrown.\n    *\n    * @param     {String}    invokables    A `stringify`'d JSON blob representing a\n    *                                      `ValidationBuilder`'s `Invokeable`'s\n    * @return    {ValidationBuilder}\n    */\n    hydrate (invokables) {\n        const tmp = this.fork();\n        tmp._invokables = [];\n\n        JSON.parse(invokables).map(JSON.parse).forEach(function(invokable) {\n            const name = invokable._name;\n            const args = invokable._args;\n            const fn = Object.getPrototypeOf(tmp)[name];\n\n            if (fn) {\n                fn.apply(tmp, args);\n            } else {\n                throw new Error(`Method ${name} missing during validation builder hydration`);\n            }\n        });\n\n        return tmp;\n    }\n}\n\nexport default ValidationBuilder;\n",
-    "static": true,
-    "longname": "/Users/tim.carlson/Dev/fence.js/src/lib/ValidationBuilder.js",
-    "access": "public",
-    "description": null,
-    "lineNumber": 1
-  },
-  {
-    "__docId__": 30,
-    "kind": "class",
-    "name": "ValidationBuilder",
-    "memberof": "src/lib/ValidationBuilder.js",
-    "static": true,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "access": "public",
-    "export": true,
-    "importPath": "fence.js/src/lib/ValidationBuilder.js",
-    "importStyle": "ValidationBuilder",
-    "description": "A `ValidationBuilder` is used to create an extensible `Validation`.\n\nAn instance of `ValidationBuilder` will have prototype methods that are created\nthrough the `register()` method. When the `fork()` method is called all of the\ninstance's already registered methods will be transferred to a new instance of\n`ValidationBuilder` that is then returned. This is what allows you to 'extend'\na `Validation` as you can then continue to `register()` methods without mutating\nthe original `ValidationBuilder`'s prototype.\n\nThese prototypical methods are called `Invokable`'s. An `Invokable` is a named\nfunction reference that optionally includes some predefined arguments that can\nbe used to make specific comparisons. *",
-    "lineNumber": 18,
-    "interface": false
-  },
-  {
-    "__docId__": 31,
-    "kind": "constructor",
-    "name": "constructor",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#constructor",
-    "access": "public",
-    "description": "",
-    "lineNumber": 22,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "Array"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "invokables",
-        "description": "A set of already defined `Invokable`'s"
-      }
-    ]
-  },
-  {
-    "__docId__": 32,
-    "kind": "member",
-    "name": "_invokables",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#_invokables",
-    "access": "private",
-    "description": null,
-    "lineNumber": 23,
-    "undocument": true,
-    "type": {
-      "types": [
-        "*"
-      ]
-    }
-  },
-  {
-    "__docId__": 33,
-    "kind": "method",
-    "name": "fork",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#fork",
-    "access": "public",
-    "description": "Create a clone of a `ValidationBuilder` instance so that it can be extended.",
-    "lineNumber": 31,
-    "return": {
-      "nullable": null,
-      "types": [
-        "ValidationBuilder"
-      ],
-      "spread": false,
-      "description": "a reference to a new `ValidationBuilder`"
-    },
-    "params": [
-      {
-        "name": "proto",
-        "types": [
-          "*"
-        ]
-      }
-    ]
-  },
-  {
-    "__docId__": 34,
-    "kind": "method",
-    "name": "register",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#register",
-    "access": "public",
-    "description": "Add a named function reference to the prototype of an instance of `ValidationBuilder`",
-    "lineNumber": 62,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "String"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "name",
-        "description": "A named function reference"
-      },
-      {
-        "nullable": null,
-        "types": [
-          "Function"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "fn",
-        "description": "A reference to a validation function"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "ValidationBuilder"
-      ],
-      "spread": false,
-      "description": "The `ValidationBuilder` instance being\n                                         operated on, used for function chaining"
-    }
-  },
-  {
-    "__docId__": 35,
-    "kind": "method",
-    "name": "unregister",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#unregister",
-    "access": "public",
-    "description": "Remove a named function reference from the prototype of an instance of `ValidationBuilder`",
-    "lineNumber": 80,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "String"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "name",
-        "description": "A named function reference"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "ValidationBuilder"
-      ],
-      "spread": false,
-      "description": "The `ValidationBuilder` instance being\n                                         operated on, used for function chaining"
-    }
-  },
-  {
-    "__docId__": 36,
-    "kind": "method",
-    "name": "build",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#build",
-    "access": "public",
-    "description": "Convert an instance of `ValidationBuilder` to something that can be used to\nvalidate some value",
-    "lineNumber": 99,
-    "return": {
-      "nullable": null,
-      "types": [
-        "Validation"
-      ],
-      "spread": false,
-      "description": "an Object with a `run()` method that can be called\n                             with a value, will produce a list of `Results`"
-    },
-    "params": []
-  },
-  {
-    "__docId__": 37,
-    "kind": "method",
-    "name": "serialize",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#serialize",
-    "access": "public",
-    "description": "Create a representation of an instance of `ValidationBuilder`'s Invokable\nfunction reference names and arguments that can be persisted then later used\nby `hydrate()` recreate an equivalent `ValidationBuilder`",
-    "lineNumber": 110,
-    "return": {
-      "nullable": null,
-      "types": [
-        "String"
-      ],
-      "spread": false,
-      "description": "a stringified JSON blob that can be persisted"
-    },
-    "params": [
-      {
-        "name": "returnFull",
-        "types": [
-          "*"
-        ]
-      }
-    ]
-  },
-  {
-    "__docId__": 38,
-    "kind": "method",
-    "name": "hydrate",
-    "memberof": "src/lib/ValidationBuilder.js~ValidationBuilder",
-    "generator": false,
-    "async": false,
-    "static": false,
-    "longname": "src/lib/ValidationBuilder.js~ValidationBuilder#hydrate",
-    "access": "public",
-    "description": "Given a string representing a `serialize`'d `ValidationBuilder`, attempt to\nrecreate a list of `Invokables` by calling the named prototype references. If\nthe `serialize`'d `ValidationBuilder` includes a reference to an unavailable\nprototype method, an error is thrown.",
-    "lineNumber": 126,
-    "params": [
-      {
-        "nullable": null,
-        "types": [
-          "String"
-        ],
-        "spread": false,
-        "optional": false,
-        "name": "invokables",
-        "description": "A `stringify`'d JSON blob representing a\n                                     `ValidationBuilder`'s `Invokeable`'s"
-      }
-    ],
-    "return": {
-      "nullable": null,
-      "types": [
-        "ValidationBuilder"
-      ],
-      "spread": false,
-      "description": ""
-    }
   },
   {
     "kind": "index",

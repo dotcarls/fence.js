@@ -3,6 +3,20 @@
   "expectCount": 33,
   "actualCount": 19,
   "files": {
+    "src/lib/Fence.js": {
+      "expectCount": 4,
+      "actualCount": 3,
+      "undocumentLines": [
+        11
+      ]
+    },
+    "src/lib/FenceBuilder.js": {
+      "expectCount": 9,
+      "actualCount": 8,
+      "undocumentLines": [
+        23
+      ]
+    },
     "src/lib/Invokable.js": {
       "expectCount": 11,
       "actualCount": 3,
@@ -25,20 +39,6 @@
         11,
         12,
         69
-      ]
-    },
-    "src/lib/Validation.js": {
-      "expectCount": 4,
-      "actualCount": 3,
-      "undocumentLines": [
-        11
-      ]
-    },
-    "src/lib/ValidationBuilder.js": {
-      "expectCount": 9,
-      "actualCount": 8,
-      "undocumentLines": [
-        23
       ]
     }
   }

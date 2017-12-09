@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <base data-ice="baseUrl" href="../../../">
-  <title data-ice="title">src/lib/Invokable.js | fence.js</title>
+  <title data-ice="title">src/lib/Fence.js | fence.js</title>
   <link type="text/css" rel="stylesheet" href="css/style.css">
   <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
   <script src="script/prettify/prettify.js"></script>
@@ -37,92 +37,39 @@
 </div>
 </nav>
 
-<div class="content" data-ice="content"><h1 data-ice="title">src/lib/Invokable.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
-* A validation function that will be invoked at some time
+<div class="content" data-ice="content"><h1 data-ice="title">src/lib/Fence.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Result from &apos;./Result&apos;;
+
+/**
+* A &apos;built&apos; FenceBuilder that can be exported for use in other functions.
 */
-class Invokable {
+class Fence {
     /**
-    * @param    {String}       name    [required] Function Name used for prototype / lookups
-    * @param    {Function}     fn      [required] Function reference that is executed during invokation
-    * @param    {Array}        args    [optional] arguments to be applied to the function
+    * @param    {array}    invokables    Array of invokable functions
     */
-    constructor (name, fn, args, memoize) {
-        this._name = name;
-        this._fn = fn;
-        this._args = args ? Array.prototype.slice.call(args) : [];
-        this._memoize = memoize === true;
-
-        if (this._memoize) {
-            this.memoize();
-        }
+    constructor (invokables) {
+        this._invokables = invokables;
     }
 
     /**
-    * Executes a validation function against a subject and any predefined arguments
+    * Iterates over an array of invokables. Each invokable is called with a subject
+    * which is the attribute value being validated.
     *
-    * @param     {Any}         subject    the value to be validated
-    * @return    {Boolean}                the result of the validation
+    * @param     {any}         subject     Some value to be validated
+    * @return    {Result}                  An object representing invoked functions
+    *                                      and their outputs
     */
-    invoke (...subjects) {
-        let fn = this._fn;
-        let args = subjects.concat(this._args);
-
-        if (this._memoize &amp;&amp; this._memoizedFn) {
-            fn = this._memoizedFn;
-            args = [this._fn].concat(args);
-        }
-
-        return fn.apply(this, args);
-    }
-
-    memoize () {
-        Object.defineProperty(this, &apos;_cache&apos;, {
-            value: {},
-            writable: false,
-            configurable: true,
-            enumerable: false
+    run (...subjects) {
+        const invokables = this._invokables;
+        const results = invokables.map(function(invokable) {
+            return invokable.invoke.apply(invokable, subjects);
         });
 
-        const memoized = function(fn, ...args) {
-            const key = args[0];
-            const cache = memoized.cache;
-
-            if (cache[key]) {
-                return cache[key];
-            }
-
-            const result = fn.apply(fn, args);
-            cache[key] = result;
-
-            return result;
-        };
-
-        memoized.cache = this._cache;
-        this._memoizedFn = memoized;
-    }
-
-    dememoize () {
-        delete this._cache;
-        delete this._memoizedFn;
-        this._memoize = false;
-    }
-
-    serialize (returnFull) {
-        if (returnFull === true) {
-            return JSON.stringify(this);
-        }
-
-        const obj = {
-            _name: this._name,
-            _args: this._args,
-            _memoize: this._memoize
-        };
-        return JSON.stringify(obj);
+        return new Result(invokables, results, subjects);
     }
 }
 
-export default Invokable;
+export default Fence;
 </code></pre>
 
 </div>

@@ -1,7 +1,7 @@
 {
   "type": "File",
   "start": 0,
-  "end": 92,
+  "end": 77,
   "loc": {
     "start": {
       "line": 1,
@@ -15,7 +15,7 @@
   "program": {
     "type": "Program",
     "start": 0,
-    "end": 92,
+    "end": 77,
     "loc": {
       "start": {
         "line": 1,
@@ -31,7 +31,7 @@
       {
         "type": "ImportDeclaration",
         "start": 0,
-        "end": 56,
+        "end": 46,
         "loc": {
           "start": {
             "line": 1,
@@ -39,14 +39,14 @@
           },
           "end": {
             "line": 1,
-            "column": 56
+            "column": 46
           }
         },
         "specifiers": [
           {
             "type": "ImportDefaultSpecifier",
             "start": 7,
-            "end": 24,
+            "end": 19,
             "loc": {
               "start": {
                 "line": 1,
@@ -54,13 +54,13 @@
               },
               "end": {
                 "line": 1,
-                "column": 24
+                "column": 19
               }
             },
             "local": {
               "type": "Identifier",
               "start": 7,
-              "end": 24,
+              "end": 19,
               "loc": {
                 "start": {
                   "line": 1,
@@ -68,39 +68,39 @@
                 },
                 "end": {
                   "line": 1,
-                  "column": 24
+                  "column": 19
                 },
-                "identifierName": "ValidationBuilder"
+                "identifierName": "FenceBuilder"
               },
-              "name": "ValidationBuilder"
+              "name": "FenceBuilder"
             }
           }
         ],
         "source": {
           "type": "StringLiteral",
-          "start": 30,
-          "end": 55,
+          "start": 25,
+          "end": 45,
           "loc": {
             "start": {
               "line": 1,
-              "column": 30
+              "column": 25
             },
             "end": {
               "line": 1,
-              "column": 55
+              "column": 45
             }
           },
           "extra": {
-            "rawValue": "./lib/ValidationBuilder",
-            "raw": "'./lib/ValidationBuilder'"
+            "rawValue": "./lib/FenceBuilder",
+            "raw": "'./lib/FenceBuilder'"
           },
-          "value": "./lib/ValidationBuilder"
+          "value": "./lib/FenceBuilder"
         }
       },
       {
         "type": "ExportDefaultDeclaration",
-        "start": 58,
-        "end": 91,
+        "start": 48,
+        "end": 76,
         "loc": {
           "start": {
             "line": 3,
@@ -108,13 +108,13 @@
           },
           "end": {
             "line": 3,
-            "column": 33
+            "column": 28
           }
         },
         "declaration": {
           "type": "Identifier",
-          "start": 73,
-          "end": 90,
+          "start": 63,
+          "end": 75,
           "loc": {
             "start": {
               "line": 3,
@@ -122,11 +122,11 @@
             },
             "end": {
               "line": 3,
-              "column": 32
+              "column": 27
             },
-            "identifierName": "ValidationBuilder"
+            "identifierName": "FenceBuilder"
           },
-          "name": "ValidationBuilder",
+          "name": "FenceBuilder",
           "leadingComments": [],
           "trailingComments": []
         }
@@ -176,9 +176,9 @@
         "postfix": false,
         "binop": null
       },
-      "value": "ValidationBuilder",
+      "value": "FenceBuilder",
       "start": 7,
-      "end": 24,
+      "end": 19,
       "loc": {
         "start": {
           "line": 1,
@@ -186,7 +186,7 @@
         },
         "end": {
           "line": 1,
-          "column": 24
+          "column": 19
         }
       }
     },
@@ -203,16 +203,16 @@
         "binop": null
       },
       "value": "from",
-      "start": 25,
-      "end": 29,
+      "start": 20,
+      "end": 24,
       "loc": {
         "start": {
           "line": 1,
-          "column": 25
+          "column": 20
         },
         "end": {
           "line": 1,
-          "column": 29
+          "column": 24
         }
       }
     },
@@ -229,17 +229,17 @@
         "binop": null,
         "updateContext": null
       },
-      "value": "./lib/ValidationBuilder",
-      "start": 30,
-      "end": 55,
+      "value": "./lib/FenceBuilder",
+      "start": 25,
+      "end": 45,
       "loc": {
         "start": {
           "line": 1,
-          "column": 30
+          "column": 25
         },
         "end": {
           "line": 1,
-          "column": 55
+          "column": 45
         }
       }
     },
@@ -256,16 +256,16 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 55,
-      "end": 56,
+      "start": 45,
+      "end": 46,
       "loc": {
         "start": {
           "line": 1,
-          "column": 55
+          "column": 45
         },
         "end": {
           "line": 1,
-          "column": 56
+          "column": 46
         }
       }
     },
@@ -284,8 +284,8 @@
         "updateContext": null
       },
       "value": "export",
-      "start": 58,
-      "end": 64,
+      "start": 48,
+      "end": 54,
       "loc": {
         "start": {
           "line": 3,
@@ -312,8 +312,8 @@
         "updateContext": null
       },
       "value": "default",
-      "start": 65,
-      "end": 72,
+      "start": 55,
+      "end": 62,
       "loc": {
         "start": {
           "line": 3,
@@ -337,9 +337,9 @@
         "postfix": false,
         "binop": null
       },
-      "value": "ValidationBuilder",
-      "start": 73,
-      "end": 90,
+      "value": "FenceBuilder",
+      "start": 63,
+      "end": 75,
       "loc": {
         "start": {
           "line": 3,
@@ -347,7 +347,7 @@
         },
         "end": {
           "line": 3,
-          "column": 32
+          "column": 27
         }
       }
     },
@@ -364,16 +364,16 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 90,
-      "end": 91,
+      "start": 75,
+      "end": 76,
       "loc": {
         "start": {
           "line": 3,
-          "column": 32
+          "column": 27
         },
         "end": {
           "line": 3,
-          "column": 33
+          "column": 28
         }
       }
     },
@@ -390,8 +390,8 @@
         "binop": null,
         "updateContext": null
       },
-      "start": 92,
-      "end": 92,
+      "start": 77,
+      "end": 77,
       "loc": {
         "start": {
           "line": 4,

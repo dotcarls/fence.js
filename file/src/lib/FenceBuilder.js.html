@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/lib/FenceBuilder.js | fence.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A framework to create efficient and extensible validations"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="fence.js"><meta property="twitter:description" content="A framework to create efficient and extensible validations"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Fence.js~Fence.html">Fence</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/FenceBuilder.js~FenceBuilder.html">FenceBuilder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html">Invokable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Result.js~Result.html">Result</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/lib/FenceBuilder.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Invokable from &apos;./Invokable&apos;;
+import Fence from &apos;./Fence&apos;;
+
+/**
+* A `FenceBuilder` is used to create an extensible `Fence`.
+*
+* An instance of `FenceBuilder` will have prototype methods that are created
+* through the `register()` method. When the `fork()` method is called all of the
+* instance&apos;s already registered methods will be transferred to a new instance of
+* `FenceBuilder` that is then returned. This is what allows you to &apos;extend&apos;
+* a `Fence` as you can then continue to `register()` methods without mutating
+* the original `FenceBuilder`&apos;s prototype.
+*
+* These prototypical methods are called `Invokable`&apos;s. An `Invokable` is a named
+* function reference that optionally includes some predefined arguments that can
+* be used to make specific comparisons. *
+*/
+class FenceBuilder {
+    /**
+    * @param    {Array}    invokables    A set of already defined `Invokable`&apos;s
+    */
+    constructor (invokables) {
+        this._invokables = invokables ? invokables.slice() : [];
+    }
+
+    /**
+    * Create a clone of a `FenceBuilder` instance so that it can be extended.
+    *
+    * @return    {FenceBuilder}    a reference to a new `FenceBuilder`
+    */
+    fork (proto) {
+        // Stop any other references to this `FenceBuilder` from registering
+        // additional methods (or overwriting currently existing ones)
+        proto = proto || Object.getPrototypeOf(this);
+
+        // Create a reference to this instance&apos;s `_invokables`, use them to seed the
+        // new instance&apos;s `_invokables`
+        const invokables = this._invokables;
+
+        // Create a new `FenceBuilder` that inherits from this `FenceBuilder`
+        const FB = function() {
+            FenceBuilder.call(this, invokables);
+        };
+
+        // Set the prototype so that registered functions are available
+        FB.prototype = Object.create(proto);
+        FB.prototype.constructor = FB;
+
+        // Instantiate the new `FenceBuilder`
+        return new FB();
+    }
+
+    /**
+    * Add a named function reference to the prototype of an instance of `FenceBuilder`
+    *
+    * @param     {String}              name    A named function reference
+    * @param     {Function}            fn      A reference to a validation function
+
+    * @return    {FenceBuilder}           The `FenceBuilder` instance being
+    *                                          operated on, used for function chaining
+    */
+    register (name, fn, memoize, debug, loggers) {
+        const proto = Object.getPrototypeOf(this);
+        proto[name] = function() {
+            this._invokables.push(new Invokable(name, fn, arguments, memoize, debug, loggers));
+
+            return this;
+        };
+
+        return this.fork(proto);
+    }
+
+    /**
+    * Remove a named function reference from the prototype of an instance of `FenceBuilder`
+    * @param     {String}              name    A named function reference
+
+    * @return    {FenceBuilder}           The `FenceBuilder` instance being
+    *                                          operated on, used for function chaining
+    */
+    unregister (name) {
+        const proto = Object.getPrototypeOf(this);
+        delete proto[name];
+
+        const tmp = this.fork(proto);
+        tmp._invokables = this._invokables.filter(function(invokable) {
+            return invokable.getName() !== name;
+        });
+
+        return tmp;
+    }
+
+    /**
+    * Convert an instance of `FenceBuilder` to something that can be used to
+    * validate some value
+    *
+    * @return    {Fence}      an Object with a `run()` method that can be called
+    *                              with a value, will produce a list of `Results`
+    */
+    build () {
+        return new Fence(this._invokables);
+    }
+
+    /**
+    * Create a representation of an instance of `FenceBuilder`&apos;s Invokable
+    * function reference names and arguments that can be persisted then later used
+    * by `hydrate()` recreate an equivalent `FenceBuilder`
+    *
+    * @return    {String}      a stringified JSON blob that can be persisted
+    */
+    serialize (returnFull) {
+        return JSON.stringify(this._invokables.map(function(invokable) {
+            return invokable.serialize(returnFull);
+        }));
+    }
+
+    /**
+    * Given a string representing a `serialize`&apos;d `FenceBuilder`, attempt to
+    * recreate a list of `Invokables` by calling the named prototype references. If
+    * the `serialize`&apos;d `FenceBuilder` includes a reference to an unavailable
+    * prototype method, an error is thrown.
+    *
+    * @param     {String}    invokables    A `stringify`&apos;d JSON blob representing a
+    *                                      `FenceBuilder`&apos;s `Invokeable`&apos;s
+    * @return    {FenceBuilder}
+    */
+    hydrate (invokables) {
+        const tmp = this.fork();
+        tmp._invokables = [];
+
+        JSON.parse(invokables).map(JSON.parse).forEach(function(invokable) {
+            const name = invokable._name;
+            const args = invokable._args;
+            const fn = Object.getPrototypeOf(tmp)[name];
+
+            if (fn) {
+                fn.apply(tmp, args);
+            } else {
+                throw new Error(`Method ${name} missing during validation builder hydration`);
+            }
+        });
+
+        return tmp;
+    }
+}
+
+export default FenceBuilder;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.0.4)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>
