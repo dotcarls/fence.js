@@ -1,6 +1,6 @@
 {
   "name": "Chain",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "A framework to create efficient and extensible validations",
   "main": "cjs/index.js",
   "browser": "dist/Chain.js",
