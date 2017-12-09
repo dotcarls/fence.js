@@ -27,13 +27,13 @@ The goal of this module is to solve these problems without getting in the way. B
 ### Example
 ```js
 const FenceBuilder = require('./lib');
-const VB = new FenceBuilder();
+const FB = new FenceBuilder();
 
-VB.register('strictEqual', function (val1, val2) {
+FB.register('strictEqual', function (val1, val2) {
     return val1 === val2;
 });
 
-var validation = VB.forge().strictEqual('a').build();
+const validation = FB.forge().strictEqual('a').build();
 console.log(`validation of "a": ${validation.run('a')}`);
 console.log(`validation of "b": ${validation.run('b')}`);
 ```
@@ -46,17 +46,17 @@ An instance can be created by creating a new `FenceBuilder`:
 
 ```js
 // new FenceBuilder
-const VB = new FenceBuilder();
+const FB = new FenceBuilder();
 ```
 
 An instance can also be created from existing instances of `FenceBuilder` via the `forge()` method:
 
 ```js
 // new FenceBuilder
-const VB = new FenceBuilder();
+const FB = new FenceBuilder();
 
-// someFence 'extends' VB
-const someFence = VB.forge();
+// someFence 'extends' FB
+const someFence = FB.forge();
 
 // anotherFence 'extends' someFence
 const anotherFence = someFence.forge();
@@ -70,9 +70,9 @@ A fresh instance of `FenceBuilder` won't be able to do much -- we must 'register
 
 ```js
 // new FenceBuilder
-const VB = new FenceBuilder();
+const FB = new FenceBuilder();
 
-VB.register('strictEqual', function(val1, val2) {
+FB.register('strictEqual', function(val1, val2) {
     return val1 === val2;
 });
 ```
