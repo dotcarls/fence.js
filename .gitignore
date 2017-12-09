@@ -1,6 +1,7 @@
-es
-cjs
-dist
-node_modules
-coverage
-*.log
+cjs/
+coverage/
+dist/
+es/
+node_modules/
+docs/
+.stage/
