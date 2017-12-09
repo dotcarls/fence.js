@@ -7,7 +7,8 @@
     "prereleaseId": "beta",
     "changelogCommand": "git log --pretty=format:'* %s (%h)' v[REV_RANGE]",
     "dist": {
-        "repo": "git@github.com:dotcarls/fence.js.git",
-        "beforeStageCommand": "npm run doc"
+        "repo": "git@github.com:dotcarls/fence.js.git#gh-pages",
+        "beforeStageCommand": "npm run doc",
+        "files": "docs/"
     }
 }
