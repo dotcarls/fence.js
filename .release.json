@@ -1,11 +1,13 @@
 {
-  "commitMessage": ":bookmark: v%s",
-  "tagName": "v%s",
-  "prereleaseId": "beta",
-  "tagAnnotation": "Version %s",
-  "changelogCommand": "git log --pretty=format:'* %s (%h)' v[REV_RANGE]",
-  "dist": {
-   "repo": "git@github.com:user/fence.js.git",
-   "beforeStageCommand": "npm run doc"
- }
+    "src": {
+        "commitMessage": ":bookmark: v%s",
+        "tagName": "v%s",
+        "tagAnnotation": "Version %s"
+    },
+    "prereleaseId": "beta",
+    "changelogCommand": "git log --pretty=format:'* %s (%h)' v[REV_RANGE]",
+    "dist": {
+        "repo": "git@github.com:dotcarls/fence.js.git",
+        "beforeStageCommand": "npm run doc"
+    }
 }
