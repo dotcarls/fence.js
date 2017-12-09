@@ -12,8 +12,8 @@
         "option": {
             "title": "Chain",
             "lint": { "enable": false },
-            "unexportedIdentifier": {"enable": true},
-            "undocumentIdentifier": {"enable": false}
+            "unexportedIdentifier": {"enable": false},
+            "undocumentIdentifier": {"enable": true}
         }
     }]
 }
