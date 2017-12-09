@@ -3,5 +3,9 @@
   "tagName": "v%s",
   "prereleaseId": "beta",
   "tagAnnotation": "Version %s",
-  "changelogCommand": "git log --pretty=format:'* %s (%h)' v[REV_RANGE]"
+  "changelogCommand": "git log --pretty=format:'* %s (%h)' v[REV_RANGE]",
+  "dist": {
+   "repo": "git@github.com:user/fence.js.git",
+   "beforeStageCommand": "npm run doc"
+ }
 }
