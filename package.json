@@ -1,6 +1,6 @@
 {
   "name": "fence.js",
-  "version": "0.5.4",
+  "version": "0.5.5",
   "description": "A framework to create efficient and extensible validations",
   "main": "cjs/index.js",
   "browser": "dist/fence.js",
