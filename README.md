@@ -26,8 +26,8 @@ The goal of this module is to solve these problems without getting in the way. B
 
 ### Example
 ```js
-const ValidationBuilder = require('./lib');
-const VB = new ValidationBuilder();
+const FenceBuilder = require('./lib');
+const VB = new FenceBuilder();
 
 VB.register('strictEqual', function (val1, val2) {
     return val1 === val2;
@@ -38,39 +38,39 @@ console.log(`validation of "a": ${validation.run('a')}`);
 console.log(`validation of "b": ${validation.run('b')}`);
 ```
 
-A Validation begins with an instance of `ValidationBuilder`. The general lifecycle of a `ValidationBuilder` instance is: instantiation, registration, composition, and building.
+A Fence begins with an instance of `FenceBuilder`. The general lifecycle of a `FenceBuilder` instance is: instantiation, registration, composition, and building.
 
 ### Instantiation
 
-An instance can be created by creating a new `ValidationBuilder`:
+An instance can be created by creating a new `FenceBuilder`:
 
 ```js
-// new ValidationBuilder
-const VB = new ValidationBuilder();
+// new FenceBuilder
+const VB = new FenceBuilder();
 ```
 
-An instance can also be created from existing instances of `ValidationBuilder` via the `forge()` method:
+An instance can also be created from existing instances of `FenceBuilder` via the `forge()` method:
 
 ```js
-// new ValidationBuilder
-const VB = new ValidationBuilder();
+// new FenceBuilder
+const VB = new FenceBuilder();
 
-// someValidation 'extends' VB
-const someValidation = VB.forge();
+// someFence 'extends' VB
+const someFence = VB.forge();
 
-// anotherValidation 'extends' someValidation
-const anotherValidation = someValidation.forge();
+// anotherFence 'extends' someFence
+const anotherFence = someFence.forge();
 ```
 
-When an instance is `forge()`'d, its prototype is copied by reference and used to instantiate a new instance of `ValidationBuilder` that is then returned. The result of calling`forge()` is a 'child' instance which can be acted on without affecting its parent.
+When an instance is `forge()`'d, its prototype is copied by reference and used to instantiate a new instance of `FenceBuilder` that is then returned. The result of calling`forge()` is a 'child' instance which can be acted on without affecting its parent.
 
 ### Registration
 
-A fresh instance of `ValidationBuilder` won't be able to do much -- we must 'register' functions so that they can be used during the composition phase. Registering a function will add an instance method to an instance of `ValidationBuilder`. Doing so makes the registered function available for use during composition. To register a function, provide `register()` with a `name` and a function reference or declaration.
+A fresh instance of `FenceBuilder` won't be able to do much -- we must 'register' functions so that they can be used during the composition phase. Registering a function will add an instance method to an instance of `FenceBuilder`. Doing so makes the registered function available for use during composition. To register a function, provide `register()` with a `name` and a function reference or declaration.
 
 ```js
-// new ValidationBuilder
-const VB = new ValidationBuilder();
+// new FenceBuilder
+const VB = new FenceBuilder();
 
 VB.register('strictEqual', function(val1, val2) {
     return val1 === val2;
