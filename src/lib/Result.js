@@ -53,7 +53,7 @@ class Result {
     /**
     * Filters results by name
     * @param     {String}    name    The name for a specific Invokable. This value
-    *                                is set by `ValidationBuilder.register`
+    *                                is set by `FenceBuilder.register`
     * @return    {Array}             An array of Booleans derived from specified
     *                                Invokables
     */

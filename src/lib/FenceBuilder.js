@@ -1,21 +1,21 @@
 import Invokable from './Invokable';
-import Validation from './Validation';
+import Fence from './Fence';
 
 /**
-* A `ValidationBuilder` is used to create an extensible `Validation`.
+* A `FenceBuilder` is used to create an extensible `Fence`.
 *
-* An instance of `ValidationBuilder` will have prototype methods that are created
+* An instance of `FenceBuilder` will have prototype methods that are created
 * through the `register()` method. When the `fork()` method is called all of the
 * instance's already registered methods will be transferred to a new instance of
-* `ValidationBuilder` that is then returned. This is what allows you to 'extend'
-* a `Validation` as you can then continue to `register()` methods without mutating
-* the original `ValidationBuilder`'s prototype.
+* `FenceBuilder` that is then returned. This is what allows you to 'extend'
+* a `Fence` as you can then continue to `register()` methods without mutating
+* the original `FenceBuilder`'s prototype.
 *
 * These prototypical methods are called `Invokable`'s. An `Invokable` is a named
 * function reference that optionally includes some predefined arguments that can
 * be used to make specific comparisons. *
 */
-class ValidationBuilder {
+class FenceBuilder {
     /**
     * @param    {Array}    invokables    A set of already defined `Invokable`'s
     */
@@ -24,12 +24,12 @@ class ValidationBuilder {
     }
 
     /**
-    * Create a clone of a `ValidationBuilder` instance so that it can be extended.
+    * Create a clone of a `FenceBuilder` instance so that it can be extended.
     *
-    * @return    {ValidationBuilder}    a reference to a new `ValidationBuilder`
+    * @return    {FenceBuilder}    a reference to a new `FenceBuilder`
     */
     fork (proto) {
-        // Stop any other references to this `ValidationBuilder` from registering
+        // Stop any other references to this `FenceBuilder` from registering
         // additional methods (or overwriting currently existing ones)
         proto = proto || Object.getPrototypeOf(this);
 
@@ -37,26 +37,26 @@ class ValidationBuilder {
         // new instance's `_invokables`
         const invokables = this._invokables;
 
-        // Create a new `ValidationBuilder` that inherits from this `ValidationBuilder`
-        const VB = function() {
-            ValidationBuilder.call(this, invokables);
+        // Create a new `FenceBuilder` that inherits from this `FenceBuilder`
+        const FB = function() {
+            FenceBuilder.call(this, invokables);
         };
 
         // Set the prototype so that registered functions are available
-        VB.prototype = Object.create(proto);
-        VB.prototype.constructor = VB;
+        FB.prototype = Object.create(proto);
+        FB.prototype.constructor = FB;
 
-        // Instantiate the new `ValidationBuilder`
-        return new VB();
+        // Instantiate the new `FenceBuilder`
+        return new FB();
     }
 
     /**
-    * Add a named function reference to the prototype of an instance of `ValidationBuilder`
+    * Add a named function reference to the prototype of an instance of `FenceBuilder`
     *
     * @param     {String}              name    A named function reference
     * @param     {Function}            fn      A reference to a validation function
 
-    * @return    {ValidationBuilder}           The `ValidationBuilder` instance being
+    * @return    {FenceBuilder}           The `FenceBuilder` instance being
     *                                          operated on, used for function chaining
     */
     register (name, fn, memoize, debug, loggers) {
@@ -71,10 +71,10 @@ class ValidationBuilder {
     }
 
     /**
-    * Remove a named function reference from the prototype of an instance of `ValidationBuilder`
+    * Remove a named function reference from the prototype of an instance of `FenceBuilder`
     * @param     {String}              name    A named function reference
 
-    * @return    {ValidationBuilder}           The `ValidationBuilder` instance being
+    * @return    {FenceBuilder}           The `FenceBuilder` instance being
     *                                          operated on, used for function chaining
     */
     unregister (name) {
@@ -90,20 +90,20 @@ class ValidationBuilder {
     }
 
     /**
-    * Convert an instance of `ValidationBuilder` to something that can be used to
+    * Convert an instance of `FenceBuilder` to something that can be used to
     * validate some value
     *
-    * @return    {Validation}      an Object with a `run()` method that can be called
+    * @return    {Fence}      an Object with a `run()` method that can be called
     *                              with a value, will produce a list of `Results`
     */
     build () {
-        return new Validation(this._invokables);
+        return new Fence(this._invokables);
     }
 
     /**
-    * Create a representation of an instance of `ValidationBuilder`'s Invokable
+    * Create a representation of an instance of `FenceBuilder`'s Invokable
     * function reference names and arguments that can be persisted then later used
-    * by `hydrate()` recreate an equivalent `ValidationBuilder`
+    * by `hydrate()` recreate an equivalent `FenceBuilder`
     *
     * @return    {String}      a stringified JSON blob that can be persisted
     */
@@ -114,14 +114,14 @@ class ValidationBuilder {
     }
 
     /**
-    * Given a string representing a `serialize`'d `ValidationBuilder`, attempt to
+    * Given a string representing a `serialize`'d `FenceBuilder`, attempt to
     * recreate a list of `Invokables` by calling the named prototype references. If
-    * the `serialize`'d `ValidationBuilder` includes a reference to an unavailable
+    * the `serialize`'d `FenceBuilder` includes a reference to an unavailable
     * prototype method, an error is thrown.
     *
     * @param     {String}    invokables    A `stringify`'d JSON blob representing a
-    *                                      `ValidationBuilder`'s `Invokeable`'s
-    * @return    {ValidationBuilder}
+    *                                      `FenceBuilder`'s `Invokeable`'s
+    * @return    {FenceBuilder}
     */
     hydrate (invokables) {
         const tmp = this.fork();
@@ -143,4 +143,4 @@ class ValidationBuilder {
     }
 }
 
-export default ValidationBuilder;
+export default FenceBuilder;

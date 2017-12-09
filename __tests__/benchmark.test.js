@@ -3,11 +3,11 @@ const Benchmark = require('benchmark');
 const vcutils = require('../example/externals/vcutils');
 const helpers = require('./helpers');
 
-const ValidationBuilder = require('../src');
+const FenceBuilder = require('../src');
 const validate = require('validate.js');
 const Joi = require('joi');
 
-const basePolicy = (new ValidationBuilder())
+const basePolicy = (new FenceBuilder())
     .register('required', vcutils.hasValue)
     .register('string', vcutils.isString)
     .register('email', vcutils.isValidEmailAddress)
@@ -22,8 +22,8 @@ const userPolicy = {
     password: baseUserPolicy.fork().min(8).build()
 };
 
-const userValidation = basePolicy.fork().policy(userPolicy).build();
-const letterValidation = basePolicy.fork().equal('a').build();
+const userFence = basePolicy.fork().policy(userPolicy).build();
+const letterFence = basePolicy.fork().equal('a').build();
 
 const constraints = {
     username: {
@@ -55,7 +55,7 @@ describe('compare benchmarks', function() {
         const cycles = [];
         const suite = new Benchmark.Suite()
             .add('fence.js Policy', () => users.forEach(user => {
-                userValidation.run(user).forAll();
+                userFence.run(user).forAll();
             }))
             .add('Validate Policy', () => users.forEach(user => {
                 validate(user, constraints);
@@ -76,7 +76,7 @@ describe('compare benchmarks', function() {
         const cycles = [];
         const suite = new Benchmark.Suite()
             .add('fence.js Strict Equal', () => chars.forEach(char => {
-                letterValidation.run(char.val).forAll();
+                letterFence.run(char.val).forAll();
             }))
             .add('Validate Strict Equal', () => chars.forEach(char => {
                 validate(char, {val: {equality: 'test'}});

@@ -1,19 +1,19 @@
-const ValidationBuilder = require('../lib');
+const FenceBuilder = require('../lib');
 
 // Const's get this show on the road!
-let VB = new ValidationBuilder();
+let FB = new FenceBuilder();
 
 // Create a prototype method that will call a function which performs a strict
 // comparison of two values. `val1` will be set to a constant value after the
 // validation has been forkd.
-VB = VB.register('strictEqual', function (val1, val2) {
+FB = FB.register('strictEqual', function (val1, val2) {
     return val1 === val2;
 });
 
-// `fork()` creates a copy of a `ValidationBuilder` that you can extend
-let original = VB.fork();
+// `fork()` creates a copy of a `FenceBuilder` that you can extend
+let original = FB.fork();
 
-// `ValidationBuilder` methods return a reference to `this` to facilitate function
+// `FenceBuilder` methods return a reference to `this` to facilitate function
 // chaining. if you do not want to chain functions, make sure to store the reference
 original = original.strictEqual('a');
 
@@ -31,8 +31,8 @@ const moreExtended = extended.fork().strictEqual('c');
 // The value we will be testing
 const val = 'a';
 
-// Once a validation is compconste, `.build()` will create an instance of `Validation`
-// (*not* `ValidationBuilder`) which would typically be exported for use by other
+// Once a validation is compconste, `.build()` will create an instance of `Fence`
+// (*not* `FenceBuilder`) which would typically be exported for use by other
 // code. here we are going to build them and run them all at once to see the output.
 const validations = [
     original.build(),

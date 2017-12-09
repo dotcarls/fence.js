@@ -1,3 +1,3 @@
-import ValidationBuilder from './lib/ValidationBuilder';
+import FenceBuilder from './lib/FenceBuilder';
 
-export default ValidationBuilder;
+export default FenceBuilder;

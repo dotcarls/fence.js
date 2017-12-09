@@ -1,21 +1,21 @@
-const ValidationBuilder = require('../lib');
+const FenceBuilder = require('../lib');
 const vcutils = require('./externals/vcutils');
 
 // Const's get this show on the road!
-let VB = new ValidationBuilder();
+let FB = new FenceBuilder();
 
-// A major benefit to the `ValidationBuilder` approach is that by lazily executing
+// A major benefit to the `FenceBuilder` approach is that by lazily executing
 // function references, we can pull validation functions from different modules
-VB = VB.register('hasValue', vcutils.hasValue);
+FB = FB.register('hasValue', vcutils.hasValue);
 
 // Function chaining allows for concise declarations and protects against mutation
-VB = VB.register('isString', vcutils.isString)
+FB = FB.register('isString', vcutils.isString)
        .register('isValidEmailAddress', vcutils.isValidEmailAddress);
 
 // Function declarations can also be used. In this case we are defining a higher
 // order validation that will receive an `entity` and a `policy` and return an
 // object that represents the validity of said entity against said policy
-VB = VB.register('policy', function(entity, policy) {
+FB = FB.register('policy', function(entity, policy) {
     const results = [];
     // This validation assumes that there is a 1:1 mapping between attributes and
     // validation functions. We will define the validation functions below
@@ -29,7 +29,7 @@ VB = VB.register('policy', function(entity, policy) {
 });
 
 // All policies that extend from `basePolicy` should have a value
-const basePolicy = VB.fork().hasValue();
+const basePolicy = FB.fork().hasValue();
 
 // Beyond that, we may want to be more specific with our validation functions,
 // so we register a `minLength` and a `maxLength` function
@@ -71,7 +71,7 @@ const userPolicy = {
 };
 
 // Our higher order policy validation
-const userValidation = VB.fork().policy(userPolicy).build();
+const userFence = FB.fork().policy(userPolicy).build();
 
 // Will pass all policy checks
 const goodUser = {
@@ -85,13 +85,13 @@ const badUser = {
     password: 'password'
 };
 
-// A collection of users we will run `userValidation` against
+// A collection of users we will run `userFence` against
 const users = [
     goodUser,
     badUser
 ];
 
-console.log('User Validation');
+console.log('User Fence');
 users.forEach(function(user) {
-    userValidation.run(user).explain();
+    userFence.run(user).explain();
 });

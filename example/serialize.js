@@ -1,13 +1,13 @@
-const ValidationBuilder = require('../lib');
+const FenceBuilder = require('../lib');
 
 // Const's get this show on the road!
-let VB = new ValidationBuilder();
+let FB = new FenceBuilder();
 
-VB = VB.register('strictEqual', function (val1, val2) {
+FB = FB.register('strictEqual', function (val1, val2) {
     return val1 === val2;
 });
 
-const original = VB.fork().strictEqual('a');
+const original = FB.fork().strictEqual('a');
 const extended = original.fork().register('alwaysTrue', function () {
     return true;
 }).strictEqual('b').alwaysTrue();

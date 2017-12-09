@@ -1,9 +1,9 @@
 import Result from './Result';
 
 /**
-* A 'built' ValidationBuilder that can be exported for use in other functions.
+* A 'built' FenceBuilder that can be exported for use in other functions.
 */
-class Validation {
+class Fence {
     /**
     * @param    {array}    invokables    Array of invokable functions
     */
@@ -29,4 +29,4 @@ class Validation {
     }
 }
 
-export default Validation;
+export default Fence;
