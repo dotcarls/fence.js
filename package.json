@@ -1,6 +1,6 @@
 {
   "name": "fence.js",
-  "version": "0.5.6",
+  "version": "0.5.7",
   "description": "A framework to create efficient and extensible validations",
   "main": "cjs/index.js",
   "browser": "dist/fence.js",
@@ -24,7 +24,8 @@
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
     "lint": "npm run lint:eslint",
     "lint:eslint": "eslint src/*.js",
-    "doc": "esdoc",
+    "doc": "rimraf ./docs && esdoc",
+    "doc:stage": "rimraf ./stage/* && cp -R ./docs/ ./.stage/",
     "test": "clear && jest",
     "test:coverage": "jest --coverage ",
     "test:watch": "clear && jest --watch",

@@ -8,7 +8,8 @@
     "changelogCommand": "git log --pretty=format:'* %s (%h)' v[REV_RANGE]",
     "dist": {
         "repo": "git@github.com:dotcarls/fence.js.git#gh-pages",
-        "beforeStageCommand": "npm run doc",
+        "beforeStageCommand": "npm run doc && npm run doc:stage",
+        "afterReleaseCommand": "rm -rf ./stage/*",
         "baseDir": "./docs",
         "files": "**/*"
     }
