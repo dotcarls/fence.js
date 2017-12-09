@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl">
+  <title data-ice="title">Home | Chain</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A framework to create efficient and extensible validations"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Chain"><meta property="twitter:description" content="A framework to create efficient and extensible validations"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/dotcarls/Chain"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Invokable">Invokable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-invoke">invoke</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Result">Result</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forAll">forAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forAny">forAny</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forOne">forOne</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Validation">Validation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-run">run</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ValidationBuilder">ValidationBuilder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-build">build</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fork">fork</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hydrate">hydrate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-register">register</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-serialize">serialize</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unregister">unregister</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><div data-ice="index" class="github-markdown"><h1 id="chain">Chain</h1><p><img src="https://img.shields.io/node/v/Chain.svg?style=flat-square" alt="Node">
+<a href="https://www.npmjs.com/package/Chain"><img src="https://img.shields.io/npm/v/Chain.svg?style=flat-square" alt="NPM"></a>
+<a href="https://travis-ci.org/dotcarls/Chain"><img src="https://img.shields.io/travis/dotcarls/Chain/master.svg?style=flat-square" alt="Travis"></a>
+<a href="https://david-dm.org/dotcarls/Chain"><img src="https://img.shields.io/david/dotcarls/Chain.svg?style=flat-square" alt="David"></a>
+<a href="https://coveralls.io/github/dotcarls/Chain"><img src="https://img.shields.io/coveralls/dotcarls/Chain.svg?style=flat-square" alt="Coverage Status"></a></p>
+<blockquote>
+<p>A framework to create efficient and extensible validations</p>
+</blockquote>
+<h2 id="features">Features</h2><ul>
+<li>Flexible</li>
+<li>Deterministic</li>
+<li>Extendable</li>
+<li>Persistable</li>
+<li>Portable</li>
+</ul>
+<h2 id="overview">Overview</h2><p>One problem with validation plugins, frameworks, etc. is that they are usually opinionated in some way -- they have an inflexible API, require certain dependencies, etc. This hampers reusability and introduces additional complexity as an application&apos;s validation requirements evolve over time. Further, if we wanted to conditionally validate certain attributes (i.e. allow an end user to &apos;configure&apos; the validation), we would typically have to hard code this functionality into each validation.</p>
+<p>The goal of this module is to solve these problems without getting in the way. By prioritizing validation composition over all else, this framework is ideal for creating complex validations that are both portable and maintainable.</p>
+<h2 id="usage">Usage</h2><h3 id="example">Example</h3><pre><code class="lang-js"><code class="source-code prettyprint">var ValidationBuilder = require(&apos;./lib&apos;);
+var VB = new ValidationBuilder();
+
+VB.register(&apos;strictEqual&apos;, function (val1, val2) {
+    return val1 === val2;
+});
+
+var validation = VB.forge().strictEqual(&apos;a&apos;).build();
+console.log(&apos;validation of &quot;a&quot;:&apos;, validation.run(&apos;a&apos;));
+console.log(&apos;validation of &quot;b&quot;:&apos;, validation.run(&apos;b&apos;));</code>
+</code></pre>
+<p>A Validation begins with an instance of <code>ValidationBuilder</code>. The general lifecycle of a <code>ValidationBuilder</code> instance is: instantiation, registration, composition, and building.</p>
+<h3 id="instantiation">Instantiation</h3><p>An instance can be created by creating a new <code>ValidationBuilder</code>:</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">// new ValidationBuilder
+var VB = new ValidationBuilder();</code>
+</code></pre>
+<p>An instance can also be created from existing instances of <code>ValidationBuilder</code> via the <code>forge()</code> method:</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">// new ValidationBuilder
+var VB = new ValidationBuilder();
+
+// someValidation &apos;extends&apos; VB
+var someValidation = VB.forge();
+
+// anotherValidation &apos;extends&apos; someValidation
+var anotherValidation = someValidation.forge();</code>
+</code></pre>
+<p>When an instance is <code>forge()</code>&apos;d, its prototype is copied by reference and used to instantiate a new instance of <code>ValidationBuilder</code> that is then returned. The result of calling<code>forge()</code> is a &apos;child&apos; instance which can be acted on without affecting its parent.</p>
+<h3 id="registration">Registration</h3><p>A fresh instance of <code>ValidationBuilder</code> won&apos;t be able to do much -- we must &apos;register&apos; functions so that they can be used during the composition phase. Registering a function will add an instance method to an instance of <code>ValidationBuilder</code>. Doing so makes the registered function available for use during composition. To register a function, provide <code>register()</code> with a <code>name</code> and a function reference or declaration.</p>
+<pre><code class="lang-js"><code class="source-code prettyprint">// new ValidationBuilder
+var VB = new ValidationBuilder();
+
+VB.register(&apos;strictEqual&apos;, function(val1, val2) {
+    return val1 === val2;
+});</code>
+</code></pre>
+<p>The <code>name</code> attribute is used to promote determinism in cases where function references can not be passed around. Consider the case where we want to validate something on the server and the client -- the server may have a <code>hasValue</code> function available from <code>vcutils</code> and the client may have a <code>hasValue</code> function available from <code>DeviceSettings</code>. If two named functions are functionally equivalent (produce the exact same output for every possible input) then we can say overall the validation is deterministic regardless of its execution context.</p>
+<p>When registering a function, we accept a <code>name</code> and a function reference.  When these instance methods are called, they create an <code>Invokable</code> which represents a function and optionally some arguments.</p>
+<h3 id="examples">Examples</h3><p>See <a href="example/script.js"><code>example</code></a> folder or the <a href="https://runkit.com/dotcarls/Chain">runkit</a> example.</p>
+<h3 id="builds">Builds</h3><p>If you don&apos;t use a package manager, you can <a href="https://unpkg.com/Chain/">access <code>Chain</code> via unpkg (CDN)</a>, download the source, or point your package manager to the url.</p>
+<p><code>Chain</code> is compiled as a collection of <a href="http://webpack.github.io/docs/commonjs.html">CommonJS</a> modules &amp; <a href="http://www.2ality.com/2014/0
+  -9/es6-modules-final.html">ES2015 modules</a> for bundlers that support the <code>jsnext:main</code> or <code>module</code> field in package.json (Rollup, Webpack 2)</p>
+<p>The <code>Chain</code> package includes precompiled production and development <a href="https://github.com/umdjs/umd">UMD</a> builds in the <a href="https://unpkg.com/Chain/dist/"><code>dist</code> folder</a>. They can be used directly without a bundler and are thus compatible with many popular JavaScript module loaders and environments. You can drop a UMD build as a <a href="https://unpkg.com/Chain"><code>&lt;script&gt;</code> tag</a> on your page. The UMD builds make <code>Chain</code> available as a <code>window.Chain</code> global variable.</p>
+<h3 id="license">License</h3><p>The code is available under the <a href="LICENSE">MIT</a> license.</p>
+<h3 id="contributing">Contributing</h3><p>We are open to contributions, see <a href="CONTRIBUTING.md">CONTRIBUTING.md</a> for more info.</p>
+<h3 id="misc">Misc</h3><p>This module was created using <a href="https://github.com/duivvv/generator-module-boilerplate">generator-module-boilerplate</a>.</p>
+</div>
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.0.4)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

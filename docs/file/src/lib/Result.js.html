@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../">
+  <title data-ice="title">src/lib/Result.js | Chain</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A framework to create efficient and extensible validations"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="Chain"><meta property="twitter:description" content="A framework to create efficient and extensible validations"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+<a style="position:relative; top:3px;" href="https://github.com/dotcarls/Chain"><img width="20px" src="./image/github.png"></a></header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Invokable">Invokable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-invoke">invoke</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Result">Result</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forAll">forAll</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forAny">forAny</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forOne">forOne</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Validation">Validation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-run">run</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ValidationBuilder">ValidationBuilder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-build">build</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fork">fork</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hydrate">hydrate</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-register">register</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-serialize">serialize</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unregister">unregister</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/lib/Result.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
+ * Adapter for mapping validation invokables to their results
+ *
+ * @param    {Array}    invokables    Array of invokable validation functions
+ * @param    {Array}    results       Array of values returned from invoked validation functions
+ */
+function Result (invokables, results, subject) {
+    this._invokables = invokables;
+    this._results = results;
+    this._subject = subject;
+}
+
+/**
+ * A Results summary that will return `true` if all validations passed
+ *
+ * @return    {Boolean}    `true` if all Results are also `true`, `false` otherwise
+ */
+Result.prototype.forAll = function() {
+    const results = this._results;
+
+    return results.reduce(function(acc, result) {
+        if (Array.isArray(result)) {
+            return acc &amp;&amp; result.reduce(function(subAcc, subResult) {
+                return subAcc &amp;&amp; subResult.forAll();
+            }, acc);
+        }
+
+        return acc &amp;&amp; result === true;
+    }, true);
+};
+
+/**
+ * A Results summary that will return `true` if any validations passed
+ * @return    {Boolean}    `true` if any one Result is also `true`, `false` if
+ *                         all results are also `false`
+ */
+Result.prototype.forAny = function() {
+    const results = this._results;
+
+    return results.reduce(function (acc, result) {
+        if (Array.isArray(result)) {
+            return acc || result.reduce(function(subAcc, subResult) {
+                return subAcc || subResult.forAny();
+            }, acc) === true;
+        }
+
+        return acc || result === true;
+    }, false);
+};
+
+/**
+ * Filters results by name
+ * @param     {String}    name    The name for a specific Invokable. This value
+ *                                is set by `ValidationBuilder.register`
+ * @return    {Array}             An array of Booleans derived from specified
+ *                                Invokables
+ */
+Result.prototype.forOne = function(name) {
+    const invokables = this._invokables;
+    const results = this._results;
+
+    return results.filter(function(element, index) {
+        return invokables[index].getName() === name;
+    });
+};
+
+Result.prototype.explain = function(logger, indent) {
+    logger = logger || console.log;
+    indent = indent || &apos;  &apos;;
+
+    logger(indent, &apos;subject:&apos;, JSON.stringify(this._subject));
+    logger(indent + indent, this.forAll() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAll&apos;);
+    logger(indent + indent, this.forAny() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAny&apos;);
+
+    logger(indent, &apos;tests:&apos;);
+    for (var i = 0; i &lt; this._results.length; i++) {
+        const result = this._results[i];
+        const invokable = this._invokables[i];
+        const testName = invokable._name;
+        const testArgs = invokable._args;
+
+        let testLabel = testName;
+        if (testArgs.length &gt; 0) {
+            testLabel += &apos; (&apos; + JSON.stringify(testArgs) + &apos;)&apos;;
+        }
+
+        logger(indent + indent, result ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, testLabel);
+
+        if (Array.isArray(result)) {
+            result.forEach(function(subResult) {
+                subResult.explain(logger, indent + indent);
+            });
+
+            continue;
+        }
+    }
+};
+
+export default Result;
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.0.4)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

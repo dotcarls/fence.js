@@ -1,3 +1,3 @@
-export default () => {
-  console.log(`hello module`);
-};
+import ValidationBuilder from './lib/ValidationBuilder';
+
+export default ValidationBuilder;

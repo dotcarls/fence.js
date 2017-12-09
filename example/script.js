@@ -1,1 +1,0 @@
-const Chain = require(`../`);

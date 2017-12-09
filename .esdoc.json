@@ -1,0 +1,19 @@
+{
+    "source": "./src",
+    "destination": "./docs",
+    "includes": [
+        "\\.js$"
+    ],
+    "excludes": [
+        "\\.external-ecmascript\\.js$"
+    ],
+    "plugins": [{
+        "name": "esdoc-standard-plugin",
+        "option": {
+            "title": "Chain",
+            "lint": { "enable": false },
+            "unexportedIdentifier": {"enable": true},
+            "undocumentIdentifier": {"enable": false}
+        }
+    }]
+}
