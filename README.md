@@ -26,16 +26,16 @@ The goal of this module is to solve these problems without getting in the way. B
 
 ### Example
 ```js
-var ValidationBuilder = require('./lib');
-var VB = new ValidationBuilder();
+const ValidationBuilder = require('./lib');
+const VB = new ValidationBuilder();
 
 VB.register('strictEqual', function (val1, val2) {
     return val1 === val2;
 });
 
 var validation = VB.forge().strictEqual('a').build();
-console.log('validation of "a":', validation.run('a'));
-console.log('validation of "b":', validation.run('b'));
+console.log(`validation of "a": ${validation.run('a')}`);
+console.log(`validation of "b": ${validation.run('b')}`);
 ```
 
 A Validation begins with an instance of `ValidationBuilder`. The general lifecycle of a `ValidationBuilder` instance is: instantiation, registration, composition, and building.
@@ -46,20 +46,20 @@ An instance can be created by creating a new `ValidationBuilder`:
 
 ```js
 // new ValidationBuilder
-var VB = new ValidationBuilder();
+const VB = new ValidationBuilder();
 ```
 
 An instance can also be created from existing instances of `ValidationBuilder` via the `forge()` method:
 
 ```js
 // new ValidationBuilder
-var VB = new ValidationBuilder();
+const VB = new ValidationBuilder();
 
 // someValidation 'extends' VB
-var someValidation = VB.forge();
+const someValidation = VB.forge();
 
 // anotherValidation 'extends' someValidation
-var anotherValidation = someValidation.forge();
+const anotherValidation = someValidation.forge();
 ```
 
 When an instance is `forge()`'d, its prototype is copied by reference and used to instantiate a new instance of `ValidationBuilder` that is then returned. The result of calling`forge()` is a 'child' instance which can be acted on without affecting its parent.
@@ -70,7 +70,7 @@ A fresh instance of `ValidationBuilder` won't be able to do much -- we must 'reg
 
 ```js
 // new ValidationBuilder
-var VB = new ValidationBuilder();
+const VB = new ValidationBuilder();
 
 VB.register('strictEqual', function(val1, val2) {
     return val1 === val2;
