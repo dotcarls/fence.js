@@ -9,6 +9,6 @@
     "dist": {
         "repo": "git@github.com:dotcarls/fence.js.git#gh-pages",
         "beforeStageCommand": "npm run doc",
-        "files": "docs/"
+        "files": "./docs/*"
     }
 }
