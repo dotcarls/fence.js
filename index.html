@@ -65,36 +65,36 @@
 </ul>
 <h2 id="overview">Overview</h2><p>One problem with validation plugins, frameworks, etc. is that they are usually opinionated in some way -- they have an inflexible API, require certain dependencies, etc. This hampers reusability and introduces additional complexity as an application&apos;s validation requirements evolve over time. Further, if we wanted to conditionally validate certain attributes (i.e. allow an end user to &apos;configure&apos; the validation), we would typically have to hard code this functionality into each validation.</p>
 <p>The goal of this module is to solve these problems without getting in the way. By prioritizing validation composition over all else, this framework is ideal for creating complex validations that are both portable and maintainable.</p>
-<h2 id="usage">Usage</h2><h3 id="example">Example</h3><pre><code class="lang-js"><code class="source-code prettyprint">var ValidationBuilder = require(&apos;./lib&apos;);
-var VB = new ValidationBuilder();
+<h2 id="usage">Usage</h2><h3 id="example">Example</h3><pre><code class="lang-js"><code class="source-code prettyprint">const ValidationBuilder = require(&apos;./lib&apos;);
+const VB = new ValidationBuilder();
 
 VB.register(&apos;strictEqual&apos;, function (val1, val2) {
     return val1 === val2;
 });
 
 var validation = VB.forge().strictEqual(&apos;a&apos;).build();
-console.log(&apos;validation of &quot;a&quot;:&apos;, validation.run(&apos;a&apos;));
-console.log(&apos;validation of &quot;b&quot;:&apos;, validation.run(&apos;b&apos;));</code>
+console.log(`validation of &quot;a&quot;: ${validation.run(&apos;a&apos;)}`);
+console.log(`validation of &quot;b&quot;: ${validation.run(&apos;b&apos;)}`);</code>
 </code></pre>
 <p>A Validation begins with an instance of <code>ValidationBuilder</code>. The general lifecycle of a <code>ValidationBuilder</code> instance is: instantiation, registration, composition, and building.</p>
 <h3 id="instantiation">Instantiation</h3><p>An instance can be created by creating a new <code>ValidationBuilder</code>:</p>
 <pre><code class="lang-js"><code class="source-code prettyprint">// new ValidationBuilder
-var VB = new ValidationBuilder();</code>
+const VB = new ValidationBuilder();</code>
 </code></pre>
 <p>An instance can also be created from existing instances of <code>ValidationBuilder</code> via the <code>forge()</code> method:</p>
 <pre><code class="lang-js"><code class="source-code prettyprint">// new ValidationBuilder
-var VB = new ValidationBuilder();
+const VB = new ValidationBuilder();
 
 // someValidation &apos;extends&apos; VB
-var someValidation = VB.forge();
+const someValidation = VB.forge();
 
 // anotherValidation &apos;extends&apos; someValidation
-var anotherValidation = someValidation.forge();</code>
+const anotherValidation = someValidation.forge();</code>
 </code></pre>
 <p>When an instance is <code>forge()</code>&apos;d, its prototype is copied by reference and used to instantiate a new instance of <code>ValidationBuilder</code> that is then returned. The result of calling<code>forge()</code> is a &apos;child&apos; instance which can be acted on without affecting its parent.</p>
 <h3 id="registration">Registration</h3><p>A fresh instance of <code>ValidationBuilder</code> won&apos;t be able to do much -- we must &apos;register&apos; functions so that they can be used during the composition phase. Registering a function will add an instance method to an instance of <code>ValidationBuilder</code>. Doing so makes the registered function available for use during composition. To register a function, provide <code>register()</code> with a <code>name</code> and a function reference or declaration.</p>
 <pre><code class="lang-js"><code class="source-code prettyprint">// new ValidationBuilder
-var VB = new ValidationBuilder();
+const VB = new ValidationBuilder();
 
 VB.register(&apos;strictEqual&apos;, function(val1, val2) {
     return val1 === val2;
