@@ -9,8 +9,11 @@
     "dist": {
         "repo": "git@github.com:dotcarls/fence.js.git#gh-pages",
         "beforeStageCommand": "npm run doc && npm run doc:stage",
-        "afterReleaseCommand": "rm -rf ./stage/*",
         "baseDir": "./docs",
         "files": "**/*"
+    },
+    "npm": {
+        "publish": true,
+        "publishPath": ".."
     }
 }
