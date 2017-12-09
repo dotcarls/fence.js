@@ -1,93 +1,27 @@
 window.esdocSearchIndex = [
   [
     "fence.js/src/lib/invokable.js~invokable",
-    "function/index.html#static-function-Invokable",
+    "class/src/lib/Invokable.js~Invokable.html",
     "<span>Invokable</span> <span class=\"search-result-import-path\">fence.js/src/lib/Invokable.js</span>",
-    "function"
+    "class"
   ],
   [
     "fence.js/src/lib/result.js~result",
-    "function/index.html#static-function-Result",
+    "class/src/lib/Result.js~Result.html",
     "<span>Result</span> <span class=\"search-result-import-path\">fence.js/src/lib/Result.js</span>",
-    "function"
+    "class"
   ],
   [
     "fence.js/src/lib/validation.js~validation",
-    "function/index.html#static-function-Validation",
+    "class/src/lib/Validation.js~Validation.html",
     "<span>Validation</span> <span class=\"search-result-import-path\">fence.js/src/lib/Validation.js</span>",
-    "function"
+    "class"
   ],
   [
     "fence.js/src/lib/validationbuilder.js~validationbuilder",
-    "function/index.html#static-function-ValidationBuilder",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html",
     "<span>ValidationBuilder</span> <span class=\"search-result-import-path\">fence.js/src/lib/ValidationBuilder.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/validationbuilder.js~build",
-    "function/index.html#static-function-build",
-    "<span>build</span> <span class=\"search-result-import-path\">fence.js/src/lib/ValidationBuilder.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/result.js~forall",
-    "function/index.html#static-function-forAll",
-    "<span>forAll</span> <span class=\"search-result-import-path\">fence.js/src/lib/Result.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/result.js~forany",
-    "function/index.html#static-function-forAny",
-    "<span>forAny</span> <span class=\"search-result-import-path\">fence.js/src/lib/Result.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/result.js~forone",
-    "function/index.html#static-function-forOne",
-    "<span>forOne</span> <span class=\"search-result-import-path\">fence.js/src/lib/Result.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/validationbuilder.js~fork",
-    "function/index.html#static-function-fork",
-    "<span>fork</span> <span class=\"search-result-import-path\">fence.js/src/lib/ValidationBuilder.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/validationbuilder.js~hydrate",
-    "function/index.html#static-function-hydrate",
-    "<span>hydrate</span> <span class=\"search-result-import-path\">fence.js/src/lib/ValidationBuilder.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/invokable.js~invoke",
-    "function/index.html#static-function-invoke",
-    "<span>invoke</span> <span class=\"search-result-import-path\">fence.js/src/lib/Invokable.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/validationbuilder.js~register",
-    "function/index.html#static-function-register",
-    "<span>register</span> <span class=\"search-result-import-path\">fence.js/src/lib/ValidationBuilder.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/validation.js~run",
-    "function/index.html#static-function-run",
-    "<span>run</span> <span class=\"search-result-import-path\">fence.js/src/lib/Validation.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/validationbuilder.js~serialize",
-    "function/index.html#static-function-serialize",
-    "<span>serialize</span> <span class=\"search-result-import-path\">fence.js/src/lib/ValidationBuilder.js</span>",
-    "function"
-  ],
-  [
-    "fence.js/src/lib/validationbuilder.js~unregister",
-    "function/index.html#static-function-unregister",
-    "<span>unregister</span> <span class=\"search-result-import-path\">fence.js/src/lib/ValidationBuilder.js</span>",
-    "function"
+    "class"
   ],
   [
     "src/index.js",
@@ -102,10 +36,118 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/lib/invokable.js~invokable#_args",
+    "class/src/lib/Invokable.js~Invokable.html#instance-member-_args",
+    "src/lib/Invokable.js~Invokable#_args",
+    "member"
+  ],
+  [
+    "src/lib/invokable.js~invokable#_fn",
+    "class/src/lib/Invokable.js~Invokable.html#instance-member-_fn",
+    "src/lib/Invokable.js~Invokable#_fn",
+    "member"
+  ],
+  [
+    "src/lib/invokable.js~invokable#_memoize",
+    "class/src/lib/Invokable.js~Invokable.html#instance-member-_memoize",
+    "src/lib/Invokable.js~Invokable#_memoize",
+    "member"
+  ],
+  [
+    "src/lib/invokable.js~invokable#_memoizedfn",
+    "class/src/lib/Invokable.js~Invokable.html#instance-member-_memoizedFn",
+    "src/lib/Invokable.js~Invokable#_memoizedFn",
+    "member"
+  ],
+  [
+    "src/lib/invokable.js~invokable#_name",
+    "class/src/lib/Invokable.js~Invokable.html#instance-member-_name",
+    "src/lib/Invokable.js~Invokable#_name",
+    "member"
+  ],
+  [
+    "src/lib/invokable.js~invokable#constructor",
+    "class/src/lib/Invokable.js~Invokable.html#instance-constructor-constructor",
+    "src/lib/Invokable.js~Invokable#constructor",
+    "method"
+  ],
+  [
+    "src/lib/invokable.js~invokable#dememoize",
+    "class/src/lib/Invokable.js~Invokable.html#instance-method-dememoize",
+    "src/lib/Invokable.js~Invokable#dememoize",
+    "method"
+  ],
+  [
+    "src/lib/invokable.js~invokable#invoke",
+    "class/src/lib/Invokable.js~Invokable.html#instance-method-invoke",
+    "src/lib/Invokable.js~Invokable#invoke",
+    "method"
+  ],
+  [
+    "src/lib/invokable.js~invokable#memoize",
+    "class/src/lib/Invokable.js~Invokable.html#instance-method-memoize",
+    "src/lib/Invokable.js~Invokable#memoize",
+    "method"
+  ],
+  [
+    "src/lib/invokable.js~invokable#serialize",
+    "class/src/lib/Invokable.js~Invokable.html#instance-method-serialize",
+    "src/lib/Invokable.js~Invokable#serialize",
+    "method"
+  ],
+  [
     "src/lib/result.js",
     "file/src/lib/Result.js.html",
     "src/lib/Result.js",
     "file"
+  ],
+  [
+    "src/lib/result.js~result#_invokables",
+    "class/src/lib/Result.js~Result.html#instance-member-_invokables",
+    "src/lib/Result.js~Result#_invokables",
+    "member"
+  ],
+  [
+    "src/lib/result.js~result#_results",
+    "class/src/lib/Result.js~Result.html#instance-member-_results",
+    "src/lib/Result.js~Result#_results",
+    "member"
+  ],
+  [
+    "src/lib/result.js~result#_subject",
+    "class/src/lib/Result.js~Result.html#instance-member-_subject",
+    "src/lib/Result.js~Result#_subject",
+    "member"
+  ],
+  [
+    "src/lib/result.js~result#constructor",
+    "class/src/lib/Result.js~Result.html#instance-constructor-constructor",
+    "src/lib/Result.js~Result#constructor",
+    "method"
+  ],
+  [
+    "src/lib/result.js~result#explain",
+    "class/src/lib/Result.js~Result.html#instance-method-explain",
+    "src/lib/Result.js~Result#explain",
+    "method"
+  ],
+  [
+    "src/lib/result.js~result#forall",
+    "class/src/lib/Result.js~Result.html#instance-method-forAll",
+    "src/lib/Result.js~Result#forAll",
+    "method"
+  ],
+  [
+    "src/lib/result.js~result#forany",
+    "class/src/lib/Result.js~Result.html#instance-method-forAny",
+    "src/lib/Result.js~Result#forAny",
+    "method"
+  ],
+  [
+    "src/lib/result.js~result#forone",
+    "class/src/lib/Result.js~Result.html#instance-method-forOne",
+    "src/lib/Result.js~Result#forOne",
+    "method"
   ],
   [
     "src/lib/validation.js",
@@ -114,9 +156,75 @@ window.esdocSearchIndex = [
     "file"
   ],
   [
+    "src/lib/validation.js~validation#_invokables",
+    "class/src/lib/Validation.js~Validation.html#instance-member-_invokables",
+    "src/lib/Validation.js~Validation#_invokables",
+    "member"
+  ],
+  [
+    "src/lib/validation.js~validation#constructor",
+    "class/src/lib/Validation.js~Validation.html#instance-constructor-constructor",
+    "src/lib/Validation.js~Validation#constructor",
+    "method"
+  ],
+  [
+    "src/lib/validation.js~validation#run",
+    "class/src/lib/Validation.js~Validation.html#instance-method-run",
+    "src/lib/Validation.js~Validation#run",
+    "method"
+  ],
+  [
     "src/lib/validationbuilder.js",
     "file/src/lib/ValidationBuilder.js.html",
     "src/lib/ValidationBuilder.js",
     "file"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#_invokables",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-member-_invokables",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#_invokables",
+    "member"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#build",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-method-build",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#build",
+    "method"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#constructor",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-constructor-constructor",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#constructor",
+    "method"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#fork",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-method-fork",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#fork",
+    "method"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#hydrate",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-method-hydrate",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#hydrate",
+    "method"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#register",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-method-register",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#register",
+    "method"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#serialize",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-method-serialize",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#serialize",
+    "method"
+  ],
+  [
+    "src/lib/validationbuilder.js~validationbuilder#unregister",
+    "class/src/lib/ValidationBuilder.js~ValidationBuilder.html#instance-method-unregister",
+    "src/lib/ValidationBuilder.js~ValidationBuilder#unregister",
+    "method"
   ]
 ]

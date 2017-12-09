@@ -29,21 +29,10 @@
 <nav class="navigation" data-ice="nav"><div>
   <ul>
     
-  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Invokable">Invokable</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-invoke">invoke</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Result">Result</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forAll">forAll</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forAny">forAny</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-forOne">forOne</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-Validation">Validation</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-run">run</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-ValidationBuilder">ValidationBuilder</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-build">build</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-fork">fork</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-hydrate">hydrate</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-register">register</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-serialize">serialize</a></span></span></li>
-<li data-ice="doc"><span data-ice="kind" class="kind-function">F</span><span data-ice="name"><span><a href="function/index.html#static-function-unregister">unregister</a></span></span></li>
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html">Invokable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Result.js~Result.html">Result</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Validation.js~Validation.html">Validation</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/ValidationBuilder.js~ValidationBuilder.html">ValidationBuilder</a></span></span></li>
 </ul>
 </div>
 </nav>
@@ -51,84 +40,87 @@
 <div class="content" data-ice="content"><h1 data-ice="title">src/lib/Invokable.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
 * A validation function that will be invoked at some time
-*
-* @param    {String}       name    [required] Function Name used for prototype / lookups
-* @param    {Function}     fn      [required] Function reference that is executed during invokation
-* @param    {Array}        args    [optional] arguments to be applied to the function
 */
-function Invokable (name, fn, args, memoize) {
-    this._name = name;
-    this._fn = fn;
-    this._args = args ? Array.prototype.slice.call(args) : [];
-    this._memoize = memoize === true;
+class Invokable {
+    /**
+    * @param    {String}       name    [required] Function Name used for prototype / lookups
+    * @param    {Function}     fn      [required] Function reference that is executed during invokation
+    * @param    {Array}        args    [optional] arguments to be applied to the function
+    */
+    constructor (name, fn, args, memoize) {
+        this._name = name;
+        this._fn = fn;
+        this._args = args ? Array.prototype.slice.call(args) : [];
+        this._memoize = memoize === true;
 
-    if (this._memoize) {
-        this.memoize();
-    }
-}
-
-/**
-* Executes a validation function against a subject and any predefined arguments
-*
-* @param     {Any}         subject    the value to be validated
-* @return    {Boolean}                the result of the validation
-*/
-Invokable.prototype.invoke = function(...subjects) {
-    let fn = this._fn;
-    let args = subjects.concat(this._args);
-
-    if (this._memoize &amp;&amp; this._memoizedFn) {
-        fn = this._memoizedFn;
-        args = [this._fn].concat(args);
+        if (this._memoize) {
+            this.memoize();
+        }
     }
 
-    return fn.apply(this, args);
-};
+    /**
+    * Executes a validation function against a subject and any predefined arguments
+    *
+    * @param     {Any}         subject    the value to be validated
+    * @return    {Boolean}                the result of the validation
+    */
+    invoke (...subjects) {
+        let fn = this._fn;
+        let args = subjects.concat(this._args);
 
-Invokable.prototype.memoize = function() {
-    Object.defineProperty(this, &apos;_cache&apos;, {
-        value: {},
-        writable: false,
-        configurable: true,
-        enumerable: false
-    });
-
-    const memoized = function(fn, ...args) {
-        const key = args[0];
-        const cache = memoized.cache;
-
-        if (cache[key]) {
-            return cache[key];
+        if (this._memoize &amp;&amp; this._memoizedFn) {
+            fn = this._memoizedFn;
+            args = [this._fn].concat(args);
         }
 
-        const result = fn.apply(fn, args);
-        cache[key] = result;
-
-        return result;
-    };
-
-    memoized.cache = this._cache;
-    this._memoizedFn = memoized;
-};
-
-Invokable.prototype.dememoize = function() {
-    delete this._cache;
-    delete this._memoizedFn;
-    this._memoize = false;
-};
-
-Invokable.prototype.serialize = function(returnFull) {
-    if (returnFull === true) {
-        return JSON.stringify(this);
+        return fn.apply(this, args);
     }
 
-    const obj = {
-        _name: this._name,
-        _args: this._args,
-        _memoize: this._memoize
-    };
-    return JSON.stringify(obj);
-};
+    memoize () {
+        Object.defineProperty(this, &apos;_cache&apos;, {
+            value: {},
+            writable: false,
+            configurable: true,
+            enumerable: false
+        });
+
+        const memoized = function(fn, ...args) {
+            const key = args[0];
+            const cache = memoized.cache;
+
+            if (cache[key]) {
+                return cache[key];
+            }
+
+            const result = fn.apply(fn, args);
+            cache[key] = result;
+
+            return result;
+        };
+
+        memoized.cache = this._cache;
+        this._memoizedFn = memoized;
+    }
+
+    dememoize () {
+        delete this._cache;
+        delete this._memoizedFn;
+        this._memoize = false;
+    }
+
+    serialize (returnFull) {
+        if (returnFull === true) {
+            return JSON.stringify(this);
+        }
+
+        const obj = {
+            _name: this._name,
+            _args: this._args,
+            _memoize: this._memoize
+        };
+        return JSON.stringify(obj);
+    }
+}
 
 export default Invokable;
 </code></pre>
