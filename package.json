@@ -68,7 +68,8 @@
   "jest": {
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
-      "<rootDir>/__tests__/helpers.js"
+      "<rootDir>/__tests__/helpers.js",
+      "<rootDir>/__tests__/benchmark.test.js"
     ],
     "verbose": true,
     "collectCoverage": true,
