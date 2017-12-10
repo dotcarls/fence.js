@@ -1,4 +1,4 @@
-import FenceBuilder from '../Fencebuilder';
+import FenceBuilder from '../FenceBuilder';
 import Invokable from '../Invokable';
 
 describe(`FenceBuilder`, function () {
