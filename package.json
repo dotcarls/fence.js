@@ -1,7 +1,7 @@
 {
   "name": "fence.js",
   "homepage": "https://dotcarls.github.io/fence.js",
-  "version": "0.8.1",
+  "version": "0.9.0",
   "description": "A framework to create efficient and extensible validations",
   "main": "cjs/index.js",
   "browser": "dist/fence.js",
