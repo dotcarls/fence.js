@@ -129,37 +129,37 @@ class Result {
         });
     }
 
-    explain (logger, indent) {
-        logger = logger || console.log;
-        indent = indent || &apos;  &apos;;
-
-        logger(indent, &apos;subject:&apos;, JSON.stringify(this._subject));
-        logger(indent + indent, this.forAll() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAll&apos;);
-        logger(indent + indent, this.forAny() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAny&apos;);
-
-        logger(indent, &apos;tests:&apos;);
-        for (var i = 0; i &lt; this._results.length; i++) {
-            const result = this._results[i];
-            const invokable = this._invokables[i];
-            const testName = invokable._name;
-            const testArgs = invokable._args;
-
-            let testLabel = testName;
-            if (testArgs.length &gt; 0) {
-                testLabel += &apos; (&apos; + JSON.stringify(testArgs) + &apos;)&apos;;
-            }
-
-            logger(indent + indent, result ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, testLabel);
-
-            if (Array.isArray(result)) {
-                result.forEach(function(subResult) {
-                    subResult.explain(logger, indent + indent);
-                });
-
-                continue;
-            }
-        }
-    }
+    // explain (logger, indent) {
+    //     logger = logger || console.log;
+    //     indent = indent || &apos;  &apos;;
+    //
+    //     logger(indent, &apos;subject:&apos;, JSON.stringify(this._subject));
+    //     logger(indent + indent, this.forAll() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAll&apos;);
+    //     logger(indent + indent, this.forAny() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAny&apos;);
+    //
+    //     logger(indent, &apos;tests:&apos;);
+    //     for (var i = 0; i &lt; this._results.length; i++) {
+    //         const result = this._results[i];
+    //         const invokable = this._invokables[i];
+    //         const testName = invokable._name;
+    //         const testArgs = invokable._args;
+    //
+    //         let testLabel = testName;
+    //         if (testArgs.length &gt; 0) {
+    //             testLabel += &apos; (&apos; + JSON.stringify(testArgs) + &apos;)&apos;;
+    //         }
+    //
+    //         logger(indent + indent, result ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, testLabel);
+    //
+    //         if (Array.isArray(result)) {
+    //             result.forEach(function(subResult) {
+    //                 subResult.explain(logger, indent + indent);
+    //             });
+    //
+    //             continue;
+    //         }
+    //     }
+    // }
 }
 
 export default Result;

@@ -1,6 +1,6 @@
 {
-  "coverage": "66.66%",
-  "expectCount": 33,
+  "coverage": "68.75%",
+  "expectCount": 32,
   "actualCount": 22,
   "files": {
     "src/lib/Fence.js": {
@@ -29,13 +29,12 @@
       ]
     },
     "src/lib/Result.js": {
-      "expectCount": 9,
+      "expectCount": 8,
       "actualCount": 5,
       "undocumentLines": [
         24,
         25,
-        26,
-        92
+        26
       ]
     }
   }

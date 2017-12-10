@@ -61,7 +61,7 @@ FB.register(&apos;strictEqual&apos;, function (val1, val2) {
     return val1 === val2;
 });
 
-const validation = FB.forge().strictEqual(&apos;a&apos;).build();
+const validation = FB.fork().strictEqual(&apos;a&apos;).build();
 console.log(`validation of &quot;a&quot;: ${validation.run(&apos;a&apos;)}`);
 console.log(`validation of &quot;b&quot;: ${validation.run(&apos;b&apos;)}`);</code>
 </code></pre>
@@ -70,17 +70,17 @@ console.log(`validation of &quot;b&quot;: ${validation.run(&apos;b&apos;)}`);</c
 <pre><code class="lang-js"><code class="source-code prettyprint">// new FenceBuilder
 const FB = new FenceBuilder();</code>
 </code></pre>
-<p>An instance can also be created from existing instances of <code>FenceBuilder</code> via the <code>forge()</code> method:</p>
+<p>An instance can also be created from existing instances of <code>FenceBuilder</code> via the <code>fork()</code> method:</p>
 <pre><code class="lang-js"><code class="source-code prettyprint">// new FenceBuilder
 const FB = new FenceBuilder();
 
 // someFence &apos;extends&apos; FB
-const someFence = FB.forge();
+const someFence = FB.fork();
 
 // anotherFence &apos;extends&apos; someFence
-const anotherFence = someFence.forge();</code>
+const anotherFence = someFence.fork();</code>
 </code></pre>
-<p>When an instance is <code>forge()</code>&apos;d, its prototype is copied by reference and used to instantiate a new instance of <code>FenceBuilder</code> that is then returned. The result of calling<code>forge()</code> is a &apos;child&apos; instance which can be acted on without affecting its parent.</p>
+<p>When an instance is <code>fork()</code>&apos;d, its prototype is copied by reference and used to instantiate a new instance of <code>FenceBuilder</code> that is then returned. The result of calling<code>fork()</code> is a &apos;child&apos; instance which can be acted on without affecting its parent.</p>
 <h3 id="registration">Registration</h3><p>A fresh instance of <code>FenceBuilder</code> won&apos;t be able to do much -- we must &apos;register&apos; functions so that they can be used during the composition phase. Registering a function will add an instance method to an instance of <code>FenceBuilder</code>. Doing so makes the registered function available for use during composition. To register a function, provide <code>register()</code> with a <code>name</code> and a function reference or declaration.</p>
 <pre><code class="lang-js"><code class="source-code prettyprint">// new FenceBuilder
 const FB = new FenceBuilder();

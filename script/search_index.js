@@ -204,12 +204,6 @@ window.esdocSearchIndex = [
     "method"
   ],
   [
-    "src/lib/result.js~result#explain",
-    "class/src/lib/Result.js~Result.html#instance-method-explain",
-    "src/lib/Result.js~Result#explain",
-    "method"
-  ],
-  [
     "src/lib/result.js~result#forall",
     "class/src/lib/Result.js~Result.html#instance-method-forAll",
     "src/lib/Result.js~Result#forAll",
