@@ -89,37 +89,37 @@ class Result {
         });
     }
 
-    explain (logger, indent) {
-        logger = logger || console.log;
-        indent = indent || '  ';
-
-        logger(indent, 'subject:', JSON.stringify(this._subject));
-        logger(indent + indent, this.forAll() ? '[✓]' : '[x]', 'forAll');
-        logger(indent + indent, this.forAny() ? '[✓]' : '[x]', 'forAny');
-
-        logger(indent, 'tests:');
-        for (var i = 0; i < this._results.length; i++) {
-            const result = this._results[i];
-            const invokable = this._invokables[i];
-            const testName = invokable._name;
-            const testArgs = invokable._args;
-
-            let testLabel = testName;
-            if (testArgs.length > 0) {
-                testLabel += ' (' + JSON.stringify(testArgs) + ')';
-            }
-
-            logger(indent + indent, result ? '[✓]' : '[x]', testLabel);
-
-            if (Array.isArray(result)) {
-                result.forEach(function(subResult) {
-                    subResult.explain(logger, indent + indent);
-                });
-
-                continue;
-            }
-        }
-    }
+    // explain (logger, indent) {
+    //     logger = logger || console.log;
+    //     indent = indent || '  ';
+    //
+    //     logger(indent, 'subject:', JSON.stringify(this._subject));
+    //     logger(indent + indent, this.forAll() ? '[✓]' : '[x]', 'forAll');
+    //     logger(indent + indent, this.forAny() ? '[✓]' : '[x]', 'forAny');
+    //
+    //     logger(indent, 'tests:');
+    //     for (var i = 0; i < this._results.length; i++) {
+    //         const result = this._results[i];
+    //         const invokable = this._invokables[i];
+    //         const testName = invokable._name;
+    //         const testArgs = invokable._args;
+    //
+    //         let testLabel = testName;
+    //         if (testArgs.length > 0) {
+    //             testLabel += ' (' + JSON.stringify(testArgs) + ')';
+    //         }
+    //
+    //         logger(indent + indent, result ? '[✓]' : '[x]', testLabel);
+    //
+    //         if (Array.isArray(result)) {
+    //             result.forEach(function(subResult) {
+    //                 subResult.explain(logger, indent + indent);
+    //             });
+    //
+    //             continue;
+    //         }
+    //     }
+    // }
 }
 
 export default Result;
