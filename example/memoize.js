@@ -1,4 +1,4 @@
-const FenceBuilder = require('../lib');
+const FenceBuilder = require('../cjs');
 
 // Const's get this show on the road!
 let FB = new FenceBuilder();
@@ -6,10 +6,10 @@ let FB = new FenceBuilder();
 // Create a prototype method that will call a function which performs a strict
 // comparison of two values. `val1` will be set to a constant value after the
 // validation has been forkd.
-FB = FB.register('strictEqual', function (val1, val2) {
+FB = FB.register(function (val1, val2) {
     console.log(val1, val2);
     return val1 === val2;
-}, true);
+}, 'strictEqual', true);
 
 // `fork()` creates a copy of a `FenceBuilder` that you can extend
 const original = FB.fork().strictEqual('a');

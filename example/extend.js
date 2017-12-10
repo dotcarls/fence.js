@@ -1,4 +1,4 @@
-const FenceBuilder = require('../lib');
+const FenceBuilder = require('../cjs');
 
 // Const's get this show on the road!
 let FB = new FenceBuilder();
@@ -6,9 +6,9 @@ let FB = new FenceBuilder();
 // Create a prototype method that will call a function which performs a strict
 // comparison of two values. `val1` will be set to a constant value after the
 // validation has been forkd.
-FB = FB.register('strictEqual', function (val1, val2) {
+FB = FB.register(function strictEqual(val1, val2) {
     return val1 === val2;
-});
+}, 'strictEqual');
 
 // `fork()` creates a copy of a `FenceBuilder` that you can extend
 let original = FB.fork();
@@ -21,9 +21,9 @@ original = original.strictEqual('a');
 let extended = original.fork().strictEqual('b');
 
 // We can add additional methods to an extended validation via `.register()`
-extended = extended.register('alwaysTrue', function () {
+extended = extended.register(function() {
     return true;
-}).alwaysTrue(); // Function chaining ftw!
+}, 'alwaysTrue').alwaysTrue(); // Function chaining ftw!
 
 // consts create a third order validation and test for 'c'
 const moreExtended = extended.fork().strictEqual('c');
