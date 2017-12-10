@@ -1,8 +1,8 @@
-const vcutils = require('../example/externals/vcutils');
+const utils = require('../example/externals/utils');
 const faker = require('faker');
 
 function minLength (val, length) {
-    if (!vcutils.hasValue(val) || !vcutils.isString(val) || !vcutils.isInteger(length)) {
+    if (!utils.required(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
 
@@ -10,7 +10,7 @@ function minLength (val, length) {
 }
 
 function maxLength (val, length) {
-    if (!vcutils.hasValue(val) || !vcutils.isString(val) || !vcutils.isInteger(length)) {
+    if (!utils.required(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
 

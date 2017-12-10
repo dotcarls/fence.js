@@ -1,5 +1,4 @@
-
-function hasValue (value) {
+function required (value) {
     if (typeof (value) === 'undefined') {
         return false;
     }
@@ -9,8 +8,8 @@ function hasValue (value) {
     return true;
 }
 
-function hasValueIsArray (obj, allowZeroLength) {
-    if (!hasValue(obj)) {
+function requiredIsArray (obj, allowZeroLength) {
+    if (!required(obj)) {
         return false;
     }
     if (!Array.isArray(obj)) {
@@ -27,20 +26,20 @@ function hasValueIsArray (obj, allowZeroLength) {
     return true;
 }
 
-function hasValueIsNonZeroLengthArray (obj) {
-    return hasValueIsArray(obj, false);
+function requiredIsNonZeroLengthArray (obj) {
+    return requiredIsArray(obj, false);
 }
 
-function hasValueIsNonEmptyObject (obj) {
-    if (!hasValue(obj) || typeof obj !== 'object') {
+function requiredIsNonEmptyObject (obj) {
+    if (!required(obj) || typeof obj !== 'object') {
         return false;
     }
 
-    return hasValueIsNonZeroLengthArray(Object.keys(obj));
+    return requiredIsNonZeroLengthArray(Object.keys(obj));
 }
 
 function stringContains (fullstring, substring) {
-    if (!hasValue(fullstring)) {
+    if (!required(fullstring)) {
         return false;
     }
 
@@ -52,7 +51,7 @@ function stringContains (fullstring, substring) {
 }
 
 function isValidEmailAddress (email) {
-    if (!hasValue(email) || (typeof (email) !== 'string')) {
+    if (!required(email) || (typeof (email) !== 'string')) {
         return false;
     }
     var filter = /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
@@ -101,10 +100,10 @@ function isValidId (id) {
 }
 
 function caseInsensitiveEqual (a, b) {
-    if (!hasValue(a) && !hasValue(b)) {
+    if (!required(a) && !required(b)) {
         return true;
     }
-    if (!hasValue(a) || !hasValue(b)) {
+    if (!required(a) || !required(b)) {
         return false;
     }
     if (a.toLowerCase() === b.toLowerCase()) {
@@ -283,9 +282,9 @@ exports.arrayHasString = arrayHasString;
 exports.isValidEmailAddress = isValidEmailAddress;
 exports.isValidEmailAddressList = isValidEmailAddressList;
 exports.isValidId = isValidId;
-exports.hasValue = hasValue;
-exports.hasValueIsArray = hasValueIsArray;
-exports.hasValueIsNonZeroLengthArray = hasValueIsNonZeroLengthArray;
-exports.hasValueIsNonEmptyObject = hasValueIsNonEmptyObject;
+exports.required = required;
+exports.requiredIsArray = requiredIsArray;
+exports.requiredIsNonZeroLengthArray = requiredIsNonZeroLengthArray;
+exports.requiredIsNonEmptyObject = requiredIsNonEmptyObject;
 exports.stringContains = stringContains;
 exports.caseInsensitiveEqual = caseInsensitiveEqual;

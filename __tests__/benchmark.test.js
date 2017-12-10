@@ -1,6 +1,6 @@
 const assert = require('assert');
 const Benchmark = require('benchmark');
-const vcutils = require('../example/externals/vcutils');
+const utils = require('../example/externals/utils');
 const helpers = require('./helpers');
 
 const FenceBuilder = require('../src');
@@ -8,9 +8,9 @@ const validate = require('validate.js');
 const Joi = require('joi');
 
 const basePolicy = (new FenceBuilder())
-    .register('required', vcutils.hasValue)
-    .register('string', vcutils.isString)
-    .register('email', vcutils.isValidEmailAddress)
+    .register('required', utils.)
+    .register('string', utils.isString)
+    .register('email', utils.isValidEmailAddress)
     .register('policy', helpers.policy)
     .register('min', helpers.minLength)
     .register('max', helpers.maxLength)

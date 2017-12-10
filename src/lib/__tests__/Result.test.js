@@ -1,6 +1,7 @@
 import Result from '../Result';
 import Invokable from '../Invokable';
 
+/** @test {Result} */
 describe(`Result`, function () {
     test(`Result empty constructor`, () => {
         expect(() => new Result()).toThrow();

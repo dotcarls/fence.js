@@ -77,7 +77,7 @@ FB.register('strictEqual', function(val1, val2) {
 });
 ```
 
-The `name` attribute is used to promote determinism in cases where function references can not be passed around. Consider the case where we want to validate something on the server and the client -- the server may have a `hasValue` function available from `vcutils` and the client may have a `hasValue` function available from `DeviceSettings`. If two named functions are functionally equivalent (produce the exact same output for every possible input) then we can say overall the validation is deterministic regardless of its execution context.
+The `name` attribute is used to promote determinism in cases where function references can not be passed around. Consider the case where we want to validate something on the server and the client -- the server may have a `required` function available from `utils` and the client may have a `required` function available from `clientUitls`. If two named functions are functionally equivalent (produce the exact same output for every possible input) then we can say overall the validation is deterministic regardless of its execution context.
 
 When registering a function, we accept a `name` and a function reference.  When these instance methods are called, they create an `Invokable` which represents a function and optionally some arguments.
 

@@ -1,16 +1,16 @@
 const FenceBuilder = require('../cjs');
-const vcutils = require('./externals/vcutils');
+const utils = require('./externals/utils');
 
 // Const's get this show on the road!
 let FB = new FenceBuilder();
 
 // A major benefit to the `FenceBuilder` approach is that by lazily executing
 // function references, we can pull validation functions from different modules
-FB = FB.register(vcutils.hasValue, 'hasValue');
+FB = FB.register(utils., '');
 
 // Function chaining allows for concise declarations and protects against mutation
-FB = FB.register(vcutils.isString, 'isString')
-       .register(vcutils.isValidEmailAddress, 'isValidEmailAddress');
+FB = FB.register(utils.isString, 'isString')
+       .register(utils.isValidEmailAddress, 'isValidEmailAddress');
 
 // Function declarations can also be used. In this case we are defining a higher
 // order validation that will receive an `entity` and a `policy` and return an
@@ -29,13 +29,13 @@ FB = FB.register(function(entity, policy) {
 }, 'policy');
 
 // All policies that extend from `basePolicy` should have a value
-const basePolicy = FB.fork().hasValue();
+const basePolicy = FB.fork().();
 
 // Beyond that, we may want to be more specific with our validation functions,
 // so we register a `minLength` and a `maxLength` function
 let usernamePolicy = basePolicy.fork();
 usernamePolicy = usernamePolicy.register(function(val, length) {
-    if (!vcutils.hasValue(val) || !vcutils.isString(val) || !vcutils.isInteger(length)) {
+    if (!utils.(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
 
@@ -44,7 +44,7 @@ usernamePolicy = usernamePolicy.register(function(val, length) {
 
 // You don't have to chain functions, just make sure to store a reference
 usernamePolicy = usernamePolicy.register(function(val, length) {
-    if (!vcutils.hasValue(val) || !vcutils.isString(val) || !vcutils.isInteger(length)) {
+    if (!utils.(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
 

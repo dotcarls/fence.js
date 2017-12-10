@@ -1,11 +1,14 @@
 import FenceBuilder from '../FenceBuilder';
 import Invokable from '../Invokable';
 
+/** @test {FenceBuilder} */
 describe(`FenceBuilder`, function () {
+    /** @test {FenceBuilder#constructor} */
     test(`FenceBuilder bad arguments`, () => {
         expect(() => new FenceBuilder(null, [])).toThrow();
     });
 
+    /** @test {FenceBuilder#serialize} */
     test(`Invokable serialize is stringified correctly`, () => {
         const FB = new FenceBuilder();
         const fb = FB.fork().register(() => true, `fn`);
@@ -17,6 +20,7 @@ describe(`FenceBuilder`, function () {
         expect(JSON.parse(parsedFb[0])).toEqual(parsedInvokable);
     });
 
+    /** @test {FenceBuilder#serialize} */
     test(`Invokable serialize is hydrated correctly`, () => {
         const fn = () => true;
         const FB = new FenceBuilder();

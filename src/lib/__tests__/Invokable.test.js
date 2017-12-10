@@ -1,5 +1,6 @@
 import Invokable from '../Invokable';
 
+/** @test {Invokable} */
 describe(`Invokable`, function () {
     test(`Invokable empty constructor`, () => {
         expect(() => new Invokable()).toThrow();

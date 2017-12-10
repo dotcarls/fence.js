@@ -7,13 +7,25 @@
     "excludes": [
         "\\.external-ecmascript\\.js$"
     ],
-    "plugins": [{
-        "name": "esdoc-standard-plugin",
-        "option": {
-            "title": "Chain",
-            "lint": { "enable": false },
-            "unexportedIdentifier": {"enable": false},
-            "undocumentIdentifier": {"enable": true}
+    "plugins": [
+        {
+            "name": "esdoc-standard-plugin",
+            "option": {
+                "title": "Chain",
+                "lint": { "enable": false },
+                "unexportedIdentifier": {"enable": true},
+                "undocumentIdentifier": {"enable": true}
+            }
+        },
+        {
+            "name": "esdoc-coverage-plugin",
+            "option": {
+                "enable": true,
+                "kind": ["class", "method", "member", "get", "set", "constructor", "function", "variable"]
+            }
+        },
+        {
+            "name": "esdoc-brand-plugin"
         }
-    }]
+    ]
 }
