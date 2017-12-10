@@ -7,13 +7,13 @@ const validate = require('validate.js');
 const Joi = require('joi');
 
 const basePolicy = (new FenceBuilder())
-    .register('required', vcutils.hasValue)
-    .register('string', vcutils.isString)
-    .register('email', vcutils.isValidEmailAddress)
-    .register('policy', helpers.policy)
-    .register('min', helpers.minLength)
-    .register('max', helpers.maxLength)
-    .register('equal', helpers.strictEqual);
+    .register(vcutils.hasValue, 'required')
+    .register(vcutils.isString, 'string')
+    .register(vcutils.isValidEmailAddress, 'email')
+    .register(helpers.policy, 'policy')
+    .register(helpers.minLength, 'min')
+    .register(helpers.maxLength, 'max')
+    .register(helpers.strictEqual, 'equal');
 
 const baseUserPolicy = basePolicy.fork().required().max(255);
 const userPolicy = {
@@ -48,7 +48,7 @@ const schema = Joi.object().keys({
 });
 
 describe('FenceBuilder', function () {
-    const {users, chars} = helpers.createTestData(50);
+    const {users, chars} = helpers.createTestData(5);
 
     users.forEach(user => {
         it(`has the same result as validate.js [${user.username} / ${user.password}]`, function() {
