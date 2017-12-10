@@ -33,7 +33,7 @@ FB.register('strictEqual', function (val1, val2) {
     return val1 === val2;
 });
 
-const validation = FB.forge().strictEqual('a').build();
+const validation = FB.fork().strictEqual('a').build();
 console.log(`validation of "a": ${validation.run('a')}`);
 console.log(`validation of "b": ${validation.run('b')}`);
 ```
@@ -49,20 +49,20 @@ An instance can be created by creating a new `FenceBuilder`:
 const FB = new FenceBuilder();
 ```
 
-An instance can also be created from existing instances of `FenceBuilder` via the `forge()` method:
+An instance can also be created from existing instances of `FenceBuilder` via the `fork()` method:
 
 ```js
 // new FenceBuilder
 const FB = new FenceBuilder();
 
 // someFence 'extends' FB
-const someFence = FB.forge();
+const someFence = FB.fork();
 
 // anotherFence 'extends' someFence
-const anotherFence = someFence.forge();
+const anotherFence = someFence.fork();
 ```
 
-When an instance is `forge()`'d, its prototype is copied by reference and used to instantiate a new instance of `FenceBuilder` that is then returned. The result of calling`forge()` is a 'child' instance which can be acted on without affecting its parent.
+When an instance is `fork()`'d, its prototype is copied by reference and used to instantiate a new instance of `FenceBuilder` that is then returned. The result of calling`fork()` is a 'child' instance which can be acted on without affecting its parent.
 
 ### Registration
 
