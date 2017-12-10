@@ -91,10 +91,10 @@
             }
           },
           "extra": {
-            "rawValue": "../Fencebuilder",
-            "raw": "'../Fencebuilder'"
+            "rawValue": "../FenceBuilder",
+            "raw": "'../FenceBuilder'"
           },
-          "value": "../Fencebuilder"
+          "value": "../FenceBuilder"
         }
       },
       {
@@ -3583,7 +3583,7 @@
         "binop": null,
         "updateContext": null
       },
-      "value": "../Fencebuilder",
+      "value": "../FenceBuilder",
       "start": 25,
       "end": 42,
       "loc": {
