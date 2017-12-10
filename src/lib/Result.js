@@ -1,12 +1,26 @@
+import Invokable from './Invokable';
+
 /**
 * Adapter for mapping validation invokables to their results
 */
 class Result {
     /**
-    * @param    {Array}    invokables    Array of invokable validation functions
-    * @param    {Array}    results       Array of values returned from invoked validation functions
+    * @param    {Invokable[]}    invokables     Array of invokable validation functions
+    * @param    {Result[]}          results     Array of values returned from invoked validation functions
     */
-    constructor (invokables, results, subject) {
+    constructor (invokables = [], results = [], subject = null) {
+        if (!Array.isArray(invokables) || invokables.length <= 0) {
+            throw `Result must be instantiated with an array containing at least one Invokable`;
+        }
+
+        if (!Array.isArray(results) || results.length <= 0) {
+            throw `Result must be instantiated with an array containing at least one result`;
+        }
+
+        if (invokables.length !== results.length) {
+            throw `There must be exactly one result for each Invokable`;
+        }
+
         this._invokables = invokables;
         this._results = results;
         this._subject = subject;
@@ -18,11 +32,13 @@ class Result {
     * @return    {Boolean}    `true` if all Results are also `true`, `false` otherwise
     */
     forAll () {
-        const results = this._results;
-
-        return results.reduce(function(acc, result) {
+        return  this._results.reduce(function(acc, result) {
             if (Array.isArray(result)) {
                 return acc && result.reduce(function(subAcc, subResult) {
+                    if (!(subResult instanceof Result)) {
+                        throw `Result results array can only contain booleans or arrays of Results`;
+                    }
+
                     return subAcc && subResult.forAll();
                 }, acc);
             }
@@ -37,11 +53,13 @@ class Result {
     *                         all results are also `false`
     */
     forAny () {
-        const results = this._results;
-
-        return results.reduce(function (acc, result) {
+        return this._results.reduce(function (acc, result) {
             if (Array.isArray(result)) {
                 return acc || result.reduce(function(subAcc, subResult) {
+                    if (!(subResult instanceof Result)) {
+                        throw `Result results array can only contain booleans or arrays of Results`;
+                    }
+
                     return subAcc || subResult.forAny();
                 }, acc) === true;
             }
@@ -58,11 +76,16 @@ class Result {
     *                                Invokables
     */
     forOne (name) {
-        const invokables = this._invokables;
-        const results = this._results;
+        if (!(typeof name === `string`) || name.length <= 0) {
+            throw `Result forOne must have Invokable name as parameter`;
+        }
 
-        return results.filter(function(element, index) {
-            return invokables[index].getName() === name;
+        return this._results.filter((element, index) => {
+            if (!(this._invokables[index] instanceof Invokable)) {
+                throw `Result invokables array can only contain Invokables`;
+            }
+
+            return this._invokables[index]._name === name;
         });
     }
 
