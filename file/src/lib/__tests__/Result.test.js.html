@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">src/lib/__tests__/Result.test.js | fence.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A framework to create efficient and extensible validations"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="fence.js"><meta property="twitter:description" content="A framework to create efficient and extensible validations"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Fence.js~Fence.html">Fence</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/FenceBuilder.js~FenceBuilder.html">FenceBuilder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html">Invokable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Result.js~Result.html">Result</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/lib/__tests__/Result.test.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Result from &apos;../Result&apos;;
+import Invokable from &apos;../Invokable&apos;;
+
+describe(`Result`, function () {
+    test(`Result empty constructor`, () =&gt; {
+        expect(() =&gt; new Result()).toThrow();
+    });
+
+    test(`Result no invokables`, () =&gt; {
+        expect(() =&gt; new Result(null, [])).toThrow();
+    });
+
+    test(`Result no results`, () =&gt; {
+        expect(() =&gt; new Result([], null)).toThrow();
+    });
+
+    test(`Result null invokables and results`, () =&gt; {
+        expect(() =&gt; new Result(null, null)).toThrow();
+    });
+
+    test(`Result empty invokables and results`, () =&gt; {
+        expect(() =&gt; new Result([], [])).toThrow();
+    });
+
+    test(`Result invokables and empty results`, () =&gt; {
+        expect(() =&gt; new Result([true], [])).toThrow();
+    });
+
+    test(`Result mismatched invokables and results`, () =&gt; {
+        expect(() =&gt; new Result([null], [null, null])).toThrow();
+    });
+
+    test(`Result forAll true`, () =&gt; {
+        const result = new Result([null, null, null], [true, true, true]);
+        expect(result.forAll()).toEqual(true);
+    });
+
+    test(`Result forAll mixed`, () =&gt; {
+        const result = new Result([null, null, null], [true, false, true]);
+        expect(result.forAll()).toEqual(false);
+    });
+
+    test(`Result forAll bad sub array`, () =&gt; {
+        const result = new Result([null], [[true]]);
+        expect(() =&gt; result.forAll()).toThrow();
+    });
+
+    test(`Result forAll good sub array`, () =&gt; {
+        const subResult = new Result([null], [true]);
+        const result = new Result([null], [[subResult]]);
+
+        expect(result.forAll()).toEqual(true);
+    });
+
+    test(`Result forAll mixed sub array`, () =&gt; {
+        const subResult = new Result([null, false], [true, false]);
+        const result = new Result([null, null], [true, [subResult]]);
+
+        expect(result.forAll()).toEqual(false);
+    });
+
+    test(`Result forAny true`, () =&gt; {
+        const result = new Result([null, null, null], [true, true, true]);
+        expect(result.forAny()).toEqual(true);
+    });
+
+    test(`Result forAny mixed`, () =&gt; {
+        const result = new Result([null, null, null], [true, false, true]);
+        expect(result.forAny()).toEqual(true);
+    });
+
+    test(`Result forAny false`, () =&gt; {
+        const result = new Result([null, null, null], [false, false, false]);
+        expect(result.forAny()).toEqual(false);
+    });
+
+    test(`Result forAny bad sub array`, () =&gt; {
+        const result = new Result([null], [[true]]);
+        expect(() =&gt; result.forAny()).toThrow();
+    });
+
+    test(`Result forAny good sub array`, () =&gt; {
+        const subResult = new Result([null], [true]);
+        const result = new Result([null], [[subResult]]);
+
+        expect(result.forAny()).toEqual(true);
+    });
+
+    test(`Result forAny mixed sub array`, () =&gt; {
+        const subResult = new Result([null, false], [true, false]);
+        const result = new Result([null, null], [true, [subResult]]);
+
+        expect(result.forAny()).toEqual(true);
+    });
+
+    test(`Result forAny false sub array`, () =&gt; {
+        const subResult = new Result([null, false], [false, false]);
+        const result = new Result([null, null], [false, [subResult]]);
+
+        expect(result.forAny()).toEqual(false);
+    });
+
+    test(`Result forOne bad name`, () =&gt; {
+        const result = new Result([null], [false]);
+
+        expect(() =&gt; result.forOne()).toThrow();
+        expect(() =&gt; result.forOne(``)).toThrow();
+        expect(() =&gt; result.forOne([true])).toThrow();
+        expect(() =&gt; result.forOne(`fn`)).toThrow();
+    });
+
+    test(`Result forOne good name`, () =&gt; {
+        const invokable = new Invokable(() =&gt; true, `fn`);
+        const result = new Result([invokable], [invokable.invoke()]);
+
+        expect(result.forOne(`fn`)).toEqual([true]);
+    });
+});
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.0.4)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

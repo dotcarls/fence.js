@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <base data-ice="baseUrl" href="../../../../">
+  <title data-ice="title">src/lib/__tests__/Invokable.test.js | fence.js</title>
+  <link type="text/css" rel="stylesheet" href="css/style.css">
+  <link type="text/css" rel="stylesheet" href="css/prettify-tomorrow.css">
+  <script src="script/prettify/prettify.js"></script>
+  <script src="script/manual.js"></script>
+<meta name="description" content="A framework to create efficient and extensible validations"><meta property="twitter:card" content="summary"><meta property="twitter:title" content="fence.js"><meta property="twitter:description" content="A framework to create efficient and extensible validations"></head>
+<body class="layout-container" data-ice="rootContainer">
+
+<header>
+  <a href="./">Home</a>
+  
+  <a href="identifiers.html">Reference</a>
+  <a href="source.html">Source</a>
+  
+  <div class="search-box">
+  <span>
+    <img src="./image/search.png">
+    <span class="search-input-edge"></span><input class="search-input"><span class="search-input-edge"></span>
+  </span>
+    <ul class="search-result"></ul>
+  </div>
+</header>
+
+<nav class="navigation" data-ice="nav"><div>
+  <ul>
+    
+  <li data-ice="doc"><a data-ice="dirPath" class="nav-dir-path" href="identifiers.html#lib">lib</a><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Fence.js~Fence.html">Fence</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/FenceBuilder.js~FenceBuilder.html">FenceBuilder</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html">Invokable</a></span></span></li>
+<li data-ice="doc"><span data-ice="kind" class="kind-class">C</span><span data-ice="name"><span><a href="class/src/lib/Result.js~Result.html">Result</a></span></span></li>
+</ul>
+</div>
+</nav>
+
+<div class="content" data-ice="content"><h1 data-ice="title">src/lib/__tests__/Invokable.test.js</h1>
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Invokable from &apos;../Invokable&apos;;
+
+describe(`Invokable`, function () {
+    test(`Invokable empty constructor`, () =&gt; {
+        expect(() =&gt; new Invokable()).toThrow();
+    });
+
+    test(`Invokable no fn`, () =&gt; {
+        expect(() =&gt; new Invokable(null, `name`, [], true)).toThrow();
+    });
+
+    test(`Invokable anonymous fn no name`, () =&gt; {
+        expect(() =&gt; new Invokable(() =&gt; true)).toThrow();
+    });
+
+    test(`Invokable bad args`, () =&gt; {
+        expect(() =&gt; new Invokable(() =&gt; true, `name`, `string`)).toThrow();
+    });
+
+    test(`Invokable bad memoize`, () =&gt; {
+        expect(() =&gt; new Invokable(() =&gt; true, `name`, [], null)).toThrow();
+    });
+
+    test(`Invokable anonymous fn with name is created`, () =&gt; {
+        expect(new Invokable(() =&gt; true, `name`)).toBeInstanceOf(Invokable);
+    });
+
+    test(`Invokable anonymous fn with name has correct name property`, () =&gt; {
+        const name = `name`;
+        const invokable = new Invokable(() =&gt; true, name);
+        expect(invokable._name).toEqual(name);
+    });
+
+    test(`Invokable named fn with no name has correct name property`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn);
+        expect(invokable._name).toEqual(`fn`);
+    });
+
+    test(`Invokable named fn with name has correct name property`, () =&gt; {
+        const fn = () =&gt; true;
+        const name = `name`;
+        const invokable = new Invokable(fn, name);
+        expect(invokable._name).toEqual(name);
+    });
+
+    test(`Invokable default properties`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn);
+
+        expect(invokable).toHaveProperty(`_name`, `fn`);
+        expect(invokable).toHaveProperty(`_args`, []);
+        expect(invokable).toHaveProperty(`_memoize`, false);
+        expect(invokable).not.toHaveProperty(`_cache`);
+        expect(invokable).not.toHaveProperty(`_memoizedFn`);
+    });
+
+    test(`Invokable memoized instantiates`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn, null, [], true);
+
+        expect(invokable).toHaveProperty(`_name`, `fn`);
+        expect(invokable).toHaveProperty(`_args`, []);
+        expect(invokable).toHaveProperty(`_memoize`, true);
+        expect(invokable).toHaveProperty(`_memoizedFn`);
+    });
+
+    test(`Invokable can be invoked`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn);
+
+        expect(invokable.invoke()).toEqual(true);
+    });
+
+    test(`Invokable memoized can be invoked`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn, null, [], true);
+
+        expect(invokable.invoke()).toEqual(true);
+    });
+
+    test(`Invokable memoized use &apos;none&apos; key when no arguments`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn, null, [], true);
+
+        expect(invokable.invoke()).toEqual(true);
+        expect(invokable._cache).toHaveProperty(`none`, true);
+    });
+
+    test(`Invokable memoized use first argument key`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn, null, [], true);
+
+        expect(invokable.invoke(`a`)).toEqual(true);
+        expect(invokable._cache).toHaveProperty(`a`, true);
+    });
+
+    test(`Invokable memoized doesn&apos;t call function with same args more than once`, () =&gt; {
+        const counter = jest.fn();
+        const fn = () =&gt; { counter(); return true; };
+        const invokable = new Invokable(fn, null, [], true);
+
+        invokable.invoke(`a`);
+        invokable.invoke(`a`);
+        invokable.invoke(`b`);
+        expect(counter).toHaveBeenCalledTimes(2);
+
+        invokable.dememoize();
+        invokable.invoke(`a`);
+        invokable.invoke(`a`);
+        expect(counter).toHaveBeenCalledTimes(4);
+    });
+
+    test(`Invokable dememoized clears properties`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn, null, [], true);
+
+        invokable.invoke(`a`);
+        expect(invokable).toHaveProperty(`_memoize`, true);
+        expect(invokable).toHaveProperty(`_cache`);
+        expect(invokable).toHaveProperty(`_memoizedFn`);
+        expect(invokable._cache).toHaveProperty(`a`, true);
+
+        invokable.dememoize();
+
+        expect(invokable).toHaveProperty(`_memoize`, false);
+        expect(invokable).not.toHaveProperty(`_cache`);
+        expect(invokable).not.toHaveProperty(`_memoizedFn`);
+    });
+
+    test(`Invokable serialize is stringified correctly`, () =&gt; {
+        const fn = () =&gt; true;
+        const invokable = new Invokable(fn, null, [], false);
+        const parsed = JSON.parse(invokable.serialize());
+
+        expect(parsed).toHaveProperty(`_name`, `fn`);
+        expect(parsed).toHaveProperty(`_args`, []);
+        expect(parsed).toHaveProperty(`_memoize`, false);
+    });
+});
+</code></pre>
+
+</div>
+
+<footer class="footer">
+  Generated by <a href="https://esdoc.org">ESDoc<span data-ice="esdocVersion">(1.0.4)</span><img src="./image/esdoc-logo-mini-black.png"></a>
+</footer>
+
+<script src="script/search_index.js"></script>
+<script src="script/search.js"></script>
+<script src="script/pretty-print.js"></script>
+<script src="script/inherited-summary.js"></script>
+<script src="script/test-summary.js"></script>
+<script src="script/inner-link.js"></script>
+<script src="script/patch-for-local.js"></script>
+</body>
+</html>

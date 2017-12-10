@@ -60,6 +60,10 @@ class FenceBuilder {
     * @param    {Array}    invokables    A set of already defined `Invokable`&apos;s
     */
     constructor (invokables) {
+        if (typeof invokables !== `undefined` &amp;&amp; !Array.isArray(invokables)) {
+            throw `FenceBuilder constructor argument can only be an Array`;
+        }
+
         this._invokables = invokables ? invokables.slice() : [];
     }
 
@@ -99,10 +103,10 @@ class FenceBuilder {
     * @return    {FenceBuilder}           The `FenceBuilder` instance being
     *                                          operated on, used for function chaining
     */
-    register (name, fn, memoize, debug, loggers) {
+    register (fn, name, memoize, debug, loggers) {
         const proto = Object.getPrototypeOf(this);
-        proto[name] = function() {
-            this._invokables.push(new Invokable(name, fn, arguments, memoize, debug, loggers));
+        proto[name] = function(...args) {
+            this._invokables.push(new Invokable(fn, name, args, memoize, debug, loggers));
 
             return this;
         };

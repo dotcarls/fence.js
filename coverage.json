@@ -1,7 +1,7 @@
 {
-  "coverage": "57.57%",
+  "coverage": "66.66%",
   "expectCount": 33,
-  "actualCount": 19,
+  "actualCount": 22,
   "files": {
     "src/lib/Fence.js": {
       "expectCount": 4,
@@ -14,31 +14,28 @@
       "expectCount": 9,
       "actualCount": 8,
       "undocumentLines": [
-        23
+        27
       ]
     },
     "src/lib/Invokable.js": {
       "expectCount": 11,
-      "actualCount": 3,
+      "actualCount": 6,
       "undocumentLines": [
-        11,
-        12,
-        13,
-        14,
-        39,
-        62,
-        65,
-        71
+        29,
+        30,
+        31,
+        32,
+        89
       ]
     },
     "src/lib/Result.js": {
       "expectCount": 9,
       "actualCount": 5,
       "undocumentLines": [
-        10,
-        11,
-        12,
-        69
+        24,
+        25,
+        26,
+        92
       ]
     }
   }

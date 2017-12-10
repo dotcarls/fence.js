@@ -97,7 +97,7 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(name: <span>String</span>, fn: <span>Function</span>, args: <span>Array</span>)</span>
+          <span class="code" data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html#instance-constructor-constructor">constructor</a></span></span><span class="code" data-ice="signature">(fn: <span>Function</span>, name: <span>String</span>, args: <span>Array</span>, memoize: <span>Boolean</span>)</span>
         </p>
       </div>
       <div>
@@ -285,7 +285,8 @@
       <div>
         
         
-        
+        <div data-ice="description"><p>Remove the <code>_cache</code> property and <code>_memoizedFn</code>.</p>
+</div>
       </div>
     </td>
     <td>
@@ -342,7 +343,9 @@
       <div>
         
         
-        
+        <div data-ice="description"><p>Create a private, non-enumerable and non-writable <code>_cache</code> property, as well
+as a <code>_memoizedFn</code> property.</p>
+</div>
       </div>
     </td>
     <td>
@@ -364,13 +367,14 @@
           
           
           
-          <span class="code" data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html#instance-method-serialize">serialize</a></span></span><span class="code" data-ice="signature">(returnFull: <span>*</span>): <span>*</span></span>
+          <span class="code" data-ice="name"><span><a href="class/src/lib/Invokable.js~Invokable.html#instance-method-serialize">serialize</a></span></span><span class="code" data-ice="signature">(): <span>String</span></span>
         </p>
       </div>
       <div>
         
         
-        
+        <div data-ice="description"><p>Represent an Invokable as a string.</p>
+</div>
       </div>
     </td>
     <td>
@@ -396,11 +400,11 @@
     
     
     
-    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(name: <span>String</span>, fn: <span>Function</span>, args: <span>Array</span>)</span>
+    <span class="code" data-ice="name">constructor</span><span class="code" data-ice="signature">(fn: <span>Function</span>, name: <span>String</span>, args: <span>Array</span>, memoize: <span>Boolean</span>)</span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber10">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber12">source</a></span></span>
     </span>
   </h3>
 
@@ -420,17 +424,18 @@
     <tbody>
     
     <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">name</td>
-      <td data-ice="type" class="code"><span>String</span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"><p>[required] Function Name used for prototype / lookups</p>
-</td>
-    </tr>
-<tr data-ice="property" data-depth="0">
       <td data-ice="name" class="code" data-depth="0">fn</td>
       <td data-ice="type" class="code"><span>Function</span></td>
       <td data-ice="appendix"></td>
-      <td data-ice="description"><p>[required] Function reference that is executed during invokation</p>
+      <td data-ice="description"><p>[required] function reference that is executed during invokation</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">name</td>
+      <td data-ice="type" class="code"><span>String</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>[required] required if function is anonymous
+                                            will override function name property</p>
 </td>
     </tr>
 <tr data-ice="property" data-depth="0">
@@ -438,6 +443,13 @@
       <td data-ice="type" class="code"><span>Array</span></td>
       <td data-ice="appendix"></td>
       <td data-ice="description"><p>[optional] arguments to be applied to the function</p>
+</td>
+    </tr>
+<tr data-ice="property" data-depth="0">
+      <td data-ice="name" class="code" data-depth="0">memoize</td>
+      <td data-ice="type" class="code"><span>Boolean</span></td>
+      <td data-ice="appendix"></td>
+      <td data-ice="description"><p>[optional] when true, function calls are memoized</p>
 </td>
     </tr>
 </tbody>
@@ -477,7 +489,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber13">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber31">source</a></span></span>
     </span>
   </h3>
 
@@ -520,7 +532,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber12">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber30">source</a></span></span>
     </span>
   </h3>
 
@@ -563,7 +575,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber14">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber32">source</a></span></span>
     </span>
   </h3>
 
@@ -606,7 +618,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber62">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber89">source</a></span></span>
     </span>
   </h3>
 
@@ -649,7 +661,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber11">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber29">source</a></span></span>
     </span>
   </h3>
 
@@ -695,14 +707,16 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber65">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber97">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Remove the <code>_cache</code> property and <code>_memoizedFn</code>. Set <code>_memoize</code> to false
+so that <code>_fn</code> is called.</p>
+</div>
 
   
 
@@ -738,7 +752,7 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber27">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber46">source</a></span></span>
     </span>
   </h3>
 
@@ -812,14 +826,18 @@
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber39">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber66">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
+  <div data-ice="description"><p>Create a private, non-enumerable and non-writable <code>_cache</code> property, as well
+as a <code>_memoizedFn</code> property. Calling an <code>Invokable</code>&apos;s <code>_memoizedFn</code> rather
+than its <code>_fn</code> will cause the result to be stored in the <code>_cache</code>, keyed by
+the function arguments.</p>
+</div>
 
   
 
@@ -851,38 +869,23 @@
     
     
     
-    <span class="code" data-ice="name">serialize</span><span class="code" data-ice="signature">(returnFull: <span>*</span>): <span>*</span></span>
+    <span class="code" data-ice="name">serialize</span><span class="code" data-ice="signature">(): <span>String</span></span>
     <span class="right-info">
       
       
-      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber71">source</a></span></span>
+      <span data-ice="source"><span><a href="file/src/lib/Invokable.js.html#lineNumber109">source</a></span></span>
     </span>
   </h3>
 
   
   
   
-  
-
-  
-
-  <div data-ice="properties"><div data-ice="properties">
-  <h4 data-ice="title">Params:</h4>
-  <table class="params">
-    <thead>
-    <tr><td>Name</td><td>Type</td><td>Attribute</td><td>Description</td></tr>
-    </thead>
-    <tbody>
-    
-    <tr data-ice="property" data-depth="0">
-      <td data-ice="name" class="code" data-depth="0">returnFull</td>
-      <td data-ice="type" class="code"><span>*</span></td>
-      <td data-ice="appendix"></td>
-      <td data-ice="description"></td>
-    </tr>
-</tbody>
-  </table>
+  <div data-ice="description"><p>Represent an Invokable as a string.</p>
 </div>
+
+  
+
+  <div data-ice="properties">
 </div>
 
   <div class="return-params" data-ice="returnParams">
@@ -890,8 +893,10 @@
     <table>
       <tbody>
         <tr>
-          <td class="return-type code" data-ice="returnType"><span>*</span></td>
-          
+          <td class="return-type code" data-ice="returnType"><span>String</span></td>
+          <td class="return-desc" data-ice="returnDescription"><p>a stringified JSON blob representing an
+                                       <code>Invokable</code> and its arguments</p>
+</td>
         </tr>
       </tbody>
     </table>

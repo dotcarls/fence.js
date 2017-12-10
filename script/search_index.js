@@ -226,5 +226,23 @@ window.esdocSearchIndex = [
     "class/src/lib/Result.js~Result.html#instance-method-forOne",
     "src/lib/Result.js~Result#forOne",
     "method"
+  ],
+  [
+    "src/lib/__tests__/fencebuilder.test.js",
+    "file/src/lib/__tests__/FenceBuilder.test.js.html",
+    "src/lib/__tests__/FenceBuilder.test.js",
+    "file"
+  ],
+  [
+    "src/lib/__tests__/invokable.test.js",
+    "file/src/lib/__tests__/Invokable.test.js.html",
+    "src/lib/__tests__/Invokable.test.js",
+    "file"
+  ],
+  [
+    "src/lib/__tests__/result.test.js",
+    "file/src/lib/__tests__/Result.test.js.html",
+    "src/lib/__tests__/Result.test.js",
+    "file"
   ]
 ]
