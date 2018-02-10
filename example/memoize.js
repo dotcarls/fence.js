@@ -6,10 +6,14 @@ let FB = new FenceBuilder();
 // Create a prototype method that will call a function which performs a strict
 // comparison of two values. `val1` will be set to a constant value after the
 // validation has been forkd.
-FB = FB.register(function (val1, val2) {
-    console.log(val1, val2);
-    return val1 === val2;
-}, 'strictEqual', true);
+FB = FB.register(
+    function(val1, val2) {
+        console.log(val1, val2);
+        return val1 === val2;
+    },
+    'strictEqual',
+    true
+);
 
 // `fork()` creates a copy of a `FenceBuilder` that you can extend
 const original = FB.fork().strictEqual('a');

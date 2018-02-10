@@ -1,7 +1,9 @@
+/* eslint-env node, jest */
+
 const utils = require('../example/externals/utils');
 const faker = require('faker');
 
-function minLength (val, length) {
+function minLength(val, length) {
     if (!utils.required(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
@@ -9,7 +11,7 @@ function minLength (val, length) {
     return val.length >= length;
 }
 
-function maxLength (val, length) {
+function maxLength(val, length) {
     if (!utils.required(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
@@ -17,9 +19,9 @@ function maxLength (val, length) {
     return val.length <= length;
 }
 
-function policy (entity, policy) {
+function policy(entity, policy) {
     const results = [];
-    for (let attribute in entity) {
+    for (const attribute in entity) {
         if (policy[attribute]) {
             results.push(policy[attribute].run(entity[attribute]));
         }
@@ -28,19 +30,23 @@ function policy (entity, policy) {
     return results;
 }
 
-function strictEqual (val1, val2) {
+function strictEqual(val1, val2) {
     return val1 === val2;
 }
 
-function createTestData (num = 1) {
+function createTestData(num = 1) {
     const users = [];
     const chars = [];
     for (let i = 0; i < num; i++) {
         users.push({
-            username: Math.floor(Math.random() * 100) % 2 === 0 ?
-                faker.internet.email() : faker.internet.userName(),
-            password: Math.floor(Math.random() * 100) % 2 === 0 ?
-                faker.internet.password() : faker.random.word()
+            username:
+                Math.floor(Math.random() * 100) % 2 === 0
+                    ? faker.internet.email()
+                    : faker.internet.userName(),
+            password:
+                Math.floor(Math.random() * 100) % 2 === 0
+                    ? faker.internet.password()
+                    : faker.random.word()
         });
 
         chars.push({

@@ -1,5 +1,5 @@
-import Invokable from "./Invokable";
-import Fence from "./Fence";
+import Invokable from './Invokable';
+import Fence from './Fence';
 
 /**
  * A `FenceBuilder` is used to create an extensible `Fence`.
@@ -20,8 +20,8 @@ class FenceBuilder {
      * @param    {Array}    invokables    A set of already defined `Invokable`'s
      */
     constructor(invokables) {
-        if (typeof invokables !== `undefined` && !Array.isArray(invokables)) {
-            throw `FenceBuilder constructor argument can only be an Array`;
+        if (typeof invokables !== 'undefined' && !Array.isArray(invokables)) {
+            throw 'FenceBuilder constructor argument can only be an Array';
         }
 
         this._invokables = invokables ? invokables.slice() : [];
@@ -55,14 +55,14 @@ class FenceBuilder {
     }
 
     /**
-    * Add a named function reference to the prototype of an instance of `FenceBuilder`
-    *
-    * @param     {String}              name    A named function reference
-    * @param     {Function}            fn      A reference to a validation function
-    *
-    * @return    {FenceBuilder}           The `FenceBuilder` instance being
-    *                                          operated on, used for function chaining
-    */
+     * Add a named function reference to the prototype of an instance of `FenceBuilder`
+     *
+     * @param     {String}              name    A named function reference
+     * @param     {Function}            fn      A reference to a validation function
+     *
+     * @return    {FenceBuilder}           The `FenceBuilder` instance being
+     *                                          operated on, used for function chaining
+     */
     register(fn, name, memoize, debug, loggers) {
         const proto = Object.getPrototypeOf(this);
         proto[name] = function(...args) {
@@ -75,12 +75,12 @@ class FenceBuilder {
     }
 
     /**
-    * Remove a named function reference from the prototype of an instance of `FenceBuilder`
-    * @param     {String}              name    A named function reference
-    *
-    * @return    {FenceBuilder}           The `FenceBuilder` instance being
-    *                                          operated on, used for function chaining
-    */
+     * Remove a named function reference from the prototype of an instance of `FenceBuilder`
+     * @param     {String}              name    A named function reference
+     *
+     * @return    {FenceBuilder}           The `FenceBuilder` instance being
+     *                                          operated on, used for function chaining
+     */
     unregister(name) {
         const proto = Object.getPrototypeOf(this);
         delete proto[name];

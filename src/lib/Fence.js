@@ -1,4 +1,4 @@
-import Result from "./Result";
+import Result from './Result';
 
 /**
  * A 'built' FenceBuilder that can be exported for use in other functions.

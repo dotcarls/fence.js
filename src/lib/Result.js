@@ -1,4 +1,4 @@
-import Invokable from "./Invokable";
+import Invokable from './Invokable';
 
 /**
  * Adapter for mapping validation invokables to their results
@@ -6,19 +6,20 @@ import Invokable from "./Invokable";
 class Result {
     /**
      * @param    {Invokable[]}    invokables     Array of invokable validation functions
-     * @param    {Result[]}          results     Array of values returned from invoked validation functions
+     * @param    {Result[]}          results     Array of values returned from invoked validation
+     *                                           functions
      */
     constructor(invokables = [], results = [], subject = null) {
         if (!Array.isArray(invokables) || invokables.length <= 0) {
-            throw `Result must be instantiated with an array containing at least one Invokable`;
+            throw 'Result must be instantiated with an array containing at least one Invokable';
         }
 
         if (!Array.isArray(results) || results.length <= 0) {
-            throw `Result must be instantiated with an array containing at least one result`;
+            throw 'Result must be instantiated with an array containing at least one result';
         }
 
         if (invokables.length !== results.length) {
-            throw `There must be exactly one result for each Invokable`;
+            throw 'There must be exactly one result for each Invokable';
         }
 
         this._invokables = invokables;
@@ -38,7 +39,7 @@ class Result {
                     acc &&
                     result.reduce(function(subAcc, subResult) {
                         if (!(subResult instanceof Result)) {
-                            throw `Result results array can only contain booleans or arrays of Results`;
+                            throw 'Result results array can only contain booleans or arrays of Results';
                         }
 
                         return subAcc && subResult.forAll();
@@ -62,7 +63,7 @@ class Result {
                     acc ||
                     result.reduce(function(subAcc, subResult) {
                         if (!(subResult instanceof Result)) {
-                            throw `Result results array can only contain booleans or arrays of Results`;
+                            throw 'Result results array can only contain booleans or arrays of Results';
                         }
 
                         return subAcc || subResult.forAny();
@@ -82,13 +83,13 @@ class Result {
      *                                Invokables
      */
     forOne(name) {
-        if (!(typeof name === `string`) || name.length <= 0) {
-            throw `Result forOne must have Invokable name as parameter`;
+        if (!(typeof name === 'string') || name.length <= 0) {
+            throw 'Result forOne must have Invokable name as parameter';
         }
 
         return this._results.filter((element, index) => {
             if (!(this._invokables[index] instanceof Invokable)) {
-                throw `Result invokables array can only contain Invokables`;
+                throw 'Result invokables array can only contain Invokables';
             }
 
             return this._invokables[index]._name === name;
@@ -97,14 +98,14 @@ class Result {
 
     explain(logger, indent) {
         logger = logger || console.log;
-        indent = indent || `  `;
+        indent = indent || '  ';
 
-        logger(indent, `subject:`, JSON.stringify(this._subject));
-        logger(indent + indent, this.forAll() ? `[✓]` : `[x]`, `forAll`);
-        logger(indent + indent, this.forAny() ? `[✓]` : `[x]`, `forAny`);
+        logger(indent, 'subject:', JSON.stringify(this._subject));
+        logger(indent + indent, this.forAll() ? '[✓]' : '[x]', 'forAll');
+        logger(indent + indent, this.forAny() ? '[✓]' : '[x]', 'forAny');
 
-        logger(indent, `tests:`);
-        for (let i = 0;i < this._results.length;i ++) {
+        logger(indent, 'tests:');
+        for (let i = 0; i < this._results.length; i++) {
             const result = this._results[i];
             const invokable = this._invokables[i];
             const testName = invokable._name;
@@ -112,10 +113,10 @@ class Result {
 
             let testLabel = testName;
             if (testArgs.length > 0) {
-                testLabel += ` (${  JSON.stringify(testArgs)  })`;
+                testLabel += ` (${JSON.stringify(testArgs)})`;
             }
 
-            logger(indent + indent, result ? `[✓]` : `[x]`, testLabel);
+            logger(indent + indent, result ? '[✓]' : '[x]', testLabel);
 
             if (Array.isArray(result)) {
                 result.forEach(function(subResult) {

@@ -21,9 +21,11 @@ original = original.strictEqual('a');
 let extended = original.fork().strictEqual('b');
 
 // We can add additional methods to an extended validation via `.register()`
-extended = extended.register(function() {
-    return true;
-}, 'alwaysTrue').alwaysTrue(); // Function chaining ftw!
+extended = extended
+    .register(function() {
+        return true;
+    }, 'alwaysTrue')
+    .alwaysTrue(); // Function chaining ftw!
 
 // consts create a third order validation and test for 'c'
 const moreExtended = extended.fork().strictEqual('c');
@@ -34,11 +36,9 @@ const val = 'a';
 // Once a validation is compconste, `.build()` will create an instance of `Fence`
 // (*not* `FenceBuilder`) which would typically be exported for use by other
 // code. here we are going to build them and run them all at once to see the output.
-const validations = [
-    original.build(),
-    extended.build(),
-    moreExtended.build()
-].map(function(validation) {
+const validations = [original.build(), extended.build(), moreExtended.build()].map(function(
+    validation
+) {
     return validation.run(val);
 });
 

@@ -3,27 +3,28 @@
  */
 class Invokable {
     /**
-     * @param    {Function}     fn      [required] function reference that is executed during invokation
+     * @param    {Function}     fn      [required] function reference that is executed during
+     *                                             invokation
      * @param    {String}       name    [required] required if function is anonymous
      *                                             will override function name property
      * @param    {Array}        args    [optional] arguments to be applied to the function
      * @param    {Boolean}      memoize [optional] when true, function calls are memoized
      */
-    constructor(fn, name = ``, args = [], memoize = false) {
-        if (!fn || typeof fn !== `function`) {
-            throw `Invokable must be instantiated with a function`;
+    constructor(fn, name = '', args = [], memoize = false) {
+        if (!fn || typeof fn !== 'function') {
+            throw 'Invokable must be instantiated with a function';
         }
 
-        if (fn.name === `` && name === ``) {
-            throw `Invokable anonymous functions must have a name argument`;
+        if (fn.name === '' && name === '') {
+            throw 'Invokable anonymous functions must have a name argument';
         }
 
         if (!Array.isArray(args)) {
-            throw `Invokable arguments must be an array`;
+            throw 'Invokable arguments must be an array';
         }
 
-        if (typeof memoize !== `boolean`) {
-            throw `Invokable memoize argument must be boolean`;
+        if (typeof memoize !== 'boolean') {
+            throw 'Invokable memoize argument must be boolean';
         }
 
         this._name = name && name.length ? name : fn.name;
@@ -64,7 +65,7 @@ class Invokable {
      * @method    memoize
      */
     memoize() {
-        Object.defineProperty(this, `_cache`, {
+        Object.defineProperty(this, '_cache', {
             value: {},
             writable: false,
             configurable: true,
@@ -72,7 +73,7 @@ class Invokable {
         });
 
         const memoized = function(fn, ...args) {
-            const key = args && args.length ? args[0] : `none`;
+            const key = args && args.length ? args[0] : 'none';
             const cache = memoized.cache;
 
             if (cache[key]) {
