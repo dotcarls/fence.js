@@ -6,7 +6,7 @@ let FB = new FenceBuilder();
 
 // A major benefit to the `FenceBuilder` approach is that by lazily executing
 // function references, we can pull validation functions from different modules
-FB = FB.register(utils.hasValue, 'hasValue');
+FB = FB.register(utils.required, 'required');
 
 // Function chaining allows for concise declarations and protects against mutation
 FB = FB.register(utils.isString, 'isString').register(
@@ -31,13 +31,13 @@ FB = FB.register(function(entity, policy) {
 }, 'policy');
 
 // All policies that extend from `basePolicy` should have a value
-const basePolicy = FB.fork().hasValue();
+const basePolicy = FB.fork().required();
 
 // Beyond that, we may want to be more specific with our validation functions,
 // so we register a `minLength` and a `maxLength` function
 let usernamePolicy = basePolicy.fork();
 usernamePolicy = usernamePolicy.register(function(val, length) {
-    if (!utils.hasValue(val) || !utils.isString(val) || !utils.isInteger(length)) {
+    if (!utils.required(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
 
@@ -46,7 +46,7 @@ usernamePolicy = usernamePolicy.register(function(val, length) {
 
 // You don't have to chain functions, just make sure to store a reference
 usernamePolicy = usernamePolicy.register(function(val, length) {
-    if (!utils.hasValue(val) || !utils.isString(val) || !utils.isInteger(length)) {
+    if (!utils.required(val) || !utils.isString(val) || !utils.isInteger(length)) {
         return false;
     }
 

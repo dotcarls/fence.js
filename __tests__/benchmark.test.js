@@ -10,7 +10,7 @@ const validate = require('validate.js');
 const Joi = require('joi');
 
 const basePolicy = new FenceBuilder()
-    .register('required', utils.hasValue)
+    .register('required', utils.required)
     .register('string', utils.isString)
     .register('email', utils.isValidEmailAddress)
     .register('policy', helpers.policy)
