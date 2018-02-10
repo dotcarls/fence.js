@@ -1,15 +1,15 @@
 /**
-* A validation function that will be invoked at some time
-*/
+ * A validation function that will be invoked at some time
+ */
 class Invokable {
     /**
-    * @param    {Function}     fn      [required] function reference that is executed during invokation
-    * @param    {String}       name    [required] required if function is anonymous
-    *                                             will override function name property
-    * @param    {Array}        args    [optional] arguments to be applied to the function
-    * @param    {Boolean}      memoize [optional] when true, function calls are memoized
-    */
-    constructor (fn, name = ``, args = [], memoize = false) {
+     * @param    {Function}     fn      [required] function reference that is executed during invokation
+     * @param    {String}       name    [required] required if function is anonymous
+     *                                             will override function name property
+     * @param    {Array}        args    [optional] arguments to be applied to the function
+     * @param    {Boolean}      memoize [optional] when true, function calls are memoized
+     */
+    constructor(fn, name = ``, args = [], memoize = false) {
         if (!fn || typeof fn !== `function`) {
             throw `Invokable must be instantiated with a function`;
         }
@@ -37,13 +37,13 @@ class Invokable {
     }
 
     /**
-    * Executes a validation function against a subject and any predefined arguments
-    *
-    * @method    invoke
-    * @param     {Any}         subject    the value to be validated
-    * @return    {Boolean}                the result of the validation
-    */
-    invoke (...subjects) {
+     * Executes a validation function against a subject and any predefined arguments
+     *
+     * @method    invoke
+     * @param     {Any}         subject    the value to be validated
+     * @return    {Boolean}                the result of the validation
+     */
+    invoke(...subjects) {
         let fn = this._fn;
         let args = subjects.concat(this._args);
 
@@ -63,7 +63,7 @@ class Invokable {
      *
      * @method    memoize
      */
-    memoize () {
+    memoize() {
         Object.defineProperty(this, `_cache`, {
             value: {},
             writable: false,
@@ -94,7 +94,7 @@ class Invokable {
      * so that `_fn` is called.
      * @method    dememoize
      */
-    dememoize () {
+    dememoize() {
         delete this._cache;
         delete this._memoizedFn;
         this._memoize = false;
@@ -106,7 +106,7 @@ class Invokable {
      * @return    {String}                    a stringified JSON blob representing an
      *                                        `Invokable` and its arguments
      */
-    serialize () {
+    serialize() {
         return JSON.stringify(this);
     }
 }
