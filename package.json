@@ -32,6 +32,7 @@
     "doc": "rimraf ./docs && esdoc",
     "doc:stage": "rimraf ./stage/* && cp -R ./docs/ ./.stage/",
     "test": "clear && jest",
+    "test:benchmark": "clear && jest benchmark",
     "test:coverage": "jest --coverage ",
     "test:watch": "clear && jest --watch",
     "lint:test": "npm run lint && npm run test:coverage",
@@ -81,9 +82,7 @@
   "jest": {
     "testEnvironment": "node",
     "testPathIgnorePatterns": [
-      "<rootDir>/.stage/",
-      "<rootDir>/__tests__/helpers.js",
-      "<rootDir>/__tests__/benchmark.test.js"
+      "<rootDir>/.stage/"
     ],
     "verbose": true,
     "collectCoverage": true,

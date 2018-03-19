@@ -5,7 +5,7 @@ const Benchmark = require('benchmark');
 const utils = require('../example/externals/utils');
 const helpers = require('./helpers');
 
-const FenceBuilder = require('../src');
+const FenceBuilder = require('../cjs');
 const validate = require('validate.js');
 const Joi = require('joi');
 
@@ -18,10 +18,10 @@ const basePolicy = new FenceBuilder()
     .register('max', helpers.maxLength)
     .register('equal', helpers.strictEqual);
 
-const baseUserPolicy = basePolicy
-    .fork()
+const baseUserPolicy = basePolicy.fork()
     .required()
     .max(255);
+
 const userPolicy = {
     username: baseUserPolicy
         .fork()
