@@ -29,7 +29,7 @@ The goal of this module is to solve these problems without getting in the way. B
 const FenceBuilder = require('./lib');
 const FB = new FenceBuilder();
 
-FB.register('strictEqual', function (val1, val2) {
+FB.register(function (val1, val2, 'strictEqual') {
     return val1 === val2;
 });
 
@@ -72,7 +72,7 @@ A fresh instance of `FenceBuilder` won't be able to do much -- we must 'register
 // new FenceBuilder
 const FB = new FenceBuilder();
 
-FB.register('strictEqual', function(val1, val2) {
+FB.register(function(val1, val2, 'strictEqual') {
     return val1 === val2;
 });
 ```

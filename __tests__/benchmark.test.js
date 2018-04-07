@@ -10,13 +10,13 @@ const validate = require('validate.js');
 const Joi = require('joi');
 
 const basePolicy = new FenceBuilder()
-    .register('required', utils.required)
-    .register('string', utils.isString)
-    .register('email', utils.isValidEmailAddress)
-    .register('policy', helpers.policy)
-    .register('min', helpers.minLength)
-    .register('max', helpers.maxLength)
-    .register('equal', helpers.strictEqual);
+    .register(utils.required, 'required')
+    .register(utils.isString, 'string')
+    .register(utils.isValidEmailAddress, 'email')
+    .register(helpers.policy, 'policy')
+    .register(helpers.minLength, 'min')
+    .register(helpers.maxLength, 'max')
+    .register(helpers.strictEqual, 'equal');
 
 const baseUserPolicy = basePolicy.fork()
     .required()
