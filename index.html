@@ -57,7 +57,7 @@
 <h2 id="usage">Usage</h2><h3 id="example">Example</h3><pre><code class="lang-js"><code class="source-code prettyprint">const FenceBuilder = require(&apos;./lib&apos;);
 const FB = new FenceBuilder();
 
-FB.register(&apos;strictEqual&apos;, function (val1, val2) {
+FB.register(function (val1, val2, &apos;strictEqual&apos;) {
     return val1 === val2;
 });
 
@@ -85,7 +85,7 @@ const anotherFence = someFence.fork();</code>
 <pre><code class="lang-js"><code class="source-code prettyprint">// new FenceBuilder
 const FB = new FenceBuilder();
 
-FB.register(&apos;strictEqual&apos;, function(val1, val2) {
+FB.register(function(val1, val2, &apos;strictEqual&apos;) {
     return val1 === val2;
 });</code>
 </code></pre>

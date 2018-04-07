@@ -38,123 +38,125 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/lib/__tests__/Result.test.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Result from &apos;../Result&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* eslint-env node, jest */
+
+import Result from &apos;../Result&apos;;
 import Invokable from &apos;../Invokable&apos;;
 
 /** @test {Result} */
-describe(`Result`, function () {
-    test(`Result empty constructor`, () =&gt; {
+describe(&apos;Result&apos;, () =&gt; {
+    test(&apos;Result empty constructor&apos;, () =&gt; {
         expect(() =&gt; new Result()).toThrow();
     });
 
-    test(`Result no invokables`, () =&gt; {
+    test(&apos;Result no invokables&apos;, () =&gt; {
         expect(() =&gt; new Result(null, [])).toThrow();
     });
 
-    test(`Result no results`, () =&gt; {
+    test(&apos;Result no results&apos;, () =&gt; {
         expect(() =&gt; new Result([], null)).toThrow();
     });
 
-    test(`Result null invokables and results`, () =&gt; {
+    test(&apos;Result null invokables and results&apos;, () =&gt; {
         expect(() =&gt; new Result(null, null)).toThrow();
     });
 
-    test(`Result empty invokables and results`, () =&gt; {
+    test(&apos;Result empty invokables and results&apos;, () =&gt; {
         expect(() =&gt; new Result([], [])).toThrow();
     });
 
-    test(`Result invokables and empty results`, () =&gt; {
+    test(&apos;Result invokables and empty results&apos;, () =&gt; {
         expect(() =&gt; new Result([true], [])).toThrow();
     });
 
-    test(`Result mismatched invokables and results`, () =&gt; {
+    test(&apos;Result mismatched invokables and results&apos;, () =&gt; {
         expect(() =&gt; new Result([null], [null, null])).toThrow();
     });
 
-    test(`Result forAll true`, () =&gt; {
+    test(&apos;Result forAll true&apos;, () =&gt; {
         const result = new Result([null, null, null], [true, true, true]);
         expect(result.forAll()).toEqual(true);
     });
 
-    test(`Result forAll mixed`, () =&gt; {
+    test(&apos;Result forAll mixed&apos;, () =&gt; {
         const result = new Result([null, null, null], [true, false, true]);
         expect(result.forAll()).toEqual(false);
     });
 
-    test(`Result forAll bad sub array`, () =&gt; {
+    test(&apos;Result forAll bad sub array&apos;, () =&gt; {
         const result = new Result([null], [[true]]);
         expect(() =&gt; result.forAll()).toThrow();
     });
 
-    test(`Result forAll good sub array`, () =&gt; {
+    test(&apos;Result forAll good sub array&apos;, () =&gt; {
         const subResult = new Result([null], [true]);
         const result = new Result([null], [[subResult]]);
 
         expect(result.forAll()).toEqual(true);
     });
 
-    test(`Result forAll mixed sub array`, () =&gt; {
+    test(&apos;Result forAll mixed sub array&apos;, () =&gt; {
         const subResult = new Result([null, false], [true, false]);
         const result = new Result([null, null], [true, [subResult]]);
 
         expect(result.forAll()).toEqual(false);
     });
 
-    test(`Result forAny true`, () =&gt; {
+    test(&apos;Result forAny true&apos;, () =&gt; {
         const result = new Result([null, null, null], [true, true, true]);
         expect(result.forAny()).toEqual(true);
     });
 
-    test(`Result forAny mixed`, () =&gt; {
+    test(&apos;Result forAny mixed&apos;, () =&gt; {
         const result = new Result([null, null, null], [true, false, true]);
         expect(result.forAny()).toEqual(true);
     });
 
-    test(`Result forAny false`, () =&gt; {
+    test(&apos;Result forAny false&apos;, () =&gt; {
         const result = new Result([null, null, null], [false, false, false]);
         expect(result.forAny()).toEqual(false);
     });
 
-    test(`Result forAny bad sub array`, () =&gt; {
+    test(&apos;Result forAny bad sub array&apos;, () =&gt; {
         const result = new Result([null], [[true]]);
         expect(() =&gt; result.forAny()).toThrow();
     });
 
-    test(`Result forAny good sub array`, () =&gt; {
+    test(&apos;Result forAny good sub array&apos;, () =&gt; {
         const subResult = new Result([null], [true]);
         const result = new Result([null], [[subResult]]);
 
         expect(result.forAny()).toEqual(true);
     });
 
-    test(`Result forAny mixed sub array`, () =&gt; {
+    test(&apos;Result forAny mixed sub array&apos;, () =&gt; {
         const subResult = new Result([null, false], [true, false]);
         const result = new Result([null, null], [true, [subResult]]);
 
         expect(result.forAny()).toEqual(true);
     });
 
-    test(`Result forAny false sub array`, () =&gt; {
+    test(&apos;Result forAny false sub array&apos;, () =&gt; {
         const subResult = new Result([null, false], [false, false]);
         const result = new Result([null, null], [false, [subResult]]);
 
         expect(result.forAny()).toEqual(false);
     });
 
-    test(`Result forOne bad name`, () =&gt; {
+    test(&apos;Result forOne bad name&apos;, () =&gt; {
         const result = new Result([null], [false]);
 
         expect(() =&gt; result.forOne()).toThrow();
-        expect(() =&gt; result.forOne(``)).toThrow();
+        expect(() =&gt; result.forOne(&apos;&apos;)).toThrow();
         expect(() =&gt; result.forOne([true])).toThrow();
-        expect(() =&gt; result.forOne(`fn`)).toThrow();
+        expect(() =&gt; result.forOne(&apos;fn&apos;)).toThrow();
     });
 
-    test(`Result forOne good name`, () =&gt; {
-        const invokable = new Invokable(() =&gt; true, `fn`);
+    test(&apos;Result forOne good name&apos;, () =&gt; {
+        const invokable = new Invokable(() =&gt; true, &apos;fn&apos;);
         const result = new Result([invokable], [invokable.invoke()]);
 
-        expect(result.forOne(`fn`)).toEqual([true]);
+        expect(result.forOne(&apos;fn&apos;)).toEqual([true]);
     });
 });
 </code></pre>

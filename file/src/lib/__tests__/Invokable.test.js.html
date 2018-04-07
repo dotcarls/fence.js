@@ -38,145 +38,150 @@
 </nav>
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/lib/__tests__/Invokable.test.js</h1>
-<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Invokable from &apos;../Invokable&apos;;
+<pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/* eslint-env node, jest, babel */
+
+import Invokable from &apos;../Invokable&apos;;
 
 /** @test {Invokable} */
-describe(`Invokable`, function () {
-    test(`Invokable empty constructor`, () =&gt; {
+describe(&apos;Invokable&apos;, () =&gt; {
+    test(&apos;Invokable empty constructor&apos;, () =&gt; {
         expect(() =&gt; new Invokable()).toThrow();
     });
 
-    test(`Invokable no fn`, () =&gt; {
-        expect(() =&gt; new Invokable(null, `name`, [], true)).toThrow();
+    test(&apos;Invokable no fn&apos;, () =&gt; {
+        expect(() =&gt; new Invokable(null, &apos;name&apos;, [], true)).toThrow();
     });
 
-    test(`Invokable anonymous fn no name`, () =&gt; {
+    test(&apos;Invokable anonymous fn no name&apos;, () =&gt; {
         expect(() =&gt; new Invokable(() =&gt; true)).toThrow();
     });
 
-    test(`Invokable bad args`, () =&gt; {
-        expect(() =&gt; new Invokable(() =&gt; true, `name`, `string`)).toThrow();
+    test(&apos;Invokable bad args&apos;, () =&gt; {
+        expect(() =&gt; new Invokable(() =&gt; true, &apos;name&apos;, &apos;string&apos;)).toThrow();
     });
 
-    test(`Invokable bad memoize`, () =&gt; {
-        expect(() =&gt; new Invokable(() =&gt; true, `name`, [], null)).toThrow();
+    test(&apos;Invokable bad memoize&apos;, () =&gt; {
+        expect(() =&gt; new Invokable(() =&gt; true, &apos;name&apos;, [], null)).toThrow();
     });
 
-    test(`Invokable anonymous fn with name is created`, () =&gt; {
-        expect(new Invokable(() =&gt; true, `name`)).toBeInstanceOf(Invokable);
+    test(&apos;Invokable anonymous fn with name is created&apos;, () =&gt; {
+        expect(new Invokable(() =&gt; true, &apos;name&apos;)).toBeInstanceOf(Invokable);
     });
 
-    test(`Invokable anonymous fn with name has correct name property`, () =&gt; {
-        const name = `name`;
+    test(&apos;Invokable anonymous fn with name has correct name property&apos;, () =&gt; {
+        const name = &apos;name&apos;;
         const invokable = new Invokable(() =&gt; true, name);
         expect(invokable._name).toEqual(name);
     });
 
-    test(`Invokable named fn with no name has correct name property`, () =&gt; {
+    test(&apos;Invokable named fn with no name has correct name property&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn);
-        expect(invokable._name).toEqual(`fn`);
+        expect(invokable._name).toEqual(&apos;fn&apos;);
     });
 
-    test(`Invokable named fn with name has correct name property`, () =&gt; {
+    test(&apos;Invokable named fn with name has correct name property&apos;, () =&gt; {
         const fn = () =&gt; true;
-        const name = `name`;
+        const name = &apos;name&apos;;
         const invokable = new Invokable(fn, name);
         expect(invokable._name).toEqual(name);
     });
 
-    test(`Invokable default properties`, () =&gt; {
+    test(&apos;Invokable default properties&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn);
 
-        expect(invokable).toHaveProperty(`_name`, `fn`);
-        expect(invokable).toHaveProperty(`_args`, []);
-        expect(invokable).toHaveProperty(`_memoize`, false);
-        expect(invokable).not.toHaveProperty(`_cache`);
-        expect(invokable).not.toHaveProperty(`_memoizedFn`);
+        expect(invokable).toHaveProperty(&apos;_name&apos;, &apos;fn&apos;);
+        expect(invokable).toHaveProperty(&apos;_args&apos;, []);
+        expect(invokable).toHaveProperty(&apos;_memoize&apos;, false);
+        expect(invokable).not.toHaveProperty(&apos;_cache&apos;);
+        expect(invokable).not.toHaveProperty(&apos;_memoizedFn&apos;);
     });
 
-    test(`Invokable memoized instantiates`, () =&gt; {
+    test(&apos;Invokable memoized instantiates&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn, null, [], true);
 
-        expect(invokable).toHaveProperty(`_name`, `fn`);
-        expect(invokable).toHaveProperty(`_args`, []);
-        expect(invokable).toHaveProperty(`_memoize`, true);
-        expect(invokable).toHaveProperty(`_memoizedFn`);
+        expect(invokable).toHaveProperty(&apos;_name&apos;, &apos;fn&apos;);
+        expect(invokable).toHaveProperty(&apos;_args&apos;, []);
+        expect(invokable).toHaveProperty(&apos;_memoize&apos;, true);
+        expect(invokable).toHaveProperty(&apos;_memoizedFn&apos;);
     });
 
-    test(`Invokable can be invoked`, () =&gt; {
+    test(&apos;Invokable can be invoked&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn);
 
         expect(invokable.invoke()).toEqual(true);
     });
 
-    test(`Invokable memoized can be invoked`, () =&gt; {
+    test(&apos;Invokable memoized can be invoked&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn, null, [], true);
 
         expect(invokable.invoke()).toEqual(true);
     });
 
-    test(`Invokable memoized use &apos;none&apos; key when no arguments`, () =&gt; {
+    test(&apos;Invokable memoized use \&apos;none\&apos; key when no arguments&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn, null, [], true);
 
         expect(invokable.invoke()).toEqual(true);
-        expect(invokable._cache).toHaveProperty(`none`, true);
+        expect(invokable._cache).toHaveProperty(&apos;none&apos;, true);
     });
 
-    test(`Invokable memoized use first argument key`, () =&gt; {
+    test(&apos;Invokable memoized use first argument key&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn, null, [], true);
 
-        expect(invokable.invoke(`a`)).toEqual(true);
-        expect(invokable._cache).toHaveProperty(`a`, true);
+        expect(invokable.invoke(&apos;a&apos;)).toEqual(true);
+        expect(invokable._cache).toHaveProperty(&apos;a&apos;, true);
     });
 
-    test(`Invokable memoized doesn&apos;t call function with same args more than once`, () =&gt; {
+    test(&apos;Invokable memoized doesn\&apos;t call function with same args more than once&apos;, () =&gt; {
         const counter = jest.fn();
-        const fn = () =&gt; { counter(); return true; };
+        const fn = () =&gt; {
+            counter();
+            return true;
+        };
         const invokable = new Invokable(fn, null, [], true);
 
-        invokable.invoke(`a`);
-        invokable.invoke(`a`);
-        invokable.invoke(`b`);
+        invokable.invoke(&apos;a&apos;);
+        invokable.invoke(&apos;a&apos;);
+        invokable.invoke(&apos;b&apos;);
         expect(counter).toHaveBeenCalledTimes(2);
 
         invokable.dememoize();
-        invokable.invoke(`a`);
-        invokable.invoke(`a`);
+        invokable.invoke(&apos;a&apos;);
+        invokable.invoke(&apos;a&apos;);
         expect(counter).toHaveBeenCalledTimes(4);
     });
 
-    test(`Invokable dememoized clears properties`, () =&gt; {
+    test(&apos;Invokable dememoized clears properties&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn, null, [], true);
 
-        invokable.invoke(`a`);
-        expect(invokable).toHaveProperty(`_memoize`, true);
-        expect(invokable).toHaveProperty(`_cache`);
-        expect(invokable).toHaveProperty(`_memoizedFn`);
-        expect(invokable._cache).toHaveProperty(`a`, true);
+        invokable.invoke(&apos;a&apos;);
+        expect(invokable).toHaveProperty(&apos;_memoize&apos;, true);
+        expect(invokable).toHaveProperty(&apos;_cache&apos;);
+        expect(invokable).toHaveProperty(&apos;_memoizedFn&apos;);
+        expect(invokable._cache).toHaveProperty(&apos;a&apos;, true);
 
         invokable.dememoize();
 
-        expect(invokable).toHaveProperty(`_memoize`, false);
-        expect(invokable).not.toHaveProperty(`_cache`);
-        expect(invokable).not.toHaveProperty(`_memoizedFn`);
+        expect(invokable).toHaveProperty(&apos;_memoize&apos;, false);
+        expect(invokable).not.toHaveProperty(&apos;_cache&apos;);
+        expect(invokable).not.toHaveProperty(&apos;_memoizedFn&apos;);
     });
 
-    test(`Invokable serialize is stringified correctly`, () =&gt; {
+    test(&apos;Invokable serialize is stringified correctly&apos;, () =&gt; {
         const fn = () =&gt; true;
         const invokable = new Invokable(fn, null, [], false);
         const parsed = JSON.parse(invokable.serialize());
 
-        expect(parsed).toHaveProperty(`_name`, `fn`);
-        expect(parsed).toHaveProperty(`_args`, []);
-        expect(parsed).toHaveProperty(`_memoize`, false);
+        expect(parsed).toHaveProperty(&apos;_name&apos;, &apos;fn&apos;);
+        expect(parsed).toHaveProperty(&apos;_args&apos;, []);
+        expect(parsed).toHaveProperty(&apos;_memoize&apos;, false);
     });
 });
 </code></pre>

@@ -41,24 +41,25 @@
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">import Invokable from &apos;./Invokable&apos;;
 
 /**
-* Adapter for mapping validation invokables to their results
-*/
+ * Adapter for mapping validation invokables to their results
+ */
 class Result {
     /**
-    * @param    {Invokable[]}    invokables     Array of invokable validation functions
-    * @param    {Result[]}          results     Array of values returned from invoked validation functions
-    */
-    constructor (invokables = [], results = [], subject = null) {
+     * @param    {Invokable[]}    invokables     Array of invokable validation functions
+     * @param    {Result[]}          results     Array of values returned from invoked validation
+     *                                           functions
+     */
+    constructor(invokables = [], results = [], subject = null) {
         if (!Array.isArray(invokables) || invokables.length &lt;= 0) {
-            throw `Result must be instantiated with an array containing at least one Invokable`;
+            throw &apos;Result must be instantiated with an array containing at least one Invokable&apos;;
         }
 
         if (!Array.isArray(results) || results.length &lt;= 0) {
-            throw `Result must be instantiated with an array containing at least one result`;
+            throw &apos;Result must be instantiated with an array containing at least one result&apos;;
         }
 
         if (invokables.length !== results.length) {
-            throw `There must be exactly one result for each Invokable`;
+            throw &apos;There must be exactly one result for each Invokable&apos;;
         }
 
         this._invokables = invokables;
@@ -67,20 +68,23 @@ class Result {
     }
 
     /**
-    * A Results summary that will return `true` if all validations passed
-    *
-    * @return    {Boolean}    `true` if all Results are also `true`, `false` otherwise
-    */
-    forAll () {
-        return  this._results.reduce(function(acc, result) {
+     * A Results summary that will return `true` if all validations passed
+     *
+     * @return    {Boolean}    `true` if all Results are also `true`, `false` otherwise
+     */
+    forAll() {
+        return this._results.reduce(function(acc, result) {
             if (Array.isArray(result)) {
-                return acc &amp;&amp; result.reduce(function(subAcc, subResult) {
-                    if (!(subResult instanceof Result)) {
-                        throw `Result results array can only contain booleans or arrays of Results`;
-                    }
+                return (
+                    acc &amp;&amp;
+                    result.reduce(function(subAcc, subResult) {
+                        if (!(subResult instanceof Result)) {
+                            throw &apos;Result results array can only contain booleans or arrays of Results&apos;;
+                        }
 
-                    return subAcc &amp;&amp; subResult.forAll();
-                }, acc);
+                        return subAcc &amp;&amp; subResult.forAll();
+                    }, acc)
+                );
             }
 
             return acc &amp;&amp; result === true;
@@ -88,20 +92,23 @@ class Result {
     }
 
     /**
-    * A Results summary that will return `true` if any validations passed
-    * @return    {Boolean}    `true` if any one Result is also `true`, `false` if
-    *                         all results are also `false`
-    */
-    forAny () {
-        return this._results.reduce(function (acc, result) {
+     * A Results summary that will return `true` if any validations passed
+     * @return    {Boolean}    `true` if any one Result is also `true`, `false` if
+     *                         all results are also `false`
+     */
+    forAny() {
+        return this._results.reduce(function(acc, result) {
             if (Array.isArray(result)) {
-                return acc || result.reduce(function(subAcc, subResult) {
-                    if (!(subResult instanceof Result)) {
-                        throw `Result results array can only contain booleans or arrays of Results`;
-                    }
+                return (
+                    acc ||
+                    result.reduce(function(subAcc, subResult) {
+                        if (!(subResult instanceof Result)) {
+                            throw &apos;Result results array can only contain booleans or arrays of Results&apos;;
+                        }
 
-                    return subAcc || subResult.forAny();
-                }, acc) === true;
+                        return subAcc || subResult.forAny();
+                    }, acc) === true
+                );
             }
 
             return acc || result === true;
@@ -109,57 +116,57 @@ class Result {
     }
 
     /**
-    * Filters results by name
-    * @param     {String}    name    The name for a specific Invokable. This value
-    *                                is set by `FenceBuilder.register`
-    * @return    {Array}             An array of Booleans derived from specified
-    *                                Invokables
-    */
-    forOne (name) {
-        if (!(typeof name === `string`) || name.length &lt;= 0) {
-            throw `Result forOne must have Invokable name as parameter`;
+     * Filters results by name
+     * @param     {String}    name    The name for a specific Invokable. This value
+     *                                is set by `FenceBuilder.register`
+     * @return    {Array}             An array of Booleans derived from specified
+     *                                Invokables
+     */
+    forOne(name) {
+        if (!(typeof name === &apos;string&apos;) || name.length &lt;= 0) {
+            throw &apos;Result forOne must have Invokable name as parameter&apos;;
         }
 
         return this._results.filter((element, index) =&gt; {
             if (!(this._invokables[index] instanceof Invokable)) {
-                throw `Result invokables array can only contain Invokables`;
+                throw &apos;Result invokables array can only contain Invokables&apos;;
             }
 
             return this._invokables[index]._name === name;
         });
     }
 
-    // explain (logger, indent) {
-    //     logger = logger || console.log;
-    //     indent = indent || &apos;  &apos;;
-    //
-    //     logger(indent, &apos;subject:&apos;, JSON.stringify(this._subject));
-    //     logger(indent + indent, this.forAll() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAll&apos;);
-    //     logger(indent + indent, this.forAny() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAny&apos;);
-    //
-    //     logger(indent, &apos;tests:&apos;);
-    //     for (var i = 0; i &lt; this._results.length; i++) {
-    //         const result = this._results[i];
-    //         const invokable = this._invokables[i];
-    //         const testName = invokable._name;
-    //         const testArgs = invokable._args;
-    //
-    //         let testLabel = testName;
-    //         if (testArgs.length &gt; 0) {
-    //             testLabel += &apos; (&apos; + JSON.stringify(testArgs) + &apos;)&apos;;
-    //         }
-    //
-    //         logger(indent + indent, result ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, testLabel);
-    //
-    //         if (Array.isArray(result)) {
-    //             result.forEach(function(subResult) {
-    //                 subResult.explain(logger, indent + indent);
-    //             });
-    //
-    //             continue;
-    //         }
-    //     }
-    // }
+    explain(logger, indent) {
+        logger = logger || console.log;
+        indent = indent || &apos;  &apos;;
+
+        logger(indent, &apos;subject:&apos;, JSON.stringify(this._subject));
+        logger(indent + indent, this.forAll() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAll&apos;);
+        logger(indent + indent, this.forAny() ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, &apos;forAny&apos;);
+
+        logger(indent, &apos;tests:&apos;);
+        for (let i = 0; i &lt; this._results.length; i++) {
+            const result = this._results[i];
+            const invokable = this._invokables[i];
+            const testName = invokable._name;
+            const testArgs = invokable._args;
+
+            let testLabel = testName;
+            if (testArgs.length &gt; 0) {
+                testLabel += ` (${JSON.stringify(testArgs)})`;
+            }
+
+            logger(indent + indent, result ? &apos;[&#x2713;]&apos; : &apos;[x]&apos;, testLabel);
+
+            if (Array.isArray(result)) {
+                result.forEach(function(subResult) {
+                    subResult.explain(logger, indent + indent);
+                });
+
+                continue;
+            }
+        }
+    }
 }
 
 export default Result;

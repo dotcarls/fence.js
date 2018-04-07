@@ -39,31 +39,32 @@
 
 <div class="content" data-ice="content"><h1 data-ice="title">src/lib/Invokable.js</h1>
 <pre class="source-code line-number raw-source-code"><code class="prettyprint linenums" data-ice="content">/**
-* A validation function that will be invoked at some time
-*/
+ * A validation function that will be invoked at some time
+ */
 class Invokable {
     /**
-    * @param    {Function}     fn      [required] function reference that is executed during invokation
-    * @param    {String}       name    [required] required if function is anonymous
-    *                                             will override function name property
-    * @param    {Array}        args    [optional] arguments to be applied to the function
-    * @param    {Boolean}      memoize [optional] when true, function calls are memoized
-    */
-    constructor (fn, name = ``, args = [], memoize = false) {
-        if (!fn || typeof fn !== `function`) {
-            throw `Invokable must be instantiated with a function`;
+     * @param    {Function}     fn      [required] function reference that is executed during
+     *                                             invokation
+     * @param    {String}       name    [required] required if function is anonymous
+     *                                             will override function name property
+     * @param    {Array}        args    [optional] arguments to be applied to the function
+     * @param    {Boolean}      memoize [optional] when true, function calls are memoized
+     */
+    constructor(fn, name = &apos;&apos;, args = [], memoize = false) {
+        if (!fn || typeof fn !== &apos;function&apos;) {
+            throw &apos;Invokable must be instantiated with a function&apos;;
         }
 
-        if (fn.name === `` &amp;&amp; name === ``) {
-            throw `Invokable anonymous functions must have a name argument`;
+        if (fn.name === &apos;&apos; &amp;&amp; name === &apos;&apos;) {
+            throw &apos;Invokable anonymous functions must have a name argument&apos;;
         }
 
         if (!Array.isArray(args)) {
-            throw `Invokable arguments must be an array`;
+            throw &apos;Invokable arguments must be an array&apos;;
         }
 
-        if (typeof memoize !== `boolean`) {
-            throw `Invokable memoize argument must be boolean`;
+        if (typeof memoize !== &apos;boolean&apos;) {
+            throw &apos;Invokable memoize argument must be boolean&apos;;
         }
 
         this._name = name &amp;&amp; name.length ? name : fn.name;
@@ -77,13 +78,13 @@ class Invokable {
     }
 
     /**
-    * Executes a validation function against a subject and any predefined arguments
-    *
-    * @method    invoke
-    * @param     {Any}         subject    the value to be validated
-    * @return    {Boolean}                the result of the validation
-    */
-    invoke (...subjects) {
+     * Executes a validation function against a subject and any predefined arguments
+     *
+     * @method    invoke
+     * @param     {Any}         subject    the value to be validated
+     * @return    {Boolean}                the result of the validation
+     */
+    invoke(...subjects) {
         let fn = this._fn;
         let args = subjects.concat(this._args);
 
@@ -103,8 +104,8 @@ class Invokable {
      *
      * @method    memoize
      */
-    memoize () {
-        Object.defineProperty(this, `_cache`, {
+    memoize() {
+        Object.defineProperty(this, &apos;_cache&apos;, {
             value: {},
             writable: false,
             configurable: true,
@@ -112,7 +113,7 @@ class Invokable {
         });
 
         const memoized = function(fn, ...args) {
-            const key = args &amp;&amp; args.length ? args[0] : `none`;
+            const key = args &amp;&amp; args.length ? args[0] : &apos;none&apos;;
             const cache = memoized.cache;
 
             if (cache[key]) {
@@ -134,7 +135,7 @@ class Invokable {
      * so that `_fn` is called.
      * @method    dememoize
      */
-    dememoize () {
+    dememoize() {
         delete this._cache;
         delete this._memoizedFn;
         this._memoize = false;
@@ -146,7 +147,7 @@ class Invokable {
      * @return    {String}                    a stringified JSON blob representing an
      *                                        `Invokable` and its arguments
      */
-    serialize () {
+    serialize() {
         return JSON.stringify(this);
     }
 }
