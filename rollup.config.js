@@ -1,8 +1,7 @@
-import babel from 'rollup-plugin-babel';
-import nodeResolve from 'rollup-plugin-node-resolve';
-// import uglify from 'rollup-plugin-uglify';
+import babel from '@rollup/plugin-babel';
+import nodeResolve from '@rollup/plugin-node-resolve';
+import commonjs from '@rollup/plugin-commonjs';
 import filesize from 'rollup-plugin-filesize';
-import commonjs from 'rollup-plugin-commonjs';
 
 const name = `fence`;
 
