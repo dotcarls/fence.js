@@ -83,7 +83,7 @@ When registering a function, we accept a `name` and a function reference.  When 
 
 ### Examples
 
-See [`example`](example/script.js) folder or the [runkit](https://runkit.com/dotcarls/fence.js) example.
+See [`example`](example/script.js) folder or the [runkit](https://runkit.com/tim/fence.js-example-extend.js) example.
 
 ### Builds
 
