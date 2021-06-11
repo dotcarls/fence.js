@@ -1,35 +1,55 @@
 {
-  
   "env": {
     "test": {
       "presets": [
-        ["es2015", {"loose": true}]
+        [
+          "@babel/preset-env",
+          {
+            "loose": true
+          }
+        ]
       ],
       "plugins": [
-        ["add-module-exports"]
+        "add-module-exports"
       ]
     },
     "cjs": {
       "presets": [
-        ["es2015", {"loose": true}]
+        [
+          "@babel/preset-env",
+          {
+            "loose": true
+          }
+        ]
       ],
       "plugins": [
-        ["add-module-exports"]
+        "add-module-exports"
       ]
     },
     "es": {
       "presets": [
-        ["es2015", {"loose": true, "modules": false}]
+        [
+          "@babel/preset-env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ]
       ]
     },
     "rollup": {
       "presets": [
-        ["es2015", {"loose": true, "modules": false}]
-    ],
+        [
+          "@babel/preset-env",
+          {
+            "loose": true,
+            "modules": false
+          }
+        ]
+      ],
       "plugins": [
-          ["external-helpers"]
+        "@babel/plugin-external-helpers"
       ]
     }
-
   }
 }

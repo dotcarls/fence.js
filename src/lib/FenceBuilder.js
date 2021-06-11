@@ -75,25 +75,6 @@ class FenceBuilder {
     }
 
     /**
-     * Remove a named function reference from the prototype of an instance of `FenceBuilder`
-     * @param     {String}              name    A named function reference
-     *
-     * @return    {FenceBuilder}           The `FenceBuilder` instance being
-     *                                          operated on, used for function chaining
-     */
-    unregister(name) {
-        const proto = Object.getPrototypeOf(this);
-        delete proto[name];
-
-        const tmp = this.fork(proto);
-        tmp._invokables = this._invokables.filter(function(invokable) {
-            return invokable.getName() !== name;
-        });
-
-        return tmp;
-    }
-
-    /**
      * Convert an instance of `FenceBuilder` to something that can be used to
      * validate some value
      *
