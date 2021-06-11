@@ -2,7 +2,7 @@
 
 ![Node](https://img.shields.io/node/v/fence.js.svg?style=flat-square)
 [![NPM](https://img.shields.io/npm/v/fence.js.svg?style=flat-square)](https://www.npmjs.com/package/fence.js)
-[![Travis](https://img.shields.io/travis/dotcarls/fence.js/master.svg?style=flat-square)](https://travis-ci.org/dotcarls/fence.js)
+[![Travis](https://www.travis-ci.com/dotcarls/fence.js.svg?branch=master)](https://travis-ci.org/dotcarls/fence.js)
 [![David](https://img.shields.io/david/dotcarls/fence.js.svg?style=flat-square)](https://david-dm.org/dotcarls/fence.js)
 [![Coverage Status](https://img.shields.io/coveralls/dotcarls/fence.js.svg?style=flat-square)](https://coveralls.io/github/dotcarls/fence.js)
 
