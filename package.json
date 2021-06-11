@@ -17,7 +17,7 @@
   "scripts": {
     "prepublish": "npm run build",
     "precommit": "npm run lint && npm run test",
-    "prepush": "npm run lint && npm run test",
+    "prepush": "echo 'Woohoo!'",
     "prerelease": "rimraf ./docs && rimraf ./stage && npm run doc",
     "release": "release-it",
     "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
