@@ -6,7 +6,9 @@ import filesize from 'rollup-plugin-filesize';
 const name = `fence`;
 
 const plugins = [
-    babel(),
+    babel({
+        babelHelpers: 'external'
+    }),
     nodeResolve({
         module: true,
         jsnext: true
