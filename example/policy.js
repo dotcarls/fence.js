@@ -1,4 +1,4 @@
-const FenceBuilder = require('../cjs');
+const FenceBuilder = require('../dist/cjs');
 const utils = require('./externals/utils');
 
 // Const's get this show on the road!

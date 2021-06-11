@@ -1,55 +1,24 @@
 {
-  "env": {
-    "test": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "loose": true
-          }
+    "env": {
+      "test": {
+        "presets": [
+          [
+            "@babel/preset-env",
+            { "modules": "umd" }
+          ]
         ]
-      ],
-      "plugins": [
-        "add-module-exports"
-      ]
+      },
+      "production": {
+        "presets": [
+          [
+            "@babel/preset-env",
+            { "modules": false }
+          ]
+        ]
+      }
     },
-    "cjs": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "loose": true
-          }
-        ]
-      ],
-      "plugins": [
-        "add-module-exports"
-      ]
-    },
-    "es": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "loose": true,
-            "modules": false
-          }
-        ]
-      ]
-    },
-    "rollup": {
-      "presets": [
-        [
-          "@babel/preset-env",
-          {
-            "loose": true,
-            "modules": false
-          }
-        ]
-      ],
-      "plugins": [
-        "@babel/plugin-external-helpers"
-      ]
-    }
+    "ignore": [
+      "node_modules/**",
+      "*.test.js"
+    ]
   }
-}

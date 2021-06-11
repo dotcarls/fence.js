@@ -1,4 +1,4 @@
-const FenceBuilder = require('../cjs');
+const FenceBuilder = require('../dist/cjs');
 
 // Const's get this show on the road!
 let FB = new FenceBuilder();

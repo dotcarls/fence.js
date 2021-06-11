@@ -1,12 +1,12 @@
 /* eslint-env node, jest */
 
-const assert = require('assert');
-const utils = require('../example/externals/utils');
-const helpers = require('./helpers');
+import assert from 'assert';
+import validate from 'validate.js';
+import Joi from 'joi';
 
-const FenceBuilder = require('../src');
-const validate = require('validate.js');
-const Joi = require('joi');
+import utils from '../example/externals/utils';
+import helpers from './helpers';
+import FenceBuilder from '../src';
 
 const basePolicy = new FenceBuilder()
     .register(utils.required, 'required')
