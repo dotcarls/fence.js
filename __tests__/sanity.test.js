@@ -95,8 +95,8 @@ describe('FenceBuilder', () => {
 
         it(`has the same result as Joi [${user.username} / ${user.password}]`, () => {
             const chainResult = userFence.run(user).forAll();
-            const joiResult = Joi.validate(user, schema);
-            const desiredResult = chainResult ? joiResult.error === null : joiResult.error !== null;
+            const joiResult = schema.validate(user);
+            const desiredResult = chainResult ? joiResult.error === undefined : joiResult.error !== undefined;
 
             assert(
                 desiredResult,
@@ -125,10 +125,9 @@ describe('FenceBuilder', () => {
 
         it(`has the same result as Joi [${char.val} / ${char.test}]`, () => {
             const chainResult = letterFence.run(char.val, char.test).forAll();
-            const joiResult = Joi.string()
-                .valid(char.test)
-                .validate(char.val);
-            const desiredResult = chainResult ? joiResult.error === null : joiResult.error !== null;
+            const schema = Joi.string().valid(char.test);
+            const joiResult = schema.validate(char.val);
+            const desiredResult = chainResult ? joiResult.error === undefined : joiResult.error !== undefined;
             const comparator = chainResult ? '===' : '!==';
 
             assert(
