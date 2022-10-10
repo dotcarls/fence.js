@@ -48,7 +48,7 @@
     "@itsjamie/esdoc-cli": "^0.3.1",
     "@itsjamie/esdoc-core": "^0.3.1",
     "@itsjamie/esdoc-standard-plugin": "^0.5.0",
-    "@rollup/plugin-babel": "^5.3.0",
+    "@rollup/plugin-babel": "^6.0.0",
     "@rollup/plugin-commonjs": "^22.0.1",
     "@rollup/plugin-node-resolve": "^13.0.0",
     "babel-core": "^7.0.0-bridge.0",
