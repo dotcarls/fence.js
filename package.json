@@ -46,7 +46,7 @@
     "@babel/preset-env": "^7.14.5",
     "@enterthenamehere/esdoc-coverage-plugin": "^2.5.0",
     "@itsjamie/esdoc-cli": "^0.3.1",
-    "@itsjamie/esdoc-core": "^0.3.1",
+    "@itsjamie/esdoc-core": "^0.5.0",
     "@itsjamie/esdoc-standard-plugin": "^0.5.0",
     "@rollup/plugin-babel": "^6.0.2",
     "@rollup/plugin-commonjs": "^23.0.2",
