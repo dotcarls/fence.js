@@ -12,7 +12,10 @@
         }
     },
     "rules": {
-        "indent": ["error", 4],
+        "indent": [
+            "error",
+            4
+        ],
         "max-len": [
             "error",
             {
@@ -23,7 +26,23 @@
                 "tabWidth": 4
             }
         ],
-        "no-console": ["warn"],
-        "quotes": ["error", "single"]
-    }
+        "no-console": [
+            "warn"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ]
+    },
+    "overrides": [
+        {
+            "files": [
+                "example/**/*.js",
+                "__tests__/**/*.js"
+            ],
+            "rules": {
+                "no-console": "off"
+            }
+        }
+    ]
 }

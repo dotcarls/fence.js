@@ -2,8 +2,7 @@
 
 ![Node](https://img.shields.io/node/v/fence.js.svg?style=flat-square)
 [![NPM](https://img.shields.io/npm/v/fence.js.svg?style=flat-square)](https://www.npmjs.com/package/fence.js)
-[![Travis](https://www.travis-ci.com/dotcarls/fence.js.svg?branch=master)](https://travis-ci.org/dotcarls/fence.js)
-[![David](https://img.shields.io/david/dotcarls/fence.js.svg?style=flat-square)](https://david-dm.org/dotcarls/fence.js)
+[![CI](https://github.com/dotcarls/fence.js/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/dotcarls/fence.js/actions/workflows/ci.yml)
 [![Coverage Status](https://img.shields.io/coveralls/dotcarls/fence.js.svg?style=flat-square)](https://coveralls.io/github/dotcarls/fence.js)
 
 > A framework to create efficient and extensible validations

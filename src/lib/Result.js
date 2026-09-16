@@ -97,6 +97,7 @@ class Result {
     }
 
     explain(logger, indent) {
+        // eslint-disable-next-line no-console
         logger = logger || console.log;
         indent = indent || '  ';
 

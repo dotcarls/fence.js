@@ -1,7 +1,7 @@
 /* eslint-env node, jest */
 
 const utils = require('../example/externals/utils');
-const faker = require('faker');
+const { faker } = require('@faker-js/faker');
 
 function minLength(val, length) {
     if (!utils.required(val) || !utils.isString(val) || !utils.isInteger(length)) {
@@ -42,15 +42,15 @@ function createTestData(num = 1) {
             username:
                 Math.floor(Math.random() * 100) % 2 === 0
                     ? faker.internet.email()
-                    : faker.internet.userName(),
+                    : faker.internet.username(),
             password:
                 Math.floor(Math.random() * 100) % 2 === 0
                     ? faker.internet.password()
-                    : faker.random.word()
+                    : faker.word.sample()
         });
 
         chars.push({
-            val: faker.random.arrayElement(['a', 'b', 'c', 'd']),
+            val: faker.helpers.arrayElement(['a', 'b', 'c', 'd']),
             test: 'a'
         });
     }

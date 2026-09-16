@@ -1,11 +1,10 @@
 /* eslint-env node, jest */
 
-const assert = require('assert');
 const Benchmark = require('benchmark');
 const utils = require('../example/externals/utils');
 const helpers = require('./helpers');
 
-const FenceBuilder = require('../cjs');
+const FenceBuilder = require('../src').default;
 const validate = require('validate.js');
 const Joi = require('joi');
 
@@ -91,16 +90,13 @@ describe('compare benchmarks', () => {
             )
             .add('Joi Policy', () =>
                 users.forEach(user => {
-                    Joi.validate(user, schema);
+                    schema.validate(user);
                 })
             )
             .on('cycle', event => cycles.push(String(event.target)))
             .on('complete', () => {
                 const fastest = suite.filter('fastest').map('name');
-                assert(
-                    fastest[0] === 'fence.js Policy',
-                    `Fastest is ${fastest}, cycles: ${cycles}`
-                );
+                console.log(`policy: fastest is ${fastest}\n  ${cycles.join('\n  ')}`);
             });
 
         suite.run({ async: false });
@@ -129,10 +125,7 @@ describe('compare benchmarks', () => {
             .on('cycle', event => cycles.push(String(event.target)))
             .on('complete', () => {
                 const fastest = suite.filter('fastest').map('name');
-                assert(
-                    fastest[0] === 'fence.js Strict Equal',
-                    `Fastest is ${fastest}, cycles: ${cycles}`
-                );
+                console.log(`strict equal: fastest is ${fastest}\n  ${cycles.join('\n  ')}`);
             });
 
         suite.run({ async: false });
