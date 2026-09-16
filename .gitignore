@@ -1,7 +1,6 @@
-cjs/
-coverage/
-dist/
-es/
 node_modules/
+dist/
+coverage/
 docs/
-.stage/
+*.tsbuildinfo
+.DS_Store

@@ -1,110 +1,97 @@
 {
   "name": "fence.js",
+  "version": "2.0.0-alpha.1",
+  "description": "Composable, portable validations: record named validation steps, fork and extend them, serialize them to JSON and run them anywhere the same names are registered",
+  "keywords": [
+    "validation",
+    "validator",
+    "composable",
+    "builder",
+    "serializable",
+    "policy",
+    "typescript"
+  ],
   "homepage": "https://dotcarls.github.io/fence.js",
-  "version": "1.0.1",
-  "description": "A framework to create efficient and extensible validations",
-  "main": "dist/cjs/index.js",
-  "browser": "dist/umd/fence.js",
-  "module": "dist/es/index.js",
-  "jsxnext:main": "dist/es/index.js",
+  "bugs": "https://github.com/dotcarls/fence.js/issues",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dotcarls/fence.js.git"
+  },
+  "license": "MIT",
+  "author": "Tim Carlson <tim.carlson@gmail.com>",
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./package.json": "./package.json"
+  },
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "sideEffects": false,
   "files": [
     "dist",
-    "src"
+    "!dist/**/*.tsbuildinfo"
   ],
   "engines": {
-    "node": ">=10.0.0"
+    "node": ">=20.19.0"
   },
   "scripts": {
-    "prepublish": "npm run build",
-    "precommit": "npm run lint && npm run test",
-    "prepush": "echo 'Woohoo!'",
-    "prerelease": "rimraf ./docs && rimraf ./stage && npm run doc",
-    "release": "release-it",
-    "coveralls": "cat ./coverage/lcov.info | ./node_modules/.bin/coveralls",
-    "lint": "npm run lint:eslint",
-    "lint:eslint": "eslint \"src/**/*.js\" \"__tests__/**/*.js\" \"example/**/*.js\"",
-    "lint:format:src": "prettier-eslint --write \"src/**/*.js\"",
-    "lint:format:example": "prettier-eslint --write \"example/**/*.js\"",
-    "lint:format:tests": "prettier-eslint --write \"./**/__tests__/*.js\"",
-    "lint:format": "npm run lint:format:src && npm run lint:format:example && npm run lint:format:tests",
-    "doc": "rimraf ./docs && esdoc",
-    "doc:stage": "rimraf ./stage/* && cp -R ./docs/ ./.stage/",
-    "test": "jest",
-    "test:benchmark": "jest --testPathIgnorePatterns=/node_modules/ --testPathIgnorePatterns=helpers.js --coverage=false benchmark",
-    "test:coverage": "jest --coverage ",
-    "test:watch": "jest --watch",
-    "prebuild": "rimraf dist",
-    "build": "BABEL_ENV=production npx rollup -c"
+    "build": "tsc -p tsconfig.build.json",
+    "clean": "rimraf dist coverage docs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage",
+    "bench": "tsx test/bench/compare.bench.ts",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:coverage && npm run build && npm run check:package",
+    "check:package": "publint && attw --pack . --profile esm-only",
+    "docs": "typedoc",
+    "examples": "tsx examples/run-all.ts",
+    "prepare": "simple-git-hooks",
+    "prepack": "npm run build",
+    "release": "release-it"
   },
-  "keywords": [],
-  "author": "Tim Carlson <tim.carlson@gmail.com>",
-  "license": "MIT",
-  "repository": "dotcarls/fence.js",
   "devDependencies": {
-    "@babel/cli": "^7.14.5",
-    "@babel/core": "^7.14.5",
-    "@babel/preset-env": "^7.14.5",
-    "@enterthenamehere/esdoc-coverage-plugin": "^2.5.0",
+    "@arethetypeswrong/cli": "^0.18.5",
+    "@eslint/js": "^10.0.1",
     "@faker-js/faker": "^9.9.0",
-    "@itsjamie/esdoc-cli": "^0.5.0",
-    "@itsjamie/esdoc-core": "^0.5.0",
-    "@itsjamie/esdoc-standard-plugin": "^0.5.0",
-    "@rollup/plugin-babel": "^6.0.2",
-    "@rollup/plugin-commonjs": "^23.0.2",
-    "@rollup/plugin-node-resolve": "^15.0.1",
-    "babel-core": "^7.0.0-bridge.0",
-    "babel-jest": "^29.0.3",
-    "babel-plugin-add-module-exports": "^1.0.4",
-    "benchmark": "^2.1.4",
-    "coveralls": "^3.1.0",
-    "cross-env": "^7.0.3",
-    "esdoc": "^1.1.0",
-    "eslint": "^8.20.0",
-    "eslint-config-airbnb": "^19.0.4",
-    "eslint-config-devine": "^3.0.1",
-    "eslint-plugin-babel": "^5.3.1",
-    "eslint-plugin-import": "^2.23.4",
-    "eslint-plugin-jsx-a11y": "^6.4.1",
-    "eslint-plugin-react": "^7.24.0",
-    "husky": "^8.0.1",
-    "jest": "^29.0.3",
-    "joi": "^17.4.0",
-    "prettier-eslint-cli": "^7.1.0",
-    "release-it": "^15.4.1",
-    "rimraf": "^3.0.2",
-    "rollup": "^2.51.1",
-    "rollup-plugin-babel": "^4.4.0",
-    "rollup-plugin-filesize": "^9.1.1",
-    "rollup-plugin-local-resolve": "^1.0.7",
-    "rollup-plugin-node-builtins": "^2.1.2",
-    "rollup-plugin-node-globals": "^1.4.0",
-    "rollup-plugin-terser": "^7.0.2",
-    "validate.js": "^0.13.1"
+    "@release-it/conventional-changelog": "^12.0.2",
+    "@types/node": "^22.20.3",
+    "@vitest/coverage-v8": "^5.0.1",
+    "eslint": "^10.10.0",
+    "eslint-config-prettier": "^10.1.8",
+    "fast-check": "^4.10.1",
+    "globals": "^17.12.0",
+    "joi": "^18.2.9",
+    "lint-staged": "^17.5.1",
+    "prettier": "^3.9.7",
+    "publint": "^0.3.24",
+    "release-it": "^21.0.3",
+    "rimraf": "^6.1.3",
+    "simple-git-hooks": "^2.14.0",
+    "tinybench": "^6.2.0",
+    "tsx": "^4.23.13",
+    "typedoc": "^0.28.20",
+    "typescript": "~6.0.3",
+    "typescript-eslint": "^8.70.0",
+    "validate.js": "^0.13.1",
+    "vitest": "^5.0.1"
   },
-  "jest": {
-    "globals": {
-      "NODE_ENV": "test",
-      "BABEL_ENV": "test"
-    },
-    "testEnvironment": "node",
-    "testPathIgnorePatterns": [
-      "<rootDir>/.stage/",
-      "__tests__/helpers.js",
-      "__tests__/benchmark.test.js"
+  "simple-git-hooks": {
+    "pre-commit": "npx lint-staged",
+    "pre-push": "npm run typecheck && npm test"
+  },
+  "lint-staged": {
+    "*.{ts,js}": [
+      "eslint --fix",
+      "prettier --write"
     ],
-    "transform": {
-      "^.+\\.js$": "babel-jest",
-      "^.+\\.jsx?$": "babel-jest"
-    },
-    "moduleDirectories": [
-      "node_modules",
-      "src"
-    ],
-    "verbose": true,
-    "collectCoverage": true,
-    "coveragePathIgnorePatterns": [
-      "__tests__/helpers.js",
-      "<rootDir>/example/*"
-    ]
+    "*.{json,md,yml}": "prettier --write"
   }
 }

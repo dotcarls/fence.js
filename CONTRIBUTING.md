@@ -7,7 +7,7 @@ For **support or usage questions** like "How do I do X with Chain." and "My code
 ## Bugs
 
 > The ideal GitHub issue (and even some feature requests) is not an issue, it's a PR with a failing test case.
-<br/> [@rauchg](https://twitter.com/rauchg/status/810589655532007424)
+> <br/> [@rauchg](https://twitter.com/rauchg/status/810589655532007424)
 
 **Before filing an issue please [search the issue tracker](https://github.com/dotcarls/Chain/issues); your issue may have already been discussed or fixed in `master`.**
 
@@ -63,13 +63,11 @@ Please **follow** the **conventions** already established in the code.
 
 Guidelines are enforced using **[ESLint](http://eslint.org/)**.
 
-
 You can **run the linting script** by using
 
 ```console
 $ npm run lint
 ```
-
 
 ## Testing
 

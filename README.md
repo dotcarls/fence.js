@@ -9,11 +9,11 @@
 
 ## Features
 
--   Flexible
--   Deterministic
--   Extendable
--   Persistable
--   Portable
+- Flexible
+- Deterministic
+- Extendable
+- Persistable
+- Portable
 
 ## Overview
 
@@ -24,6 +24,7 @@ The goal of this module is to solve these problems without getting in the way. B
 ## Usage
 
 ### Example
+
 ```js
 const FenceBuilder = require('./lib');
 const FB = new FenceBuilder();
@@ -78,7 +79,7 @@ FB.register(function(val1, val2, 'strictEqual') {
 
 The `name` attribute is used to promote determinism in cases where function references can not be passed around. Consider the case where we want to validate something on the server and the client -- the server may have a `required` function available from `utils` and the client may have a `required` function available from `clientUitls`. If two named functions are functionally equivalent (produce the exact same output for every possible input) then we can say overall the validation is deterministic regardless of its execution context.
 
-When registering a function, we accept a `name` and a function reference.  When these instance methods are called, they create an `Invokable` which represents a function and optionally some arguments.
+When registering a function, we accept a `name` and a function reference. When these instance methods are called, they create an `Invokable` which represents a function and optionally some arguments.
 
 ### Examples
 
@@ -89,7 +90,7 @@ See [`example`](example/script.js) folder or the [runkit](https://runkit.com/tim
 If you don't use a package manager, you can [access `fence.js` via unpkg (CDN)](https://unpkg.com/fence.js/), download the source, or point your package manager to the url.
 
 `fence.js` is compiled as a collection of [CommonJS](http://webpack.github.io/docs/commonjs.html) modules & [ES2015 modules](http://www.2ality.com/2014/0
-  -9/es6-modules-final.html) for bundlers that support the `jsnext:main` or `module` field in package.json (Rollup, Webpack 2)
+-9/es6-modules-final.html) for bundlers that support the `jsnext:main` or `module` field in package.json (Rollup, Webpack 2)
 
 The `fence.js` package includes precompiled production and development [UMD](https://github.com/umdjs/umd) builds in the [`dist` folder](https://unpkg.com/fence.js/dist/). They can be used directly without a bundler and are thus compatible with many popular JavaScript module loaders and environments. You can drop a UMD build as a [`<script>` tag](https://unpkg.com/fence.js) on your page. The UMD builds make `fence.js` available as a `window.fence.js` global variable.
 
