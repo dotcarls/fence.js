@@ -1,84 +1,40 @@
 /*
- * Validators used by the end-to-end tests and benchmarks. fence.js ships no
- * validators of its own; these stand in for an application's utility module.
+ * Validators used by the tests, examples and benchmarks. fence.js ships no validators of
+ * its own; these stand in for an application's utility module.
  */
-import { faker } from '@faker-js/faker';
+import type { Fence, Result } from '../../src/index.js';
 
-import type { Fence } from '../../src/index.js';
+export const required = (value: unknown): boolean => value !== undefined && value !== null;
 
-export function required(value: unknown): boolean {
-    return value !== undefined && value !== null;
-}
-
-export function isString(value: unknown): boolean {
-    return typeof value === 'string';
-}
-
-export function isInteger(value: unknown): boolean {
-    if ((typeof value !== 'number' && typeof value !== 'string') || Number.isNaN(Number(value))) {
-        return false;
-    }
-    const x = Number.parseFloat(String(value));
-    return Number.isInteger(x);
-}
+export const isString = (value: unknown): value is string => typeof value === 'string';
 
 const EMAIL =
     /^([\w-.]+)@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.)|(([\w-]+\.)+))([a-zA-Z]{2,4}|[0-9]{1,3})(\]?)$/;
 
-export function isValidEmailAddress(email: unknown): boolean {
-    return typeof email === 'string' && EMAIL.test(email);
-}
+export const isEmail = (value: unknown): boolean => typeof value === 'string' && EMAIL.test(value);
 
-export function minLength(val: unknown, length: unknown): boolean {
-    if (!required(val) || !isString(val) || !isInteger(length)) {
-        return false;
-    }
-    return (val as string).length >= (length as number);
-}
+export const minLength = (value: unknown, length: number): boolean =>
+    typeof value === 'string' && value.length >= length;
 
-export function maxLength(val: unknown, length: unknown): boolean {
-    if (!required(val) || !isString(val) || !isInteger(length)) {
-        return false;
-    }
-    return (val as string).length <= (length as number);
-}
+export const maxLength = (value: unknown, length: number): boolean =>
+    typeof value === 'string' && value.length <= length;
 
-export function strictEqual(val1: unknown, val2: unknown): boolean {
-    return val1 === val2;
-}
+export const strictEqual = (value: unknown, other: unknown): boolean => value === other;
 
-/** Higher-order validator: runs one fence per attribute of the entity. */
-export function policy(entity: Record<string, unknown>, shape: Record<string, Fence>) {
-    const results = [];
-    for (const attribute in entity) {
-        const fence = shape[attribute];
-        if (fence) {
-            results.push(fence.run(entity[attribute]));
-        }
-    }
-    return results;
-}
+/** Higher-order validator: runs one fence per attribute of the shape, keyed by attribute. */
+export const policy = (
+    entity: unknown,
+    shape: Readonly<Record<string, Fence>>,
+): Readonly<Record<string, Result>> => {
+    const record = (entity ?? {}) as Record<string, unknown>;
+    return Object.fromEntries(
+        Object.entries(shape).map(([attribute, fence]) => [
+            attribute,
+            fence.run(record[attribute]),
+        ]),
+    );
+};
 
-export interface TestUser {
-    username: string;
-    password: string;
-}
-
-export function createTestData(num = 1) {
-    const users: TestUser[] = [];
-    const chars: { val: string; test: string }[] = [];
-
-    for (let i = 0; i < num; i++) {
-        users.push({
-            username: faker.datatype.boolean() ? faker.internet.email() : faker.internet.username(),
-            password: faker.datatype.boolean() ? faker.internet.password() : faker.word.sample(),
-        });
-
-        chars.push({
-            val: faker.helpers.arrayElement(['a', 'b', 'c', 'd']),
-            test: 'a',
-        });
-    }
-
-    return { users, chars };
-}
+/** Higher-order validator: every item of an array must pass the fence. */
+export const each = (items: unknown, fence: Fence): readonly Result[] | boolean =>
+    Array.isArray(items) ? items.map((item: unknown) => fence.run(item)) : false;

@@ -1,83 +1,140 @@
-import { describe, expect, test, vi } from 'vitest';
+import { describe, expect, test } from 'vitest';
 
-import { Invokable, Result } from '../src/index.js';
+import { FenceBuilder, Result, type Step } from '../src/index.js';
+import * as v from './support/validators.js';
 
-describe('Result', () => {
-    test('constructor guards', () => {
-        expect(() => new Result()).toThrow();
-        // @ts-expect-error -- exercising the runtime guard
-        expect(() => new Result(null, [])).toThrow();
-        // @ts-expect-error -- exercising the runtime guard
-        expect(() => new Result([], null)).toThrow();
-        expect(() => new Result([], [])).toThrow();
-        expect(() => new Result([true], [])).toThrow();
-        expect(() => new Result([null], [null, null])).toThrow();
+const step = (name: string, ...args: unknown[]): Step => ({ name, args });
+const bools = (...values: boolean[]) =>
+    new Result(
+        's',
+        values.map((value, i) => ({ step: step(`s${String(i)}`), value })),
+    );
+
+describe('Result verdicts', () => {
+    test('passed and anyPassed over boolean outcomes', () => {
+        expect(bools(true, true).passed).toBe(true);
+        expect(bools(true, false).passed).toBe(false);
+        expect(bools(true, false).anyPassed).toBe(true);
+        expect(bools(false, false).anyPassed).toBe(false);
     });
 
-    test('forAll', () => {
-        expect(new Result([null, null, null], [true, true, true]).forAll()).toBe(true);
-        expect(new Result([null, null, null], [true, false, true]).forAll()).toBe(false);
-        expect(() => new Result([null], [[true]]).forAll()).toThrow();
+    test('nested arrays and records fold into the verdict', () => {
+        const passing = bools(true);
+        const failing = bools(false, false);
+        const mixed = bools(true, false);
 
-        const passing = new Result([null], [true]);
-        expect(new Result([null], [[passing]]).forAll()).toBe(true);
-
-        const mixed = new Result([null, false], [true, false]);
-        expect(new Result([null, null], [true, [mixed]]).forAll()).toBe(false);
+        expect(new Result('s', [{ step: step('n'), value: [passing] }]).passed).toBe(true);
+        expect(new Result('s', [{ step: step('n'), value: [passing, mixed] }]).passed).toBe(false);
+        expect(new Result('s', [{ step: step('n'), value: { a: passing } }]).passed).toBe(true);
+        expect(new Result('s', [{ step: step('n'), value: { a: failing } }]).anyPassed).toBe(false);
+        expect(
+            new Result('s', [{ step: step('n'), value: { a: failing, b: mixed } }]).anyPassed,
+        ).toBe(true);
     });
 
-    test('forAny', () => {
-        expect(new Result([null, null, null], [true, true, true]).forAny()).toBe(true);
-        expect(new Result([null, null, null], [true, false, true]).forAny()).toBe(true);
-        expect(new Result([null, null, null], [false, false, false]).forAny()).toBe(false);
-        expect(() => new Result([null], [[true]]).forAny()).toThrow();
+    test('empty nested collections are vacuously passed and not anyPassed', () => {
+        const result = new Result('s', [{ step: step('n'), value: [] }]);
 
-        const passing = new Result([null], [true]);
-        expect(new Result([null], [[passing]]).forAny()).toBe(true);
-
-        const mixed = new Result([null, false], [true, false]);
-        expect(new Result([null, null], [true, [mixed]]).forAny()).toBe(true);
-
-        const failing = new Result([null, false], [false, false]);
-        expect(new Result([null, null], [false, [failing]]).forAny()).toBe(false);
+        expect(result.passed).toBe(true);
+        expect(result.anyPassed).toBe(false);
+        expect(result.explain()).toContain('(no nested results)');
     });
 
-    test('forOne', () => {
-        const bad = new Result([null], [false]);
-        // @ts-expect-error -- exercising the runtime guard
-        expect(() => bad.forOne()).toThrow();
-        expect(() => bad.forOne('')).toThrow();
-        expect(() => bad.forOne('fn')).toThrow();
-
-        const invokable = new Invokable(() => true, 'fn');
-        const result = new Result([invokable], [invokable.invoke()]);
-        expect(result.forOne('fn')).toEqual([true]);
+    test('a Result with no outcomes is vacuously passed', () => {
+        expect(new Result('s', []).passed).toBe(true);
+        expect(new Result('s', []).anyPassed).toBe(false);
     });
 
-    test('explain defaults to console.log and marks failures', () => {
-        const spy = vi.spyOn(console, 'log').mockImplementation(() => undefined);
-        const result = new Result([new Invokable(() => false, 'no')], [false], 'x');
+    test('outcomes must be an array', () => {
+        expect(() => new Result('s', null as unknown as [])).toThrow(TypeError);
+    });
+});
 
-        result.explain();
+describe('Result queries', () => {
+    const base = FenceBuilder.create()
+        .register('required', v.required)
+        .register('min', v.minLength)
+        .register('max', v.maxLength)
+        .register('email', v.isEmail)
+        .register('policy', v.policy)
+        .register('each', v.each);
 
-        const out = spy.mock.calls.map((parts) => parts.join(' ')).join('\n');
-        spy.mockRestore();
-        expect(out).toContain('[x] forAll');
-        expect(out).toContain('[x] no');
+    const user = base.required().max(255);
+    const userPolicy = base
+        .policy({
+            username: user.min(4).email().build(),
+            password: user.min(8).build(),
+        })
+        .build();
+
+    test('for(name) returns every outcome recorded under that name', () => {
+        const result = base.min(1).max(3).min(2).build().run('ab');
+
+        expect(result.for('min')).toEqual([true, true]);
+        expect(result.for('max')).toEqual([true]);
+        expect(result.for('nope')).toEqual([]);
     });
 
-    test('explain writes to the supplied logger', () => {
-        const lines: string[] = [];
-        const inner = new Result([new Invokable(() => true, 'inner')], [true], 'x');
-        const result = new Result(
-            [new Invokable(() => true, 'eq', ['a']), new Invokable(() => [inner], 'nested')],
-            [true, [inner]],
-            ['a'],
-        );
+    test('failures() flattens nested results into paths', () => {
+        const result = userPolicy.run({ username: 'tim', password: 'hunter22' });
 
-        result.explain((...parts) => lines.push(parts.join(' ')));
+        expect(result.passed).toBe(false);
+        expect(result.failures()).toEqual([
+            {
+                path: ['policy', 'username', 'min'],
+                step: { name: 'min', args: [4] },
+                subject: 'tim',
+            },
+            {
+                path: ['policy', 'username', 'email'],
+                step: { name: 'email', args: [] },
+                subject: 'tim',
+            },
+        ]);
+    });
 
-        expect(lines.join('\n')).toContain('[✓] eq (["a"])');
-        expect(lines.join('\n')).toContain('[✓] inner');
+    test('failures() uses indices for nested arrays and is empty when passed', () => {
+        const fence = base.each(base.min(2).build()).build();
+
+        expect(
+            fence
+                .run(['ab', 'c', 'de'])
+                .failures()
+                .map((f) => f.path),
+        ).toEqual([['each', '1', 'min']]);
+        expect(fence.run(['ab', 'cd']).failures()).toEqual([]);
+    });
+
+    test('explain() reports the verdict, each step and nested results', () => {
+        const text = userPolicy.run({ username: 'tim@example.com', password: 'short' }).explain();
+
+        expect(text).toContain('subject: {username: "tim@example.com", password: "short"}');
+        expect(text).toContain('FAILED (0/1 steps)');
+        expect(text).toContain('[x] policy({username: Fence(4 steps), password: Fence(3 steps)})');
+        expect(text).toContain('username:');
+        expect(text).toContain('PASSED (4/4 steps)');
+        expect(text).toContain('[✓] email');
+        expect(text).toContain('[x] min(8)');
+        expect(text.split('\n').every((line) => line.length < 100)).toBe(true);
+    });
+
+    test('toJSON() gives a plain description that survives JSON.stringify', () => {
+        const json = JSON.parse(JSON.stringify(base.min(2).build().run('a'))) as unknown;
+
+        expect(json).toEqual({
+            subject: 'a',
+            passed: false,
+            outcomes: [{ name: 'min', args: [2], value: false }],
+        });
+    });
+
+    test('deprecated aliases delegate to the new API', () => {
+        const result = base.min(1).min(5).build().run('abc');
+
+        /* eslint-disable @typescript-eslint/no-deprecated */
+        expect(result.forAll()).toBe(result.passed);
+        expect(result.forAny()).toBe(result.anyPassed);
+        expect(result.forOne('min')).toEqual(result.for('min'));
+        /* eslint-enable @typescript-eslint/no-deprecated */
     });
 });

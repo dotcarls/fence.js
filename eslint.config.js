@@ -6,7 +6,7 @@ import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-    globalIgnores(['dist/', 'coverage/', 'docs/', 'example/']),
+    globalIgnores(['dist/', 'coverage/', 'docs/']),
     js.configs.recommended,
     tseslint.configs.strictTypeChecked,
     tseslint.configs.stylisticTypeChecked,
@@ -22,6 +22,14 @@ export default defineConfig(
             // Validators are user-supplied functions of arbitrary shape; `any` in
             // the *parameter* position of the Validator type is the honest signature.
             '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true }],
+            '@typescript-eslint/no-unused-vars': [
+                'error',
+                {
+                    argsIgnorePattern: '^_',
+                    varsIgnorePattern: '^_',
+                    caughtErrorsIgnorePattern: '^_',
+                },
+            ],
         },
     },
     {

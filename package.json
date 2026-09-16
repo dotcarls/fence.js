@@ -1,6 +1,6 @@
 {
   "name": "fence.js",
-  "version": "2.0.0-alpha.1",
+  "version": "2.0.0-beta.1",
   "description": "Composable, portable validations: record named validation steps, fork and extend them, serialize them to JSON and run them anywhere the same names are registered",
   "keywords": [
     "validation",
@@ -60,7 +60,6 @@
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@eslint/js": "^10.0.1",
-    "@faker-js/faker": "^9.9.0",
     "@release-it/conventional-changelog": "^12.0.2",
     "@types/node": "^22.20.3",
     "@vitest/coverage-v8": "^5.0.1",

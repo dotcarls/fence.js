@@ -1,6 +1,5 @@
 dist/
 coverage/
 docs/
-example/
 package-lock.json
 CHANGELOG.md

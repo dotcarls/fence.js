@@ -1,0 +1,19 @@
+<!doctype html>
+<!-- fence.js is ESM only; browsers load it natively from any ESM CDN. Open this file directly. -->
+<meta charset="utf-8" />
+<title>fence.js in the browser</title>
+<pre id="out"></pre>
+<script type="module">
+    import { FenceBuilder } from 'https://esm.sh/fence.js@2';
+
+    const fence = FenceBuilder.create()
+        .register('min', (value, length) => value.length >= length)
+        .register('email', (value) => value.includes('@'))
+        .min(4)
+        .email()
+        .build();
+
+    document.getElementById('out').textContent = ['tim', 'tim@example.com']
+        .map((subject) => fence.run(subject).explain())
+        .join('\n\n');
+</script>
