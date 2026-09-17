@@ -1,4 +1,4 @@
-import { formatCall, formatValue } from './format.js';
+import { formatCall, formatValue, isPlainObject } from './format.js';
 import { toLenientJsonValue } from './serialize.js';
 import type {
     Failure,
@@ -34,7 +34,8 @@ export class Result {
      * Results are normally created by {@link Fence.run}. Constructing one directly is useful
      * in tests and in higher-order validators.
      *
-     * @throws TypeError when `outcomes` is not an array of `{ step: { name, args }, value }`.
+     * @throws TypeError when `outcomes` is not an array of `{ step: { name, args }, value }`
+     * with an {@link Outcome} as `value`.
      */
     constructor(subject: unknown, outcomes: readonly StepOutcome[]) {
         this.subject = subject;
@@ -88,12 +89,12 @@ export class Result {
 
     /**
      * A plain-data description for logging or transport. Nested fences in step arguments are
-     * tagged as in {@link Fence.toJSON}; arguments that are not JSON values are described as
-     * strings rather than throwing.
+     * tagged as in {@link Fence.toJSON}; the subject and any argument that is not a JSON value
+     * are described as strings rather than throwing.
      */
     toJSON(): SerializedResult {
         return {
-            subject: this.subject,
+            subject: toLenientJsonValue(this.subject, 'subject'),
             passed: this.passed,
             outcomes: this.outcomes.map(({ step, value }): SerializedOutcome => ({
                 name: step.name,
@@ -166,15 +167,35 @@ export class Result {
     }
 }
 
+/** `true` for a (non-sparse) array whose every item is a {@link Result}. */
+export function isResultList(value: unknown): value is readonly Result[] {
+    if (!Array.isArray(value)) {
+        return false;
+    }
+    // for...of visits holes (as undefined), unlike every(), so sparse arrays are rejected.
+    for (const item of value) {
+        if (!(item instanceof Result)) {
+            return false;
+        }
+    }
+    return true;
+}
+
+/** `true` for a plain object whose every value is a {@link Result}. */
+export function isResultRecord(value: unknown): value is Readonly<Record<string, Result>> {
+    return isPlainObject(value) && Object.values(value).every((item) => item instanceof Result);
+}
+
 function freezeOutcomes(value: unknown): readonly StepOutcome[] {
     if (!Array.isArray(value)) {
         throw new TypeError('Result outcomes must be an array of { step, value }');
     }
     return Object.freeze(
-        Array.from(value as readonly unknown[], (entry, index) => {
+        Array.from(value, (entry: unknown, index) => {
             if (!isStepOutcome(entry)) {
                 throw new TypeError(
-                    `Result outcome ${String(index)} must be { step: { name, args }, value }`,
+                    `Result outcome ${String(index)} must be { step: { name, args }, value }, ` +
+                        'where value is a boolean, an array of Results or a record of Results',
                 );
             }
             return Object.isFrozen(entry)
@@ -188,12 +209,13 @@ function isStepOutcome(value: unknown): value is StepOutcome {
     if (typeof value !== 'object' || value === null || !('step' in value) || !('value' in value)) {
         return false;
     }
-    const { step } = value as { step: unknown };
+    const { step, value: outcome } = value;
     return (
         typeof step === 'object' &&
         step !== null &&
         typeof (step as { name?: unknown }).name === 'string' &&
-        Array.isArray((step as { args?: unknown }).args)
+        Array.isArray((step as { args?: unknown }).args) &&
+        (typeof outcome === 'boolean' || isResultList(outcome) || isResultRecord(outcome))
     );
 }
 
@@ -203,24 +225,24 @@ function serializeOutcome(
     if (typeof value === 'boolean') {
         return value;
     }
-    if (isResultList(value)) {
+    if (isList(value)) {
         return value.map((result) => result.toJSON());
     }
     return Object.fromEntries(Object.entries(value).map(([key, result]) => [key, result.toJSON()]));
 }
 
-function isResultList(value: Nested): value is readonly Result[] {
+function isList(value: Nested): value is readonly Result[] {
     return Array.isArray(value);
 }
 
 function entriesOf(value: Nested): [string, Result][] {
-    return isResultList(value)
+    return isList(value)
         ? value.map((result, index): [string, Result] => [String(index), result])
         : Object.entries(value);
 }
 
 function nestedOf(value: Nested): readonly Result[] {
-    return isResultList(value) ? value : Object.values(value);
+    return isList(value) ? value : Object.values(value);
 }
 
 function outcomePassed(value: Outcome): boolean {

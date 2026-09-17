@@ -1,6 +1,5 @@
 import { InvalidOutcomeError } from './errors.js';
-import { isPlainObject } from './format.js';
-import { Result } from './result.js';
+import { isResultList, isResultRecord } from './result.js';
 import type {
     MemoizeOptions,
     Outcome,
@@ -14,9 +13,17 @@ import type {
 /** Runs one step's validator against a subject. */
 export type Runner = (subject: unknown) => Outcome;
 
-/** A frozen step record. Arguments are held by reference. */
+/**
+ * A frozen step record. Arguments are held by reference. Trailing `undefined` arguments are
+ * dropped, so `between(1, undefined)` records the same step as `between(1)` (the validator
+ * cannot tell them apart either) and stays serializable.
+ */
 export function createStep(name: string, args: readonly unknown[]): Step {
-    return Object.freeze({ name, args: Object.freeze([...args]) });
+    let length = args.length;
+    while (length > 0 && args[length - 1] === undefined) {
+        length -= 1;
+    }
+    return Object.freeze({ name, args: Object.freeze(args.slice(0, length)) });
 }
 
 /**
@@ -87,23 +94,6 @@ export function registryOf(entries: RegistryEntries): Registry {
 }
 
 const registries = new WeakMap<RegistryEntries, Registry>();
-
-function isResultList(value: unknown): value is readonly Result[] {
-    if (!Array.isArray(value)) {
-        return false;
-    }
-    // for...of visits holes (as undefined), unlike every(), so sparse arrays are rejected.
-    for (const item of value as readonly unknown[]) {
-        if (!(item instanceof Result)) {
-            return false;
-        }
-    }
-    return true;
-}
-
-function isResultRecord(value: unknown): value is Readonly<Record<string, Result>> {
-    return isPlainObject(value) && Object.values(value).every((item) => item instanceof Result);
-}
 
 function identity(subject: unknown): unknown {
     return subject;

@@ -140,3 +140,31 @@ describe('fluent method types', () => {
         expectTypeOf(stepNames(FenceBuilder.create())).toEqualTypeOf<string[]>();
     });
 });
+
+describe('review follow-ups', () => {
+    test('registerAll rejects a builder with an overlapping name', () => {
+        const other = FenceBuilder.create().register('min', min).register('extra', isString);
+        // @ts-expect-error -- "'min' is already registered"
+        base.registerAll(other);
+        expectTypeOf(
+            base.registerAll(FenceBuilder.create().register('extra', isString)).extra,
+        ).toBeFunction();
+    });
+
+    test('the constructor does not accept an explicit registry type argument', () => {
+        expectTypeOf(new FenceBuilder()).toEqualTypeOf<FenceBuilder>();
+        // @ts-expect-error -- an explicit registry would promise methods the instance lacks
+        new FenceBuilder<{ readonly min: typeof min }>();
+    });
+
+    test('legacy Object.prototype accessors are reserved names too', () => {
+        // @ts-expect-error -- "'__defineGetter__' is reserved: ..."
+        base.register('__defineGetter__', isString);
+    });
+
+    test('fromJSON with a plain registry is typed by that registry', () => {
+        expectTypeOf(FenceBuilder.fromJSON({}, { min }).min).parameters.toEqualTypeOf<
+            [n: number]
+        >();
+    });
+});

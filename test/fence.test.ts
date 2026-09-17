@@ -249,3 +249,18 @@ describe('Fence memoization', () => {
         expect(calls).toEqual(['a', 'a']);
     });
 });
+
+describe('Fence review follow-ups', () => {
+    test('the constructor validates and freezes hand-made steps', () => {
+        const step = { name: 'min', args: [2] };
+        const fence = new Fence(base.entries, [step]);
+
+        expect(Object.isFrozen(fence.steps[0])).toBe(true);
+        expect(Object.isFrozen(fence.steps[0]?.args)).toBe(true);
+        step.args[0] = 5;
+        expect(fence.run('ab').passed).toBe(true); // the recorded step did not change
+        expect(() => new Fence(base.entries, [{ name: 'min' } as never])).toThrow(
+            /step 0 must be \{ name: string, args: unknown\[\] \}/,
+        );
+    });
+});

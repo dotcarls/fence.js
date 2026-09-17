@@ -1,7 +1,7 @@
 import { EmptyFenceError, RegistrationError } from './errors.js';
 import { Result } from './result.js';
 import { serializeSteps } from './serialize.js';
-import { bindStep, registryOf, type Runner } from './step.js';
+import { bindStep, createStep, registryOf, type Runner } from './step.js';
 import type { Registry, RegistryEntries, SerializedFence, Step } from './types.js';
 
 /**
@@ -25,11 +25,11 @@ export class Fence<R extends Registry = Registry> {
 
     /**
      * Binds `steps` to the validators in `entries`. Prefer {@link FenceBuilder.build}, which
-     * supplies both.
+     * supplies both. Steps are copied into frozen records.
      *
      * @throws {@link EmptyFenceError} when `steps` is empty.
      * @throws {@link RegistrationError} when a step names a validator that `entries` lacks.
-     * @throws TypeError when the arguments are not a Map and an array.
+     * @throws TypeError when the arguments are not a Map and an array of `{ name, args }` steps.
      */
     constructor(entries: RegistryEntries, steps: readonly Step[]) {
         // Locals keep the declared types; the guards below would otherwise narrow to `any`.
@@ -48,7 +48,16 @@ export class Fence<R extends Registry = Registry> {
         }
 
         this.#entries = map;
-        this.#steps = Object.freeze([...list]);
+        this.#steps = Object.freeze(
+            list.map((step, index) => {
+                if (!isStepLike(step)) {
+                    throw new TypeError(
+                        `Fence step ${String(index)} must be { name: string, args: unknown[] }`,
+                    );
+                }
+                return createStep(step.name, step.args);
+            }),
+        );
         this.#bound = this.#steps.map((step) => {
             const entry = map.get(step.name);
             if (!entry) {
@@ -97,4 +106,13 @@ export class Fence<R extends Registry = Registry> {
 /** `Array.isArray` without the narrowing to `any[]` that it applies to readonly arrays. */
 function isArray(value: unknown): value is readonly unknown[] {
     return Array.isArray(value);
+}
+
+function isStepLike(value: unknown): value is Step {
+    return (
+        typeof value === 'object' &&
+        value !== null &&
+        typeof (value as { name?: unknown }).name === 'string' &&
+        Array.isArray((value as { args?: unknown }).args)
+    );
 }

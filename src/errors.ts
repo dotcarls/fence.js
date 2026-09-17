@@ -6,7 +6,11 @@ export interface FenceErrorOptions {
     readonly cause?: unknown;
 }
 
-/** Base class of every error thrown by fence.js. */
+/**
+ * Base class of every error fence.js raises about validation input or state. Arguments of the
+ * wrong JavaScript type (a non-Map to the `Fence` constructor, a non-object `base` to
+ * `fromJSON`) raise a plain `TypeError` instead.
+ */
 export class FenceError extends Error {
     override readonly name: string = 'FenceError';
 

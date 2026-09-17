@@ -24,6 +24,8 @@ export type {
     KnownKeys,
     MemoizeOptions,
     Merge,
+    Mergeable,
+    DuplicateKeys,
     Outcome,
     Registrable,
     Registry,

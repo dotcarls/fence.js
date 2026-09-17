@@ -202,3 +202,53 @@ describe('FenceBuilder deprecated aliases', () => {
     });
     /* eslint-enable @typescript-eslint/no-deprecated */
 });
+
+describe('FenceBuilder review follow-ups', () => {
+    test('trailing undefined arguments are dropped when a step is recorded', () => {
+        const between = (v: number, lo: number, hi?: number) =>
+            v >= lo && (hi === undefined || v <= hi);
+        const builder = FenceBuilder.create().register('between', between);
+        const hi: number | undefined = undefined;
+
+        expect(builder.between(1, hi).steps).toEqual([{ name: 'between', args: [1] }]);
+        expect(builder.between(1, undefined).toJSON()).toEqual(builder.between(1).toJSON());
+        expect(builder.between(1, hi).build().run(5).passed).toBe(true);
+        // Only trailing ones: an undefined in the middle is kept (and is not serializable).
+        const eq = FenceBuilder.create().register('eq', (_v: unknown, ..._a: unknown[]) => true);
+        expect(eq.eq(undefined, 1).steps[0]?.args).toEqual([undefined, 1]);
+    });
+
+    test('registerAll rejects a builder with an overlapping name at run time', () => {
+        const other = FenceBuilder.create().register('min', v.minLength);
+        expect(() => base.registerAll(other as never)).toThrow(/'min' is already registered/);
+    });
+
+    test('a plain registry passed to fromJSON is validated like registerAll', () => {
+        const json = { fence: 2, steps: [{ name: 'min', args: [1] }] };
+
+        expect(() => FenceBuilder.fromJSON(json, { min: v.minLength, build: v.required })).toThrow(
+            RegistrationError,
+        );
+        expect(() => FenceBuilder.fromJSON(json, { min: v.minLength, then: v.required })).toThrow(
+            /reserved/,
+        );
+        expect(() =>
+            FenceBuilder.fromJSON(json, { min: 5 as unknown as typeof v.minLength }),
+        ).toThrow(/must be a function/);
+        expect(() => FenceBuilder.fromLegacyJSON('[]', { toString: v.required })).toThrow(
+            /reserved/,
+        );
+    });
+
+    test('fromJSON accepts a live fence or builder in place of its JSON', () => {
+        const fence = base.min(2).build();
+
+        expect(FenceBuilder.fromJSON(fence, base).steps).toEqual(fence.steps);
+        expect(FenceBuilder.fromJSON(base.min(3), base).steps).toEqual([
+            { name: 'min', args: [3] },
+        ]);
+        expect(() => FenceBuilder.fromJSON(new Date(0), base)).toThrow(
+            /must be a plain object, got \[object Date\]/,
+        );
+    });
+});

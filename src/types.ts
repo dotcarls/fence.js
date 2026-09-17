@@ -67,6 +67,10 @@ export type ReservedName =
     | 'toLocaleString'
     | 'toString'
     | 'valueOf'
+    | '__defineGetter__'
+    | '__defineSetter__'
+    | '__lookupGetter__'
+    | '__lookupSetter__'
     | 'prototype'
     | 'then'
     | '__proto__';
@@ -95,6 +99,15 @@ export type Registrable<R extends Registry, V extends Registry> =
                   K in keyof V & (ReservedName | KnownKeys<R>)
               ]: `'${K & string}' is reserved or already registered`;
           };
+
+/** Names present in both registries, which {@link FenceBuilder.registerAll} rejects. */
+export type DuplicateKeys<R extends Registry, V extends Registry> = KnownKeys<R> & KnownKeys<V>;
+
+/** Constrains a builder passed to {@link FenceBuilder.registerAll}: overlapping names become a sentence. */
+export type Mergeable<R extends Registry, V extends Registry> = FenceBuilder<V> &
+    ([DuplicateKeys<R, V>] extends [never]
+        ? unknown
+        : { readonly [K in DuplicateKeys<R, V>]: `'${K}' is already registered` });
 
 /**
  * `R` with validator `F` registered as `N`. Registering under a non-literal `string` name
@@ -206,9 +219,12 @@ export interface SerializedOutcome {
         boolean | readonly SerializedResult[] | Readonly<Record<string, SerializedResult>>;
 }
 
-/** The JSON form of a {@link Result}, for logging and transport of diagnostics. */
+/**
+ * The JSON form of a {@link Result}, for logging and transport of diagnostics. The subject and
+ * the step arguments are JSON values; anything that is not JSON is described as a string.
+ */
 export interface SerializedResult {
-    readonly subject: unknown;
+    readonly subject: JsonValue;
     readonly passed: boolean;
     readonly outcomes: readonly SerializedOutcome[];
 }

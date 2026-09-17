@@ -61,8 +61,9 @@ scripts/        release helpers
 - Public API changes need: a behaviour test, a type test when types are involved, an entry in
   `CHANGELOG.md` (hand-maintained, Keep a Changelog format) under the upcoming version, and a
   doc comment on the exported symbol.
-- Errors thrown by the library are subclasses of `FenceError`; `TypeError` is reserved for
-  misuse of constructors.
+- Errors the library raises about validation input or state are subclasses of `FenceError`;
+  `TypeError` is reserved for arguments of the wrong JavaScript type (constructors, the `base`
+  argument of `fromJSON`).
 - Prettier, ESLint and the related Vitest files run on staged files in the pre-commit hook;
   `typecheck` and the full test suite run before push.
 

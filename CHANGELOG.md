@@ -19,6 +19,9 @@ A TypeScript rewrite. See [MIGRATING.md](MIGRATING.md) for the upgrade path.
   dynamic names widen the builder type (permanently) instead of mistyping existing methods.
 - `FORMAT_VERSION` and `NESTED_FENCE_KEY` constants; `SerializedResult` type.
 - `Symbol.toStringTag` and Node.js `util.inspect` support on builders, fences and results.
+- `Result.toJSON()` is JSON-safe: the subject and non-JSON arguments are described as strings,
+  nested fences are tagged.
+- Trailing `undefined` step arguments are dropped when recorded.
 - Nested results as records (`Record<string, Result>`) in addition to arrays.
 - `Result.passed`, `Result.anyPassed`, `Result.for(name)`, `Result.failures()` (flattened, with
   nested paths), `Result.explain()` returning text, `Result.toJSON()`.

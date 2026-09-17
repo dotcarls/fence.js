@@ -232,3 +232,55 @@ describe('Result queries', () => {
         /* eslint-enable @typescript-eslint/no-deprecated */
     });
 });
+
+describe('Result review follow-ups', () => {
+    const base = FenceBuilder.create()
+        .register('min', v.minLength)
+        .register('each', v.each)
+        .register('any', (_s: unknown, ..._args: unknown[]) => true);
+
+    test('toJSON() never throws: nested fences with non-JSON arguments and odd subjects are described', () => {
+        const inner = base
+            .any(() => 1, new Date(0))
+            .min(1)
+            .build();
+        const result = base.each(inner).build().run(['a']);
+        const json = JSON.parse(JSON.stringify(result)) as { outcomes: { args: unknown[] }[] };
+
+        expect(json.outcomes[0]?.args).toEqual([
+            {
+                $fence: {
+                    fence: 2,
+                    steps: [
+                        { name: 'any', args: ['[Function anonymous]', '[object Date]'] },
+                        { name: 'min', args: [1] },
+                    ],
+                },
+            },
+        ]);
+
+        const cyclic: Record<string, unknown> = {};
+        cyclic.self = cyclic;
+        expect(base.min(1).build().run(10n).toJSON().subject).toBe('10n');
+        expect(base.min(1).build().run(cyclic).toJSON().subject).toEqual({ self: '[Circular]' });
+        expect(base.min(1).build().run(undefined).toJSON().subject).toBe('undefined');
+        expect(() =>
+            JSON.stringify(
+                base
+                    .min(1)
+                    .build()
+                    .run(new Map([[1, 2]])),
+            ),
+        ).not.toThrow();
+    });
+
+    test('the constructor rejects outcome values that are not outcomes', () => {
+        const step = { name: 'x', args: [] };
+        for (const value of [42, null, undefined, 'yes', [1], { a: 1 }]) {
+            expect(() => new Result('s', [{ step, value: value as never }])).toThrow(
+                /where value is a boolean, an array of Results or a record of Results/,
+            );
+        }
+        expect(new Result('s', [{ step, value: {} }]).passed).toBe(true);
+    });
+});

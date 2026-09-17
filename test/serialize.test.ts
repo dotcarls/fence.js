@@ -69,7 +69,7 @@ describe('toJSON', () => {
 
     test.each([
         ['a function', () => true, /steps\[0\]\.args\[0\] is \[Function/],
-        ['undefined', undefined, /is undefined/],
+        ['undefined inside an array', [undefined], /args\[0\]\[0\] is undefined/],
         ['NaN', NaN, /is NaN/],
         ['Infinity', Infinity, /is Infinity/],
         ['a bigint', 1n, /is 1n;/],
@@ -207,8 +207,8 @@ describe('fromJSON', () => {
 
     test.each([
         ['invalid JSON text', '{not json', /not valid JSON/],
-        ['a non-object', 42, /must be an object/],
-        ['null', null, /must be an object/],
+        ['a non-object', 42, /must be a plain object/],
+        ['null', null, /must be a plain object/],
         ['a missing version', { steps: [] }, /unsupported version undefined/],
         [
             'v1 output',
@@ -217,7 +217,7 @@ describe('fromJSON', () => {
         ],
         ['a wrong version', { fence: 1, steps: [] }, /version 1/],
         ['non-array steps', { fence: 2, steps: {} }, /\.steps must be an array/],
-        ['a non-object step', { fence: 2, steps: [1] }, /steps\[0\] must be an object/],
+        ['a non-object step', { fence: 2, steps: [1] }, /steps\[0\] must be a plain object/],
         ['a step without a name', { fence: 2, steps: [{ args: [] }] }, /steps\[0\]\.name/],
         ['a step without args', { fence: 2, steps: [{ name: 'min' }] }, /steps\[0\]\.args/],
         [

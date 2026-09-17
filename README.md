@@ -21,7 +21,7 @@ serializable and deterministic across environments.
 - **Portable.** `JSON.stringify(fence)` is the wire format; `FenceBuilder.fromJSON(json, base)`
   restores it wherever the same validator names are registered (pass a builder or a plain
   registry as `base`). Nested fences round-trip.
-- **Zero dependencies, ESM only,** about 7 KB gzipped unminified, runs on Node 20.19+ and in
+- **Zero dependencies, ESM only,** about 9 KB gzipped unminified, runs on Node 20.19+ and in
   evergreen browsers.
 
 ## Install
@@ -96,7 +96,8 @@ The first parameter of a validator is the subject; the rest become the fluent me
 parameters. Names must be unique within a registry and may not shadow builder or `Object.prototype`
 members (`build`, `step`, `then`, `toString`, …); both rules are enforced at compile time,
 with the reason spelled out in the error, and at run time (`RegistrationError`).
-`registerAll(otherBuilder)` copies a registry including its options.
+`registerAll(otherBuilder)` copies a registry including its options and rejects overlapping
+names the same way.
 
 Validators are called as plain functions (`this` is `undefined`) with the subject first, then
 the recorded arguments. Return `true`/`false`, or nested results (below). Anything else throws
@@ -170,7 +171,8 @@ as `memoize` apply) or a plain registry. It validates the whole document, includ
 every argument is a JSON value, and throws
 `HydrationError` whose `missing` property lists **every** validator name (nested included) the
 base registry lacks. Only JSON values and fences may appear in step arguments; anything else
-throws `SerializationError` when serializing. `FenceBuilder.fromLegacyJSON(text, base)` reads the
+throws `SerializationError` when serializing (trailing `undefined` arguments are dropped when a
+step is recorded, so optional parameters left out stay serializable). `FenceBuilder.fromLegacyJSON(text, base)` reads the
 v1 `serialize()` format.
 
 Because fences refer to validators by name, the two sides only need validators that are
@@ -178,8 +180,11 @@ _functionally equivalent_ under the same names; they can be different implementa
 
 ### Errors
 
-Every error thrown by fence.js extends `FenceError`: `RegistrationError`, `EmptyFenceError`,
-`SerializationError`, `HydrationError` (`.missing`), `InvalidOutcomeError` (`.step`, `.value`).
+Every error fence.js raises about validation input or state extends `FenceError`:
+`RegistrationError`, `EmptyFenceError`, `SerializationError`, `HydrationError` (`.missing`),
+`InvalidOutcomeError` (`.step`, `.value`). Arguments of the wrong JavaScript type (a non-object
+`base` for `fromJSON`, a malformed step for the `Fence` or `Result` constructor) raise a plain
+`TypeError`. Exceptions thrown by your validators propagate unchanged.
 
 ## TypeScript
 

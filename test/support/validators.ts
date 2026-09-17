@@ -1,5 +1,5 @@
 /*
- * Validators used by the tests, examples and benchmarks. fence.js ships no validators of
+ * Validators used by the tests and the benchmark. fence.js ships no validators of
  * its own; these stand in for an application's utility module.
  */
 import type { Fence, Result } from '../../src/index.js';

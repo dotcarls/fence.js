@@ -10,11 +10,12 @@ export const NESTED_FENCE_KEY = '$fence';
 
 /**
  * Converts recorded steps to the portable JSON form. Nested fences are tagged; any other
- * non-JSON value (functions, undefined, NaN, Dates, class instances, cycles) throws.
+ * non-JSON value (functions, undefined, NaN, Dates, class instances, cycles) throws, unless
+ * `lenient` is set, in which case it is described as a string.
  *
  * @throws {@link SerializationError}
  */
-export function serializeSteps(steps: readonly Step[]): SerializedFence {
+export function serializeSteps(steps: readonly Step[], lenient = false): SerializedFence {
     return {
         fence: FORMAT_VERSION,
         steps: steps.map((step, index): SerializedStep => ({
@@ -24,7 +25,7 @@ export function serializeSteps(steps: readonly Step[]): SerializedFence {
                     arg,
                     `steps[${String(index)}].args[${String(argIndex)}]`,
                     new WeakSet(),
-                    false,
+                    lenient,
                 ),
             ),
         })),
@@ -37,8 +38,9 @@ export function toLenientJsonValue(value: unknown, path: string): JsonValue {
 }
 
 /**
- * Accepts a JSON string or an already-parsed value and validates the version-2 shape,
- * including that every step argument is a JSON value (with nested fences tagged).
+ * Accepts a JSON string, an already-parsed value, or a live fence/builder (whose `toJSON()`
+ * is used) and validates the version-2 shape, including that every step argument is a JSON
+ * value (with nested fences tagged).
  *
  * @throws {@link HydrationError}
  */
@@ -58,8 +60,11 @@ export function parseSerializedFence(input: unknown, path = 'serialized fence'):
             `${path} is a JSON array, which looks like v1 serialize() output; use FenceBuilder.fromLegacyJSON`,
         );
     }
+    if (isFenceLike(value) || isBuilderLike(value)) {
+        value = value.toJSON();
+    }
     if (!isPlainObject(value)) {
-        throw new HydrationError(`${path} must be an object, got ${formatValue(value)}`);
+        throw new HydrationError(`${path} must be a plain object, got ${formatValue(value)}`);
     }
     if (value.fence !== FORMAT_VERSION) {
         throw new HydrationError(
@@ -74,7 +79,9 @@ export function parseSerializedFence(input: unknown, path = 'serialized fence'):
     const steps = value.steps.map((step: unknown, index): SerializedStep => {
         const stepPath = `${path}.steps[${String(index)}]`;
         if (!isPlainObject(step)) {
-            throw new HydrationError(`${stepPath} must be an object`);
+            throw new HydrationError(
+                `${stepPath} must be a plain object, got ${formatValue(step)}`,
+            );
         }
         if (typeof step.name !== 'string' || step.name === '') {
             throw new HydrationError(`${stepPath}.name must be a non-empty string`);
@@ -190,7 +197,14 @@ function toJsonValue(
                     : reject('is circular; only JSON values and fences can be serialized');
             }
             if (isFenceLike(value)) {
-                return { [NESTED_FENCE_KEY]: value.toJSON() };
+                // In lenient mode the nested fence is serialized leniently too, so a fence
+                // holding a non-JSON argument still yields a document instead of throwing.
+                return {
+                    [NESTED_FENCE_KEY]:
+                        lenient && isStepList(value.steps)
+                            ? serializeSteps(value.steps, true)
+                            : value.toJSON(),
+                };
             }
             if (Array.isArray(value)) {
                 ancestors.add(value);
@@ -312,4 +326,19 @@ function isJsonArray(value: JsonValue): value is readonly JsonValue[] {
 
 function isJsonObject(value: JsonValue): value is Readonly<Record<string, JsonValue>> {
     return typeof value === 'object' && value !== null && !Array.isArray(value);
+}
+
+function isBuilderLike(value: unknown): value is { toJSON(): unknown } {
+    return (
+        typeof value === 'object' &&
+        value !== null &&
+        (value as { [Symbol.toStringTag]?: unknown })[Symbol.toStringTag] === 'FenceBuilder' &&
+        typeof (value as { toJSON?: unknown }).toJSON === 'function'
+    );
+}
+
+function isStepList(value: readonly unknown[]): value is readonly Step[] {
+    return value.every(
+        (item) => isPlainObject(item) && typeof item.name === 'string' && Array.isArray(item.args),
+    );
 }
