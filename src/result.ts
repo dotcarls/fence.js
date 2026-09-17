@@ -1,26 +1,44 @@
 import { formatCall, formatValue } from './format.js';
-import type { Failure, Outcome, StepOutcome } from './types.js';
+import { toLenientJsonValue } from './serialize.js';
+import type {
+    Failure,
+    Outcome,
+    SerializedOutcome,
+    SerializedResult,
+    StepOutcome,
+} from './types.js';
+
+type Nested = readonly Result[] | Readonly<Record<string, Result>>;
 
 /**
  * The outcome of running a {@link Fence} against one subject: every step paired with what
  * its validator returned.
  *
- * Nested outcomes (arrays or records of `Result`) are folded in: {@link Result.passed} needs
- * every nested result to pass and {@link Result.anyPassed} needs any nested result to have
- * any passing step. An empty nested collection is vacuously passed and vacuously not
- * anyPassed, which {@link Result.explain} makes visible.
+ * Nested outcomes (arrays or records of `Result`) fold in: {@link Result.passed} needs every
+ * nested result to pass and {@link Result.anyPassed} needs any nested result to have any
+ * passing step. An empty nested collection is vacuously passed and vacuously not anyPassed,
+ * which {@link Result.explain} makes visible.
  */
 export class Result {
+    static {
+        Object.defineProperty(Result.prototype, Symbol.toStringTag, {
+            value: 'Result',
+            configurable: true,
+        });
+    }
+
     readonly subject: unknown;
     readonly outcomes: readonly StepOutcome[];
 
+    /**
+     * Results are normally created by {@link Fence.run}. Constructing one directly is useful
+     * in tests and in higher-order validators.
+     *
+     * @throws TypeError when `outcomes` is not an array of `{ step: { name, args }, value }`.
+     */
     constructor(subject: unknown, outcomes: readonly StepOutcome[]) {
-        const list: readonly StepOutcome[] = outcomes;
-        if (!Array.isArray(outcomes)) {
-            throw new TypeError('Result outcomes must be an array of { step, value }');
-        }
         this.subject = subject;
-        this.outcomes = Object.freeze([...list]);
+        this.outcomes = freezeOutcomes(outcomes);
     }
 
     /** `true` when every step (and every nested result) passed. */
@@ -65,21 +83,24 @@ export class Result {
 
     /** A human-readable, multi-line report. Returns text; nothing is logged. */
     explain(): string {
-        return this.lines('').join('\n');
+        return this.#lines('').join('\n');
     }
 
-    toJSON(): {
-        subject: unknown;
-        passed: boolean;
-        outcomes: { name: string; args: readonly unknown[]; value: Outcome }[];
-    } {
+    /**
+     * A plain-data description for logging or transport. Nested fences in step arguments are
+     * tagged as in {@link Fence.toJSON}; arguments that are not JSON values are described as
+     * strings rather than throwing.
+     */
+    toJSON(): SerializedResult {
         return {
             subject: this.subject,
             passed: this.passed,
-            outcomes: this.outcomes.map(({ step, value }) => ({
+            outcomes: this.outcomes.map(({ step, value }): SerializedOutcome => ({
                 name: step.name,
-                args: step.args,
-                value,
+                args: step.args.map((arg, index) =>
+                    toLenientJsonValue(arg, `args[${String(index)}]`),
+                ),
+                value: serializeOutcome(value),
             })),
         };
     }
@@ -99,11 +120,28 @@ export class Result {
         return this.for(name);
     }
 
-    private lines(indent: string): string[] {
+    /** Node.js `util.inspect` support, so `console.log(result)` shows the outcomes. */
+    [Symbol.for('nodejs.util.inspect.custom')](): {
+        subject: unknown;
+        passed: boolean;
+        outcomes: { step: string; value: Outcome }[];
+    } {
+        return {
+            subject: this.subject,
+            passed: this.passed,
+            outcomes: this.outcomes.map(({ step, value }) => ({
+                step: formatCall(step.name, step.args),
+                value,
+            })),
+        };
+    }
+
+    #lines(indent: string): string[] {
         const passedCount = this.outcomes.filter(({ value }) => outcomePassed(value)).length;
+        const verdict = this.passed ? 'PASSED' : 'FAILED';
         const lines = [
             `${indent}subject: ${formatValue(this.subject)}`,
-            `${indent}${this.passed ? 'PASSED' : 'FAILED'} (${String(passedCount)}/${String(this.outcomes.length)} steps)`,
+            `${indent}${verdict} (${String(passedCount)}/${String(this.outcomes.length)} steps)`,
         ];
 
         for (const { step, value } of this.outcomes) {
@@ -120,7 +158,7 @@ export class Result {
             }
             for (const [key, result] of nested) {
                 lines.push(`${indent}      ${key}:`);
-                lines.push(...result.lines(`${indent}        `));
+                lines.push(...result.#lines(`${indent}        `));
             }
         }
 
@@ -128,7 +166,48 @@ export class Result {
     }
 }
 
-type Nested = readonly Result[] | Readonly<Record<string, Result>>;
+function freezeOutcomes(value: unknown): readonly StepOutcome[] {
+    if (!Array.isArray(value)) {
+        throw new TypeError('Result outcomes must be an array of { step, value }');
+    }
+    return Object.freeze(
+        Array.from(value as readonly unknown[], (entry, index) => {
+            if (!isStepOutcome(entry)) {
+                throw new TypeError(
+                    `Result outcome ${String(index)} must be { step: { name, args }, value }`,
+                );
+            }
+            return Object.isFrozen(entry)
+                ? entry
+                : Object.freeze({ step: entry.step, value: entry.value });
+        }),
+    );
+}
+
+function isStepOutcome(value: unknown): value is StepOutcome {
+    if (typeof value !== 'object' || value === null || !('step' in value) || !('value' in value)) {
+        return false;
+    }
+    const { step } = value as { step: unknown };
+    return (
+        typeof step === 'object' &&
+        step !== null &&
+        typeof (step as { name?: unknown }).name === 'string' &&
+        Array.isArray((step as { args?: unknown }).args)
+    );
+}
+
+function serializeOutcome(
+    value: Outcome,
+): boolean | readonly SerializedResult[] | Readonly<Record<string, SerializedResult>> {
+    if (typeof value === 'boolean') {
+        return value;
+    }
+    if (isResultList(value)) {
+        return value.map((result) => result.toJSON());
+    }
+    return Object.fromEntries(Object.entries(value).map(([key, result]) => [key, result.toJSON()]));
+}
 
 function isResultList(value: Nested): value is readonly Result[] {
     return Array.isArray(value);
@@ -140,14 +219,14 @@ function entriesOf(value: Nested): [string, Result][] {
         : Object.entries(value);
 }
 
+function nestedOf(value: Nested): readonly Result[] {
+    return isResultList(value) ? value : Object.values(value);
+}
+
 function outcomePassed(value: Outcome): boolean {
     return typeof value === 'boolean' ? value : nestedOf(value).every((result) => result.passed);
 }
 
 function outcomeAnyPassed(value: Outcome): boolean {
     return typeof value === 'boolean' ? value : nestedOf(value).some((result) => result.anyPassed);
-}
-
-function nestedOf(value: Nested): readonly Result[] {
-    return isResultList(value) ? value : Object.values(value);
 }

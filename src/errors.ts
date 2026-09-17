@@ -1,9 +1,19 @@
 import { formatValue } from './format.js';
 import type { Step } from './types.js';
 
+/** Structural stand-in for `ErrorOptions`, so the declarations do not require the ES2022 lib. */
+export interface FenceErrorOptions {
+    readonly cause?: unknown;
+}
+
 /** Base class of every error thrown by fence.js. */
 export class FenceError extends Error {
     override readonly name: string = 'FenceError';
+
+    // eslint-disable-next-line @typescript-eslint/no-useless-constructor -- narrows the options type in the declarations
+    constructor(message: string, options?: FenceErrorOptions) {
+        super(message, options);
+    }
 }
 
 /** A validator could not be registered, or a step names a validator that is not registered. */
@@ -25,6 +35,11 @@ export class SerializationError extends FenceError {
     override readonly name = 'SerializationError';
 }
 
+export interface HydrationErrorOptions extends FenceErrorOptions {
+    /** Validator names present in the input but absent from the registry. */
+    readonly missing?: readonly string[];
+}
+
 /** Serialized input is malformed or names validators that are not registered. */
 export class HydrationError extends FenceError {
     override readonly name = 'HydrationError';
@@ -32,9 +47,9 @@ export class HydrationError extends FenceError {
     /** Validator names present in the input but absent from the registry. */
     readonly missing: readonly string[];
 
-    constructor(message: string, missing: readonly string[] = [], options?: ErrorOptions) {
+    constructor(message: string, options: HydrationErrorOptions = {}) {
         super(message, options);
-        this.missing = missing;
+        this.missing = options.missing ?? [];
     }
 }
 

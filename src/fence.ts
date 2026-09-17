@@ -1,26 +1,56 @@
 import { EmptyFenceError, RegistrationError } from './errors.js';
 import { Result } from './result.js';
-import { serializeSteps, type Runner, bindStep } from './internal.js';
+import { serializeSteps } from './serialize.js';
+import { bindStep, registryOf, type Runner } from './step.js';
 import type { Registry, RegistryEntries, SerializedFence, Step } from './types.js';
 
 /**
- * A built, immutable validation. Run it against any number of subjects; each run returns a
- * {@link Result}. Fences serialize to JSON with `JSON.stringify(fence)` and are restored with
- * `FenceBuilder.fromJSON(json, base).build()`.
+ * A built, immutable validation. Run it against one subject at a time, as often as needed;
+ * each run returns a {@link Result}. Fences serialize to JSON with `JSON.stringify(fence)` and
+ * are restored with `FenceBuilder.fromJSON(json, base).build()`.
  *
- * @typeParam R The registry the fence was built from. Kept for symmetry with the builder.
+ * @typeParam R The registry the fence was built from; the type of {@link Fence.registry}.
  */
 export class Fence<R extends Registry = Registry> {
+    static {
+        Object.defineProperty(Fence.prototype, Symbol.toStringTag, {
+            value: 'Fence',
+            configurable: true,
+        });
+    }
+
+    readonly #entries: RegistryEntries;
+    readonly #steps: readonly Step[];
     readonly #bound: readonly { readonly step: Step; readonly run: Runner }[];
 
-    /** @internal Use {@link FenceBuilder.build}. */
+    /**
+     * Binds `steps` to the validators in `entries`. Prefer {@link FenceBuilder.build}, which
+     * supplies both.
+     *
+     * @throws {@link EmptyFenceError} when `steps` is empty.
+     * @throws {@link RegistrationError} when a step names a validator that `entries` lacks.
+     * @throws TypeError when the arguments are not a Map and an array.
+     */
     constructor(entries: RegistryEntries, steps: readonly Step[]) {
+        // Locals keep the declared types; the guards below would otherwise narrow to `any`.
+        const map: RegistryEntries = entries;
+        const list: readonly Step[] = steps;
+        if (!(entries instanceof Map)) {
+            throw new TypeError(
+                'Fence entries must be a Map of registry entries (see FenceBuilder.entries)',
+            );
+        }
+        if (!isArray(steps)) {
+            throw new TypeError('Fence steps must be an array of steps');
+        }
         if (steps.length === 0) {
             throw new EmptyFenceError();
         }
 
-        this.#bound = steps.map((step) => {
-            const entry = entries.get(step.name);
+        this.#entries = map;
+        this.#steps = Object.freeze([...list]);
+        this.#bound = this.#steps.map((step) => {
+            const entry = map.get(step.name);
             if (!entry) {
                 throw new RegistrationError(`No validator is registered as '${step.name}'`);
             }
@@ -30,28 +60,41 @@ export class Fence<R extends Registry = Registry> {
 
     /** The recorded steps, in execution order. */
     get steps(): readonly Step[] {
-        return this.#bound.map(({ step }) => step);
+        return this.#steps;
     }
 
-    readonly [Symbol.toStringTag] = 'Fence';
+    /** The validators the fence was built with, by name. */
+    get registry(): R {
+        return registryOf(this.#entries) as R;
+    }
 
-    /** Runs every step against `subject`. */
+    /**
+     * Runs every step against `subject`.
+     *
+     * Exceptions thrown by a validator propagate unchanged; they are the validator's, not the
+     * fence's.
+     *
+     * @throws {@link InvalidOutcomeError} when a validator returns something other than an outcome.
+     */
     run(subject: unknown): Result {
         return new Result(
             subject,
-            this.#bound.map(({ step, run }) => ({ step, value: run(subject) })),
+            this.#bound.map(({ step, run }) => Object.freeze({ step, value: run(subject) })),
         );
     }
 
+    /** @throws {@link SerializationError} when a step argument is not a JSON value or a fence. */
     toJSON(): SerializedFence {
-        return serializeSteps(this.steps, tagFence);
+        return serializeSteps(this.#steps);
     }
 
-    /** Type-level marker only; never assigned. @internal */
-    declare readonly __registry?: R;
+    /** Node.js `util.inspect` support, so `console.log(fence)` shows the steps. */
+    [Symbol.for('nodejs.util.inspect.custom')](): { steps: readonly Step[] } {
+        return { steps: this.#steps };
+    }
 }
 
-/** Recognises fences nested inside step arguments during serialization. */
-export function tagFence(value: object): SerializedFence | undefined {
-    return value instanceof Fence ? value.toJSON() : undefined;
+/** `Array.isArray` without the narrowing to `any[]` that it applies to readonly arrays. */
+function isArray(value: unknown): value is readonly unknown[] {
+    return Array.isArray(value);
 }

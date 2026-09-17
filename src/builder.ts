@@ -1,24 +1,25 @@
 import { HydrationError, RegistrationError } from './errors.js';
-import { Fence, tagFence } from './fence.js';
+import { Fence } from './fence.js';
 import {
     collectStepNames,
-    createStep,
     parseLegacySerializedFence,
     parseSerializedFence,
     reviveArgs,
     serializeSteps,
-} from './internal.js';
+} from './serialize.js';
+import { createStep, registryOf } from './step.js';
 import type {
     EmptyRegistry,
     Extend,
     Fluent,
     Merge,
+    Registrable,
     Registry,
     RegistryEntries,
     RegistryEntry,
-    ReservedName,
     SerializedFence,
     Step,
+    StepName,
     StepOptions,
     Validator,
     ValidatorArgs,
@@ -29,7 +30,7 @@ import type {
  *
  * A builder is an immutable value: {@link FenceBuilder.register}, {@link FenceBuilder.step}
  * and every fluent step method return a new builder and leave the receiver untouched, so a
- * base builder can be derived from any number of times without `fork()` discipline.
+ * base builder can be derived from any number of times.
  *
  * ```ts
  * const base = FenceBuilder.create()
@@ -43,47 +44,56 @@ import type {
  * @typeParam R The registry: validator names to validator types. Grows with each `register`.
  */
 export class FenceBuilder<R extends Registry = EmptyRegistry> {
+    static {
+        Object.defineProperty(FenceBuilder.prototype, Symbol.toStringTag, {
+            value: 'FenceBuilder',
+            configurable: true,
+        });
+    }
+
     static readonly #descriptors = new WeakMap<RegistryEntries, PropertyDescriptorMap>();
-    static readonly #registries = new WeakMap<RegistryEntries, Registry>();
 
     #entries: RegistryEntries = new Map();
-    #steps: readonly Step[] = [];
+    #steps: readonly Step[] = EMPTY_STEPS;
 
-    /** Creates a builder with an empty registry; the same as `new FenceBuilder()`. */
+    /**
+     * Creates a builder with an empty registry. `new FenceBuilder()` does the same; the type
+     * argument, if given explicitly, must be {@link EmptyRegistry}.
+     */
     static create(): Fluent<EmptyRegistry> {
         return new FenceBuilder();
     }
 
     /**
-     * Restores a builder from {@link FenceBuilder.toJSON} output (an object or a JSON string),
-     * resolving step names against `base`'s registry. Nested fences are restored with the
-     * same registry.
+     * Restores a builder from {@link FenceBuilder.toJSON} output (an object or a JSON string).
+     * Step names are resolved against `base`, which is either a builder (whose registry and
+     * options are used) or a plain registry. Nested fences are restored with the same
+     * registry. Steps recorded on `base` itself are not carried over.
      *
      * @throws {@link HydrationError} when the input is malformed or names unregistered
-     * validators. Its `missing` property lists every unknown name.
+     * validators. Its `missing` property lists every unknown name, nested fences included.
      */
-    static fromJSON<T extends Registry>(json: unknown, base: FenceBuilder<T>): Fluent<T> {
-        return FenceBuilder.#hydrate<T>(base.#entries, parseSerializedFence(json));
+    static fromJSON<T extends Registry>(json: unknown, base: FenceBuilder<T> | T): Fluent<T> {
+        return FenceBuilder.#hydrate<T>(entriesOf(base), parseSerializedFence(json));
     }
 
-    /** Restores a builder from the string produced by v1's `serialize()`. */
-    static fromLegacyJSON<T extends Registry>(json: string, base: FenceBuilder<T>): Fluent<T> {
-        return FenceBuilder.#hydrate<T>(base.#entries, parseLegacySerializedFence(json));
+    /**
+     * Restores a builder from the string produced by v1's `serialize()`.
+     *
+     * @throws {@link HydrationError}
+     */
+    static fromLegacyJSON<T extends Registry>(json: string, base: FenceBuilder<T> | T): Fluent<T> {
+        return FenceBuilder.#hydrate<T>(entriesOf(base), parseLegacySerializedFence(json));
     }
 
     /** The registered validators by name. */
     get registry(): R {
-        let registry = FenceBuilder.#registries.get(this.#entries);
-        if (!registry) {
-            registry = Object.freeze(
-                Object.fromEntries<Validator>(
-                    [...this.#entries].map(([name, { fn }]): [string, Validator] => [name, fn]),
-                ),
-            );
-            FenceBuilder.#registries.set(this.#entries, registry);
-        }
+        return registryOf(this.#entries) as R;
+    }
 
-        return registry as R;
+    /** The registered validators with their options; accepted by {@link FenceBuilder.registerAll}. */
+    get entries(): RegistryEntries {
+        return this.#entries;
     }
 
     /** The recorded steps, in execution order. */
@@ -95,34 +105,55 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
      * Returns a builder whose registry also holds `fn` as `name`, exposing a fluent method
      * `name(...args)` typed from `fn`'s parameters after the subject.
      *
+     * A name that is not a string literal (a `string` variable) is allowed at run time and
+     * widens the builder's type: every fluent method then accepts any arguments, and the
+     * builder stays wide.
+     *
      * @throws {@link RegistrationError} for a duplicate or reserved name, or a non-function.
      */
     register<N extends string, F extends Validator>(
-        name: Exclude<N, ReservedName>,
+        name: StepName<R, N>,
         fn: F,
         options: StepOptions = {},
     ): Fluent<Extend<R, N, F>> {
         return FenceBuilder.#make(this.#extend([[name, { fn, options }]]), this.#steps);
     }
 
-    /** Registers every validator in `validators` under its key. */
-    registerAll<V extends Registry>(validators: V): Fluent<Merge<R, V>> {
-        const additions = Object.entries(validators).map(([name, fn]): [string, RegistryEntry] => [
-            name,
-            { fn, options: {} },
-        ]);
+    /**
+     * Registers every validator in `validators` under its key, or copies another builder's
+     * registry including its options. `options` apply to validators given as a record.
+     *
+     * @throws {@link RegistrationError} for duplicate or reserved names, or non-functions.
+     */
+    registerAll<V extends Registry>(
+        validators: Registrable<R, V> | FenceBuilder<V>,
+        options: StepOptions = {},
+    ): Fluent<Merge<R, V>> {
+        const additions: [string, RegistryEntry][] =
+            validators instanceof FenceBuilder
+                ? [...validators.#entries]
+                : Object.entries<Validator>(validators as Registry).map(([name, fn]) => [
+                      name,
+                      { fn, options },
+                  ]);
         return FenceBuilder.#make(this.#extend(additions), this.#steps);
     }
 
     /**
      * Records a step by name. The fluent methods are sugar for this:
-     * `builder.min(4)` is `builder.step('min', 4)`.
+     * `builder.min(4)` is `builder.step('min', 4)`. Arguments are held by reference.
+     *
+     * @throws {@link RegistrationError} when `name` is not a registered validator.
      */
     step<K extends keyof R & string>(name: K, ...args: ValidatorArgs<R[K]>): Fluent<R> {
+        assertStepName(name);
         if (!this.#entries.has(name)) {
             throw new RegistrationError(`No validator is registered as '${name}'`);
         }
-        return FenceBuilder.#make(this.#entries, [...this.#steps, createStep(name, args)]);
+        return FenceBuilder.#make(
+            this.#entries,
+            Object.freeze([...this.#steps, createStep(name, args)]),
+        );
     }
 
     /**
@@ -134,8 +165,9 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
         return new Fence<R>(this.#entries, this.#steps);
     }
 
+    /** @throws {@link SerializationError} when a step argument is not a JSON value or a fence. */
     toJSON(): SerializedFence {
-        return serializeSteps(this.#steps, tagFence);
+        return serializeSteps(this.#steps);
     }
 
     /**
@@ -151,9 +183,17 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
         return JSON.stringify(this);
     }
 
-    /** @deprecated Use {@link FenceBuilder.fromJSON} (or `fromLegacyJSON` for v1 output). */
+    /**
+     * @deprecated Use {@link FenceBuilder.fromJSON}. Note that v1 `serialize()` output is
+     * no longer accepted here; use {@link FenceBuilder.fromLegacyJSON} for that.
+     */
     hydrate(json: string): Fluent<R> {
         return FenceBuilder.fromJSON(json, this);
+    }
+
+    /** Node.js `util.inspect` support, so `console.log(builder)` shows registry and steps. */
+    [Symbol.for('nodejs.util.inspect.custom')](): { registry: string[]; steps: readonly Step[] } {
+        return { registry: [...this.#entries.keys()], steps: this.#steps };
     }
 
     #extend(additions: readonly (readonly [string, RegistryEntry])[]): RegistryEntries {
@@ -166,7 +206,9 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
                 throw new RegistrationError(`Validator '${name}' must be a function`);
             }
             if (RESERVED_NAMES.has(name)) {
-                throw new RegistrationError(`'${name}' is reserved and cannot name a validator`);
+                throw new RegistrationError(
+                    `'${name}' is reserved: it would shadow a builder or Object member`,
+                );
             }
             if (entries.has(name)) {
                 throw new RegistrationError(`'${name}' is already registered`);
@@ -184,18 +226,20 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
         if (missing.length > 0) {
             throw new HydrationError(
                 `Serialized fence uses unregistered validators: ${missing.join(', ')}`,
-                missing,
+                { missing },
             );
         }
         return FenceBuilder.#make<T>(entries, FenceBuilder.#reviveSteps(entries, serialized));
     }
 
-    static #reviveSteps(entries: RegistryEntries, serialized: SerializedFence): Step[] {
+    static #reviveSteps(entries: RegistryEntries, serialized: SerializedFence): readonly Step[] {
         const buildNested = (nested: SerializedFence): Fence =>
             new Fence(entries, FenceBuilder.#reviveSteps(entries, nested));
 
-        return serialized.steps.map(({ name, args }) =>
-            createStep(name, reviveArgs(args, buildNested)),
+        return Object.freeze(
+            serialized.steps.map(({ name, args }) =>
+                createStep(name, reviveArgs(args, buildNested)),
+            ),
         );
     }
 
@@ -231,10 +275,33 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
     }
 }
 
-/** Names that would shadow builder members or confuse the runtime (`then` makes objects thenable). */
+const EMPTY_STEPS: readonly Step[] = Object.freeze([]);
+
+/** Builder members, Object.prototype members and names that would confuse the runtime. */
 const RESERVED_NAMES: ReadonlySet<string> = new Set([
     ...Object.getOwnPropertyNames(FenceBuilder.prototype),
+    ...Object.getOwnPropertyNames(Object.prototype),
     'prototype',
     'then',
-    '__proto__',
 ]);
+
+function entriesOf(base: unknown): RegistryEntries {
+    if (base instanceof FenceBuilder) {
+        return base.entries;
+    }
+    if (typeof base !== 'object' || base === null) {
+        throw new TypeError('fromJSON needs a FenceBuilder or a registry of validators');
+    }
+    return new Map(
+        Object.entries<Validator>(base as Registry).map(([name, fn]): [string, RegistryEntry] => [
+            name,
+            { fn, options: {} },
+        ]),
+    );
+}
+
+function assertStepName(name: unknown): asserts name is string {
+    if (typeof name !== 'string') {
+        throw new RegistrationError(`Step names must be strings, got ${typeof name}`);
+    }
+}

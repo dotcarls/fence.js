@@ -21,5 +21,5 @@ for (const subject of ['tim', 'tim.carlson', 42]) {
     }
 }
 
-// Every failing step, in order:
+// The full report: every step with its verdict.
 console.log(username.run('').explain());

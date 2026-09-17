@@ -403,3 +403,28 @@ node example/policy.js           # works only because it never round-trips throu
 ```
 
 Behavioural defects C1–C9 were confirmed with a throwaway Jest probe (removed afterwards); each row in §2.2 quotes the observed value.
+
+## Appendix B. Implementation notes (2026-09-16)
+
+The proposal was approved with every open question in §8 accepted, amended so that ESM-only
+distribution is accepted on the condition that browsers can still consume the package (native
+ESM / ESM CDNs). The implementation deviates from the text above in these ways:
+
+- **Build:** plain `tsc` instead of tsdown/tsup. tsdown requires Node 22.18+ (the development
+  machine runs 22.15) and a single-entry, dependency-free library does not need a bundler.
+- **TypeScript 6.0**, not 5.x: 6.0 is the last TypeScript that typescript-eslint and TypeDoc
+  support (TypeScript 7 is the Go port).
+- **Phases 2 and 3** (core rewrite and serialization v2) landed in one commit; they share code.
+- **`Fence.run(subject)`** takes exactly one subject. The `...extra` parameter in §4.4 cannot be
+  typed alongside inferred step arguments and had no motivating use case.
+- **`register(name, fn, options)` and `registerAll(record | builder, options)`** instead of
+  overloading `register`. `fromJSON`/`fromLegacyJSON` accept a builder or a plain registry.
+- **Reserved names** also include `Object.prototype` members and `then`.
+- **Dynamic (non-literal) names** are allowed and widen the builder's type to the plain
+  `Registry`, and it stays wide from then on.
+- **Vitest 5** removed its typed `bench` API; the comparison benchmark is a tinybench script.
+- **No coverage upload service**; thresholds are enforced in CI and the badge was removed.
+  `eslint-plugin-import-x` was not adopted (ten modules, no import-graph problems to police);
+  `vitest related` runs in the pre-commit hook as proposed.
+- **CHANGELOG** is hand-maintained in Keep a Changelog format; release-it verifies the section
+  exists rather than generating it from commit messages.

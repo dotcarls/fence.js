@@ -28,8 +28,9 @@ jobs:
       - run: npm run format:check
       - run: npm run test:coverage
       - run: npm run build
-      - run: npm run check:package
+      - run: npm run typecheck:examples
       - run: npm run examples
+      - run: npm run check:package
 
   consume:
     # The published package supports Node >= 20.19 even though the dev toolchain needs 22+.

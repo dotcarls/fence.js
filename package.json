@@ -32,7 +32,7 @@
   "sideEffects": false,
   "files": [
     "dist",
-    "!dist/**/*.tsbuildinfo"
+    "src"
   ],
   "engines": {
     "node": ">=20.19.0"
@@ -49,18 +49,18 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "bench": "tsx test/bench/compare.bench.ts",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:coverage && npm run build && npm run check:package",
+    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:coverage && npm run build && npm run typecheck:examples && npm run examples && npm run check:package",
     "check:package": "publint && attw --pack . --profile esm-only",
     "docs": "typedoc",
-    "examples": "tsx examples/run-all.ts",
+    "examples": "tsx --tsconfig examples/tsconfig.json examples/run-all.ts",
     "prepare": "simple-git-hooks",
-    "prepack": "npm run build",
-    "release": "release-it"
+    "prepack": "rimraf dist && npm run build",
+    "release": "release-it",
+    "typecheck:examples": "tsc --noEmit -p examples"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
     "@eslint/js": "^10.0.1",
-    "@release-it/conventional-changelog": "^12.0.2",
     "@types/node": "^22.20.3",
     "@vitest/coverage-v8": "^5.0.1",
     "eslint": "^10.10.0",
@@ -89,7 +89,8 @@
   "lint-staged": {
     "*.{ts,js}": [
       "eslint --fix",
-      "prettier --write"
+      "prettier --write",
+      "vitest related --run"
     ],
     "*.{json,md,yml}": "prettier --write"
   }

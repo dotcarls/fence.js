@@ -6,7 +6,8 @@
     "requireUpstream": true,
     "commitMessage": "Release v${version}",
     "tagName": "v${version}",
-    "tagAnnotation": "Release v${version}"
+    "tagAnnotation": "Release v${version}",
+    "changelog": false
   },
   "npm": {
     "publish": false
@@ -15,13 +16,7 @@
     "release": false
   },
   "hooks": {
-    "before:init": ["npm run check"]
-  },
-  "plugins": {
-    "@release-it/conventional-changelog": {
-      "preset": { "name": "conventionalcommits" },
-      "infile": "CHANGELOG.md",
-      "header": "# Changelog"
-    }
+    "before:init": ["npm run check"],
+    "after:bump": "node scripts/check-changelog.mjs ${version}"
   }
 }

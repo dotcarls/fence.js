@@ -1,3 +1,5 @@
+import { inspect } from 'node:util';
+
 import { describe, expect, test } from 'vitest';
 
 import { FenceBuilder, Result, type Step } from '../src/index.js';
@@ -45,8 +47,22 @@ describe('Result verdicts', () => {
         expect(new Result('s', []).anyPassed).toBe(false);
     });
 
-    test('outcomes must be an array', () => {
+    test('the constructor validates and freezes its outcomes', () => {
         expect(() => new Result('s', null as unknown as [])).toThrow(TypeError);
+        expect(() => new Result('s', [{ value: true }] as unknown as [])).toThrow(
+            /outcome 0 must be/,
+        );
+        expect(
+            () => new Result('s', [{ step: { name: 1 }, value: true }] as unknown as []),
+        ).toThrow(TypeError);
+
+        const entry = { step: step('a'), value: true };
+        const result = new Result('s', [entry]);
+        expect(Object.isFrozen(result.outcomes)).toBe(true);
+        expect(Object.isFrozen(result.outcomes[0])).toBe(true);
+        expect(result.outcomes[0]).not.toBe(entry);
+        entry.value = false;
+        expect(result.passed).toBe(true);
     });
 });
 
@@ -93,8 +109,9 @@ describe('Result queries', () => {
         ]);
     });
 
-    test('failures() uses indices for nested arrays and is empty when passed', () => {
+    test('failures() uses indices for nested arrays, recurses to any depth, and is empty when passed', () => {
         const fence = base.each(base.min(2).build()).build();
+        const deep = base.each(base.policy({ name: base.min(2).build() }).build()).build();
 
         expect(
             fence
@@ -103,29 +120,106 @@ describe('Result queries', () => {
                 .map((f) => f.path),
         ).toEqual([['each', '1', 'min']]);
         expect(fence.run(['ab', 'cd']).failures()).toEqual([]);
+        expect(deep.run([{ name: 'ab' }, { name: 'c' }]).failures()).toEqual([
+            {
+                path: ['each', '1', 'policy', 'name', 'min'],
+                step: { name: 'min', args: [2] },
+                subject: 'c',
+            },
+        ]);
     });
 
     test('explain() reports the verdict, each step and nested results', () => {
         const text = userPolicy.run({ username: 'tim@example.com', password: 'short' }).explain();
 
-        expect(text).toContain('subject: {username: "tim@example.com", password: "short"}');
-        expect(text).toContain('FAILED (0/1 steps)');
-        expect(text).toContain('[x] policy({username: Fence(4 steps), password: Fence(3 steps)})');
-        expect(text).toContain('username:');
-        expect(text).toContain('PASSED (4/4 steps)');
-        expect(text).toContain('[✓] email');
-        expect(text).toContain('[x] min(8)');
-        expect(text.split('\n').every((line) => line.length < 100)).toBe(true);
+        expect(text).toBe(
+            [
+                'subject: {username: "tim@example.com", password: "short"}',
+                'FAILED (0/1 steps)',
+                '  [x] policy({username: Fence(4 steps), password: Fence(3 steps)})',
+                '      username:',
+                '        subject: "tim@example.com"',
+                '        PASSED (4/4 steps)',
+                '          [✓] required',
+                '          [✓] max(255)',
+                '          [✓] min(4)',
+                '          [✓] email',
+                '      password:',
+                '        subject: "short"',
+                '        FAILED (2/3 steps)',
+                '          [✓] required',
+                '          [✓] max(255)',
+                '          [x] min(8)',
+            ].join('\n'),
+        );
     });
 
-    test('toJSON() gives a plain description that survives JSON.stringify', () => {
-        const json = JSON.parse(JSON.stringify(base.min(2).build().run('a'))) as unknown;
+    test('explain() survives cyclic subjects and huge values', () => {
+        const cyclic: Record<string, unknown> = { name: 'x' };
+        cyclic.self = cyclic;
+        const text = base.min(1).build().run(cyclic).explain();
+
+        expect(text).toContain('subject: {name: "x", self: [Circular]}');
+        expect(
+            base.min(1).build().run('y'.repeat(500)).explain().split('\n')[0]?.length,
+        ).toBeLessThan(80);
+        expect(
+            base
+                .min(1)
+                .build()
+                .run(Array.from({ length: 50 }, (_, i) => i))
+                .explain(),
+        ).toContain('…');
+    });
+
+    test('toJSON() gives plain data with tagged fences and described non-JSON arguments', () => {
+        const fn = () => true;
+        const fence = base
+            .register('any', (_s: unknown, ..._args: unknown[]) => true)
+            .any(fn, base.min(1).build(), new Date(0))
+            .each(base.min(2).build())
+            .build();
+        const json = JSON.parse(JSON.stringify(fence.run(['ab', 'c']))) as unknown;
 
         expect(json).toEqual({
-            subject: 'a',
+            subject: ['ab', 'c'],
             passed: false,
-            outcomes: [{ name: 'min', args: [2], value: false }],
+            outcomes: [
+                {
+                    name: 'any',
+                    args: [
+                        '[Function fn]',
+                        { $fence: { fence: 2, steps: [{ name: 'min', args: [1] }] } },
+                        '[object Date]',
+                    ],
+                    value: true,
+                },
+                {
+                    name: 'each',
+                    args: [{ $fence: { fence: 2, steps: [{ name: 'min', args: [2] }] } }],
+                    value: [
+                        {
+                            subject: 'ab',
+                            passed: true,
+                            outcomes: [{ name: 'min', args: [2], value: true }],
+                        },
+                        {
+                            subject: 'c',
+                            passed: false,
+                            outcomes: [{ name: 'min', args: [2], value: false }],
+                        },
+                    ],
+                },
+            ],
         });
+    });
+
+    test('has a string tag and a useful Node.js inspection', () => {
+        const result = base.min(2).build().run('a');
+
+        expect(Object.prototype.toString.call(result)).toBe('[object Result]');
+        expect(inspect(result)).toContain("step: 'min(2)'");
+        expect(inspect(result)).toContain('passed: false');
     });
 
     test('deprecated aliases delegate to the new API', () => {

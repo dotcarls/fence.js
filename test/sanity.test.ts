@@ -1,7 +1,8 @@
 /*
  * Differential tests: fence.js must agree with validate.js and Joi on the same policies for
- * generated users. Strings are non-empty because validate.js treats "" as absent while Joi
- * and our validators do not; that difference is theirs, not ours.
+ * generated users. Generated strings are non-empty because validate.js treats "" as absent
+ * while Joi and our validators do not; that difference is theirs, not ours. Emails stay short
+ * because Joi enforces RFC length limits on the local part that the other two do not.
  */
 import fc from 'fast-check';
 import Joi from 'joi';
@@ -39,25 +40,38 @@ const schema = Joi.object().keys({
     password: Joi.string().min(8).max(255).required(),
 });
 
-const word = (max: number) => fc.stringMatching(new RegExp(`^[a-z0-9]{1,${String(max)}}$`));
+const word = (min: number, max: number) =>
+    fc.string({
+        unit: fc.stringMatching(/^[a-z0-9]$/),
+        minLength: min,
+        maxLength: max,
+    });
 const email = fc
-    .tuple(word(10), word(8), fc.constantFrom('com', 'org', 'io'))
+    .tuple(word(1, 10), word(1, 8), fc.constantFrom('com', 'org', 'io'))
     .map(([local, domain, tld]) => `${local}@${domain}.${tld}`);
-const userArb = fc.record({
-    username: fc.oneof(email, word(12)),
-    password: fc.oneof(word(6), word(20)),
-});
+const maybe = <T>(arb: fc.Arbitrary<T>) => fc.option(arb, { nil: undefined, freq: 8 });
+const userArb = fc.record(
+    {
+        username: maybe(fc.oneof(email, word(1, 12), word(250, 260))),
+        password: maybe(fc.oneof(word(1, 7), word(8, 20), word(250, 260))),
+    },
+    { requiredKeys: [] },
+);
 
 describe('fence.js agrees with validate.js and Joi', () => {
-    test('user policy', () => {
+    test('user policy, across presence, type, length and email failures', () => {
+        const verdicts = { passed: 0, failed: 0 };
         fc.assert(
             fc.property(userArb, (candidate) => {
                 const ours = userFence.run(candidate).passed;
+                verdicts[ours ? 'passed' : 'failed']++;
                 expect(validate(candidate, constraints) === undefined).toBe(ours);
                 expect(schema.validate(candidate).error === undefined).toBe(ours);
             }),
-            { numRuns: 200 },
+            { numRuns: 300 },
         );
+        expect(verdicts.passed).toBeGreaterThan(0);
+        expect(verdicts.failed).toBeGreaterThan(0);
     });
 
     test('strict equality', () => {
@@ -73,7 +87,7 @@ describe('fence.js agrees with validate.js and Joi', () => {
         );
     });
 
-    test('an empty entity fails the policy (v1 vacuously passed it)', () => {
+    test('the support policy validator reports every attribute of the shape, so an empty entity fails', () => {
         expect(userFence.run({}).passed).toBe(false);
         expect(
             userFence
@@ -91,5 +105,8 @@ describe('fence.js agrees with validate.js and Joi', () => {
             'policy.password.max',
             'policy.password.min',
         ]);
+        // A policy that iterated the entity instead would let {} through; that is the
+        // validator's choice, not the library's.
+        expect(base.policy({}).build().run({}).passed).toBe(true);
     });
 });

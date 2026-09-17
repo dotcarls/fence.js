@@ -14,15 +14,20 @@ const userFence = server
 const wire = JSON.stringify(userFence);
 console.log(wire);
 
-// The "client" has functionally equivalent validators registered under the same names.
+// The "client" registers compatible validators under the same names. They may be different
+// implementations (here `min`/`max` are inlined); equivalence is the application's promise.
 const client = FenceBuilder.create().registerAll({
     required: (v: unknown) => v != null,
     isString: (v: unknown) => typeof v === 'string',
-    isEmail: (v: string) => v.includes('@'),
+    isEmail,
     min: (v: string, n: number) => v.length >= n,
     max: (v: string, n: number) => v.length <= n,
     policy,
 });
+
+// A plain registry works as the base too:
+const viaRegistry = FenceBuilder.fromJSON(wire, client.registry).build();
+console.log(viaRegistry.run({ username: 'a@b.co', password: 'x' }).passed); // false
 
 const restored = FenceBuilder.fromJSON(wire, client).build();
 console.log(restored.run({ username: 'tim@example.com', password: 'long enough' }).passed); // true

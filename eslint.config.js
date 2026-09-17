@@ -22,6 +22,7 @@ export default defineConfig(
             // Validators are user-supplied functions of arbitrary shape; `any` in
             // the *parameter* position of the Validator type is the honest signature.
             '@typescript-eslint/no-explicit-any': ['error', { ignoreRestArgs: true }],
+            '@typescript-eslint/no-invalid-void-type': ['error', { allowAsThisParameter: true }],
             '@typescript-eslint/no-unused-vars': [
                 'error',
                 {
@@ -33,7 +34,7 @@ export default defineConfig(
         },
     },
     {
-        files: ['**/*.js'],
+        files: ['**/*.js', '**/*.mjs'],
         extends: [tseslint.configs.disableTypeChecked],
     },
     {

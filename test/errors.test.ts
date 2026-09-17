@@ -23,17 +23,26 @@ describe('errors', () => {
         expect(error.stack).toContain(name);
     });
 
+    test('every error accepts a cause', () => {
+        const cause = new Error('root');
+
+        expect(new FenceError('f', { cause }).cause).toBe(cause);
+        expect(new SerializationError('s', { cause }).cause).toBe(cause);
+        expect(new FenceError('f').cause).toBeUndefined();
+    });
+
     test('EmptyFenceError has a default message', () => {
         expect(new EmptyFenceError().message).toMatch(/no steps/);
     });
 
     test('HydrationError carries the missing names and an optional cause', () => {
         const cause = new SyntaxError('bad');
-        const error = new HydrationError('h', ['a', 'b'], { cause });
+        const error = new HydrationError('h', { missing: ['a', 'b'], cause });
 
         expect(error.missing).toEqual(['a', 'b']);
         expect(error.cause).toBe(cause);
         expect(new HydrationError('h').missing).toEqual([]);
+        expect(new HydrationError('h', { cause }).missing).toEqual([]);
     });
 
     test('InvalidOutcomeError describes the step and the value', () => {
