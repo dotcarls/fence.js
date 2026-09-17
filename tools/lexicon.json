@@ -1,0 +1,47 @@
+{
+  "$comment": "Machine mirror of the spelling section of docs/toolchain/lexicon.md; the `lexicon` gate refuses the variants below in governed Markdown and in source comments.",
+  "language": "American English",
+  "spelling": [
+    { "avoid": "behaviour", "use": "behavior" },
+    { "avoid": "behaviours", "use": "behaviors" },
+    { "avoid": "artefact", "use": "artifact" },
+    { "avoid": "artefacts", "use": "artifacts" },
+    { "avoid": "serialise", "use": "serialize" },
+    { "avoid": "serialised", "use": "serialized" },
+    { "avoid": "serialisation", "use": "serialization" },
+    { "avoid": "deserialise", "use": "deserialize" },
+    { "avoid": "initialise", "use": "initialize" },
+    { "avoid": "normalise", "use": "normalize" },
+    { "avoid": "recognise", "use": "recognize" },
+    { "avoid": "organise", "use": "organize" },
+    { "avoid": "colour", "use": "color" },
+    { "avoid": "honour", "use": "honor" },
+    { "avoid": "favour", "use": "favor" },
+    { "avoid": "centre", "use": "center" },
+    { "avoid": "licence", "use": "license" },
+    { "avoid": "catalogue", "use": "catalog" },
+    {
+      "avoid": "cancelled",
+      "use": "cancelled",
+      "note": "exception: the work-item status keeps the double l because it is an enum value"
+    }
+  ],
+  "terms_to_avoid": [
+    {
+      "avoid": "fork",
+      "use": "derive",
+      "why": "fork() was the 1.x mutable-prototype mechanism; builders are values now"
+    },
+    {
+      "avoid": "hydrate",
+      "use": "restore (fromJSON)",
+      "why": "the 2.0 API is fromJSON; hydration survives only in HydrationError, the error class name"
+    },
+    { "avoid": "invokable", "use": "step", "why": "1.x class name" },
+    {
+      "avoid": "validation (for a built fence)",
+      "use": "fence",
+      "why": "a validation is what a validator performs; the composed artifact is a fence"
+    }
+  ]
+}

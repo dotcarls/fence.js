@@ -18,6 +18,8 @@ type Nested = readonly Result[] | Readonly<Record<string, Result>>;
  * nested result to pass and {@link Result.anyPassed} needs any nested result to have any
  * passing step. An empty nested collection is vacuously passed and vacuously not anyPassed,
  * which {@link Result.explain} makes visible.
+ *
+ * @fence:adr(ADR-0001#decision) @fence:invariant(result.vacuous-empty)
  */
 export class Result {
     static {

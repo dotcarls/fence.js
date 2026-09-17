@@ -29,6 +29,7 @@ export function createStep(name: string, args: readonly unknown[]): Step {
 /**
  * Binds a registry entry to a recorded step. The validator is called as a plain function
  * (`this` is `undefined`) with the subject followed by the recorded arguments.
+ * @fence:invariant(validator.plain-call)
  */
 export function bindStep(entry: RegistryEntry, step: Step): Runner {
     const { fn } = entry;
@@ -43,6 +44,7 @@ export function bindStep(entry: RegistryEntry, step: Step): Runner {
  * Caches outcomes per subject. Primitive keys (symbols included) use a `Map`, so `1` and
  * `'1'` are distinct and `false` outcomes are cached; object and function keys use a
  * `WeakMap` by identity.
+ * @fence:invariant(memo.per-fence)
  */
 export function memoize(run: Runner, { key = identity }: MemoizeOptions): Runner {
     const primitives = new Map<unknown, Outcome>();

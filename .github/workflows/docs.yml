@@ -27,7 +27,7 @@ jobs:
       - run: npm run docs
       - uses: actions/upload-pages-artifact@v4
         with:
-          path: docs
+          path: site
 
   deploy:
     needs: build

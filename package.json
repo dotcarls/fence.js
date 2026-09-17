@@ -41,7 +41,7 @@
   },
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
-    "clean": "rimraf dist coverage docs",
+    "clean": "rimraf dist coverage site",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
@@ -51,14 +51,19 @@
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
     "bench": "tsx test/bench/compare.bench.ts",
-    "check": "npm run typecheck && npm run lint && npm run format:check && npm run test:coverage && npm run build && npm run typecheck:examples && npm run examples && npm run check:package",
+    "check": "npm run gates && npm run typecheck && npm run lint && npm run format:check && npm run test:coverage && npm run build && npm run typecheck:examples && npm run examples && npm run check:package",
     "check:package": "publint && attw --pack . --profile esm-only",
     "docs": "typedoc",
     "examples": "tsx --tsconfig examples/tsconfig.json examples/run-all.ts",
     "prepare": "simple-git-hooks",
     "prepack": "rimraf dist && npm run build",
     "release": "release-it",
-    "typecheck:examples": "tsc --noEmit -p examples"
+    "typecheck:examples": "tsc --noEmit -p examples",
+    "gates": "tsx tools/gates/cli.ts gates",
+    "gates:fix": "tsx tools/gates/cli.ts gates --fix",
+    "work": "tsx tools/gates/cli.ts item",
+    "adr": "tsx tools/gates/cli.ts adr",
+    "checkpoint": "tsx tools/gates/cli.ts checkpoint check"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
@@ -87,7 +92,7 @@
     "yaml": "^2.9.1"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged",
+    "pre-commit": "npx lint-staged && npm run gates",
     "pre-push": "npm run typecheck && npm test"
   },
   "lint-staged": {

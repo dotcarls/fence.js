@@ -37,6 +37,8 @@ import type {
  * ```
  *
  * @typeParam R The registry: validator names to validator types. Grows with each `register`.
+ *
+ * @fence:adr(ADR-0001#decision) @fence:invariant(builder.immutable)
  */
 export class FenceBuilder<R extends Registry = EmptyRegistry> {
     static {
@@ -196,6 +198,7 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
         return entries;
     }
 
+    /** @fence:invariant(hydrate.validate-everything) */
     static #hydrate<T extends Registry>(
         entries: RegistryEntries,
         serialized: SerializedFence,
@@ -256,7 +259,10 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
 
 const EMPTY_STEPS: readonly Step[] = Object.freeze([]);
 
-/** Builder members, Object.prototype members and names that would confuse the runtime. */
+/**
+ * Builder members, Object.prototype members and names that would confuse the runtime.
+ * @fence:invariant(registry.reserved-names)
+ */
 const RESERVED_NAMES: ReadonlySet<string> = new Set([
     ...Object.getOwnPropertyNames(FenceBuilder.prototype),
     ...Object.getOwnPropertyNames(Object.prototype),

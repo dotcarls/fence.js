@@ -2,7 +2,10 @@ import { HydrationError, SerializationError } from './errors.js';
 import { formatValue, isFenceLike, isPlainObject } from './format.js';
 import type { JsonValue, SerializedFence, SerializedStep, Step } from './types.js';
 
-/** The serialization format version written by {@link FenceBuilder.toJSON} and {@link Fence.toJSON}. */
+/**
+ * The serialization format version written by {@link FenceBuilder.toJSON} and {@link Fence.toJSON}.
+ * @fence:adr(ADR-0003#decision)
+ */
 export const FORMAT_VERSION = 2;
 
 /** Reserved object key that marks a nested fence inside serialized step arguments. */
@@ -14,6 +17,7 @@ export const NESTED_FENCE_KEY = '$fence';
  * `lenient` is set, in which case it is described as a string.
  *
  * @throws {@link SerializationError}
+ * @fence:invariant(serialize.json-only)
  */
 export function serializeSteps(steps: readonly Step[], lenient = false): SerializedFence {
     return {

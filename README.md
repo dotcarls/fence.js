@@ -234,7 +234,8 @@ TypeScript types. See [MIGRATING.md](MIGRATING.md).
 
 ## Contributing
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md](CONTRIBUTING.md). Design decisions, the architecture and the way work is
+tracked live in the [documentation index](docs/INDEX.md).
 
 ## License
 

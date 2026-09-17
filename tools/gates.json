@@ -1,0 +1,107 @@
+{
+  "$comment": "Configuration for the gate tool (tools/gates/cli.ts). Paths are repository-relative; globs support **, * and ?.",
+  "markdown": {
+    "include": ["*.md", "docs/**/*.md", ".claude/**/*.md", "tools/**/*.md", "examples/**/*.md"],
+    "exclude": [
+      "node_modules/**",
+      "dist/**",
+      "site/**",
+      "coverage/**",
+      "docs/adr/TEMPLATE.md",
+      "docs/work/TEMPLATE.md"
+    ]
+  },
+  "ids": {
+    "FJ": {
+      "pattern": "FJ-\\d{4}",
+      "dir": "docs/work/items"
+    },
+    "ADR": {
+      "pattern": "ADR-\\d{4}",
+      "dir": "docs/adr"
+    }
+  },
+  "reachability": {
+    "roots": ["CLAUDE.md", "docs/INDEX.md"],
+    "mustReach": [
+      "docs/**/*.md",
+      "README.md",
+      "MIGRATING.md",
+      "CHANGELOG.md",
+      "CONTRIBUTING.md",
+      ".claude/**/*.md",
+      "tools/**/*.md"
+    ],
+    "exclude": ["docs/adr/TEMPLATE.md", "docs/work/TEMPLATE.md"]
+  },
+  "schemas": [
+    {
+      "glob": "docs/work/items/FJ-*.md",
+      "schema": "tools/schemas/work-item.schema.json",
+      "requiredSections": ["Description"]
+    },
+    {
+      "glob": "docs/adr/ADR-*.md",
+      "schema": "tools/schemas/adr.schema.json",
+      "requiredSections": ["Context", "Decision", "Consequences"]
+    },
+    {
+      "glob": "docs/work/CHECKPOINT.md",
+      "schema": "tools/schemas/checkpoint.schema.json",
+      "requiredSections": ["Now", "Done", "In progress", "Next action", "Open questions"]
+    },
+    {
+      "glob": "docs/**/*.md",
+      "schema": "tools/schemas/doc.schema.json",
+      "exclude": [
+        "docs/work/items/**",
+        "docs/adr/ADR-*.md",
+        "docs/work/CHECKPOINT.md",
+        "docs/adr/TEMPLATE.md",
+        "docs/work/TEMPLATE.md"
+      ]
+    }
+  ],
+  "binding": {
+    "sources": ["src/**/*.ts"],
+    "ontology": "tools/ontology.json"
+  },
+  "lexicon": {
+    "config": "tools/lexicon.json",
+    "include": [
+      "*.md",
+      "docs/**/*.md",
+      ".claude/**/*.md",
+      "tools/**/*.md",
+      "src/**/*.ts",
+      "test/**/*.ts",
+      "examples/**/*.ts"
+    ],
+    "exclude": [
+      "node_modules/**",
+      "dist/**",
+      "site/**",
+      "coverage/**",
+      "docs/toolchain/lexicon.md",
+      "tools/lexicon.json",
+      "test/toolchain/**"
+    ]
+  },
+  "changelog": {
+    "file": "CHANGELOG.md",
+    "categories": ["Added", "Changed", "Deprecated", "Removed", "Fixed", "Security"]
+  },
+  "generated": {
+    "docs/work/README.md": ["work-index"],
+    "docs/adr/README.md": ["adr-index"],
+    "docs/toolchain/ontology.md": ["ontology-kinds", "ontology-invariants"],
+    "docs/toolchain/taxonomy.md": [
+      "taxonomy-work-item",
+      "taxonomy-adr",
+      "taxonomy-doc",
+      "taxonomy-changelog",
+      "taxonomy-annotations"
+    ],
+    "docs/toolchain/lexicon.md": ["lexicon-spelling", "lexicon-terms"]
+  }
+}

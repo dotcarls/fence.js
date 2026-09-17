@@ -1,0 +1,56 @@
+{
+  "$comment": "Machine mirror of docs/toolchain/ontology.md. The `generated` gate renders that document's tables from this file, so the two cannot drift. Adding a kind or an invariant means editing this file and running `npm run gates:fix`.",
+  "annotation": "@fence:<kind>(<target>)",
+  "kinds": {
+    "adr": {
+      "summary": "This construct implements or depends on a decision record; an anchor names the clause.",
+      "target_pattern": "^ADR-\\d{4}(#[a-z0-9-]+)?$",
+      "resolver": "adr"
+    },
+    "item": {
+      "summary": "This construct is the work tracked by a work item.",
+      "target_pattern": "^FJ-\\d{4}$",
+      "resolver": "item"
+    },
+    "invariant": {
+      "summary": "This construct establishes or relies on a named invariant from the table below.",
+      "target_pattern": "^[a-z0-9]+(\\.[a-z0-9-]+)+$",
+      "resolver": "invariant"
+    },
+    "doc": {
+      "summary": "Reference to a documentation section (the weakest binding; prefer a specific kind).",
+      "target_pattern": "^docs/[A-Za-z0-9/._-]+\\.md(#[a-z0-9-]+)?$",
+      "resolver": "doc"
+    }
+  },
+  "invariants": {
+    "builder.immutable": {
+      "meaning": "No operation on a FenceBuilder mutates the receiver, its registry, its steps or any prototype; every operation returns a new builder.",
+      "defined_in": "docs/adr/ADR-0001-immutable-registry-builder-with-inferred-types.md#decision"
+    },
+    "registry.reserved-names": {
+      "meaning": "A validator may not be registered under a builder member name, an Object.prototype member name, `then`, `prototype` or `__proto__`; the check runs at compile time and at run time.",
+      "defined_in": "docs/adr/ADR-0001-immutable-registry-builder-with-inferred-types.md#decision"
+    },
+    "validator.plain-call": {
+      "meaning": "A validator is called as a plain function (`this` is undefined) with the subject followed by the recorded step arguments; exceptions it throws propagate unchanged.",
+      "defined_in": "docs/adr/ADR-0001-immutable-registry-builder-with-inferred-types.md#decision"
+    },
+    "memo.per-fence": {
+      "meaning": "A memoization cache belongs to one built Fence, keys primitives by SameValueZero and objects by identity, and caches every outcome including false.",
+      "defined_in": "docs/adr/ADR-0001-immutable-registry-builder-with-inferred-types.md#decision"
+    },
+    "result.vacuous-empty": {
+      "meaning": "An empty nested outcome collection counts as passed for `passed` and as not passed for `anyPassed`; explain() names it.",
+      "defined_in": "docs/adr/ADR-0001-immutable-registry-builder-with-inferred-types.md#decision"
+    },
+    "serialize.json-only": {
+      "meaning": "Only JSON values and fences may appear in step arguments; a fence nested in an argument is tagged `{\"$fence\": …}`; anything else is refused when serializing (strict) or described as a string (lenient, diagnostics only).",
+      "defined_in": "docs/adr/ADR-0003-serialization-format-2.md#decision"
+    },
+    "hydrate.validate-everything": {
+      "meaning": "fromJSON validates the whole document, including nested fences and every argument, and reports every unregistered validator name at once before building anything.",
+      "defined_in": "docs/adr/ADR-0003-serialization-format-2.md#decision"
+    }
+  }
+}

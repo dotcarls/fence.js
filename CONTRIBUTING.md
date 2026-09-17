@@ -3,6 +3,13 @@
 Thanks for helping out. Issues and pull requests are welcome; small, focused changes with a
 test are the fastest to review.
 
+## Where things are decided and tracked
+
+The [documentation index](docs/INDEX.md) is the root: architecture in `docs/architecture/`,
+decisions in `docs/adr/`, work items in `docs/work/items/`, and how all of it is governed in
+`docs/toolchain/` (start with [the lifecycle](docs/toolchain/sdlc.md)). Every change beyond a typo
+has a work item; decisions have an ADR; `npm run gates` checks the graph on every commit.
+
 ## Setup
 
 fence.js has no runtime dependencies. Developing it needs **Node.js 22 (LTS) or 24** (see
@@ -52,6 +59,9 @@ test/
   bench/           tinybench comparison
 examples/       runnable usage examples; they import `fence.js` by name, so they exercise dist/
 scripts/        release helpers
+tools/          gate tool (tools/gates/), schemas, ontology and lexicon files, Claude Code hooks
+docs/           the documentation graph: index, toolchain and governance, decisions, work items
+.claude/        hooks configuration, skills, subagent definitions
 ```
 
 ## Conventions

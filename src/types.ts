@@ -57,7 +57,10 @@ export type KnownKeys<R> = keyof R extends infer K
         : never
     : never;
 
-/** Names that cannot be used for validators because they would shadow builder or Object members. */
+/**
+ * Names that cannot be used for validators because they would shadow builder or Object members.
+ * @fence:invariant(registry.reserved-names)
+ */
 export type ReservedName =
     | keyof FenceBuilder
     | 'constructor'
