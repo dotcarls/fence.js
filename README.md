@@ -39,8 +39,7 @@ fence.js is published as ES modules. Node consumers can `import` it, or `require
 </script>
 ```
 
-While 2.0 is in prerelease, pin the exact version in the URL (`fence.js@2.0.0-beta.1`). The
-declarations need TypeScript 5.0+ with `lib` ES2020 or later.
+The declarations need TypeScript 5.0+ with `lib` ES2020 or later.
 
 ## Quick start
 

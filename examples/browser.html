@@ -1,14 +1,10 @@
 <!doctype html>
-<!--
-    fence.js is ESM only; browsers load it natively from any ESM CDN. Open this file directly.
-    While 2.0 is in prerelease, pin the exact version (fence.js@2.0.0-beta.1); once 2.0.0 is
-    published, fence.js@2 resolves.
--->
+<!-- fence.js is ESM only; browsers load it natively from any ESM CDN. Open this file directly. -->
 <meta charset="utf-8" />
 <title>fence.js in the browser</title>
 <pre id="out"></pre>
 <script type="module">
-    import { FenceBuilder } from 'https://esm.sh/fence.js@2.0.0-beta.1';
+    import { FenceBuilder } from 'https://esm.sh/fence.js@2';
 
     const fence = FenceBuilder.create()
         .register('min', (value, length) => value.length >= length)

@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.0.0] - 2026-09-16
+
 A TypeScript rewrite. See [MIGRATING.md](MIGRATING.md) for the upgrade path.
 
 ### Added

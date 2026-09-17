@@ -13,12 +13,6 @@ Template: [TEMPLATE.md](TEMPLATE.md). Create with `npm run work -- new --title "
 <!-- BEGIN GENERATED: work-index -->
 _13 items. Generated from front matter; run `npm run gates:fix`._
 
-### in-progress (1)
-
-| id | title | type | priority | milestone | parent |
-|---|---|---|---|---|---|
-| [FJ-0009](items/FJ-0009-release-2-0-0.md) | Release 2.0.0 | release | p0 | 2.0.0 | FJ-0001 |
-
 ### ready (1)
 
 | id | title | type | priority | milestone | parent |
@@ -33,7 +27,7 @@ _13 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0012](items/FJ-0012-verify-browser-consumption-from-an-esm-cdn.md) | Verify browser consumption from an ESM CDN | task | p2 | 2.x | — |
 | [FJ-0013](items/FJ-0013-decide-the-1-x-maintenance-line.md) | Decide the 1.x maintenance line | decision | p3 | — | — |
 
-### done (8)
+### done (9)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
@@ -45,4 +39,5 @@ _13 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0006](items/FJ-0006-readme-migration-guide-and-changelog.md) | README, migration guide and changelog for 2.0 | task | p0 | 2.0.0 | FJ-0001 |
 | [FJ-0007](items/FJ-0007-remove-the-1-x-compatibility-surface.md) | Remove the 1.x compatibility surface | task | p0 | 2.0.0 | FJ-0001 |
 | [FJ-0008](items/FJ-0008-agentic-toolchain-and-governance-scaffold.md) | Agentic toolchain and SDLC governance scaffold | story | p0 | 2.0.0 | FJ-0001 |
+| [FJ-0009](items/FJ-0009-release-2-0-0.md) | Release 2.0.0 | release | p0 | 2.0.0 | FJ-0001 |
 <!-- END GENERATED: work-index -->

@@ -2,7 +2,7 @@
 id: FJ-0009
 title: "Release 2.0.0"
 type: release
-status: in-progress
+status: done
 priority: p0
 milestone: "2.0.0"
 created: 2026-09-16
@@ -13,16 +13,16 @@ blocked_by: []
 owner: agent
 acceptance_criteria:
   - text: "Every item with milestone 2.0.0 is done"
-    satisfied: false
-    evidence: null
+    satisfied: true
+    evidence: docs/work/README.md
     verified_by: "work index"
   - text: "CHANGELOG.md has a dated 2.0.0 section and package.json says 2.0.0"
-    satisfied: false
-    evidence: null
+    satisfied: true
+    evidence: CHANGELOG.md
     verified_by: "changelog gate"
   - text: "v2 is merged into master and the Release v2.0.0 commit is tagged v2.0.0"
-    satisfied: false
-    evidence: null
+    satisfied: true
+    evidence: docs/releases/README.md
     verified_by: "git log; git tag"
 links:
   code: []
@@ -40,3 +40,4 @@ Cut 2.0.0 the canonical way (ADR-0008): close the milestone, date the changelog 
 ## Notes
 
 - 2026-09-16: created; in progress in the session that scaffolded the toolchain.
+- 2026-09-16: done. `v2` merged into `master` (no fast-forward), `Release v2.0.0` committed and tagged `v2.0.0`. Not pushed: FJ-0010.
