@@ -1,0 +1,22 @@
+{
+  "$schema": "https://unpkg.com/release-it/schema/release-it.json",
+  "git": {
+    "requireBranch": "master",
+    "requireCleanWorkingDir": true,
+    "requireUpstream": true,
+    "commitMessage": "Release v${version}",
+    "tagName": "v${version}",
+    "tagAnnotation": "Release v${version}",
+    "changelog": false
+  },
+  "npm": {
+    "publish": false
+  },
+  "github": {
+    "release": false
+  },
+  "hooks": {
+    "before:init": ["npm run check"],
+    "after:bump": "node scripts/check-changelog.mjs ${version}"
+  }
+}

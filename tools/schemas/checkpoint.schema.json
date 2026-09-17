@@ -1,0 +1,26 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/dotcarls/fence.js/tools/schemas/checkpoint.schema.json",
+  "title": "Checkpoint document front matter (docs/work/CHECKPOINT.md)",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["doc_type", "milestone", "updated", "next_action", "in_progress_items"],
+  "properties": {
+    "doc_type": { "const": "checkpoint" },
+    "milestone": { "type": "string", "description": "The release currently being worked toward." },
+    "updated": { "type": "string", "pattern": "^\\d{4}-\\d{2}-\\d{2}$" },
+    "next_action": {
+      "type": "string",
+      "minLength": 10,
+      "description": "One imperative sentence: the exact next action on resume."
+    },
+    "in_progress_items": {
+      "type": "array",
+      "items": { "type": "string", "pattern": "^FJ-\\d{4}$" }
+    },
+    "session": {
+      "type": ["string", "null"],
+      "description": "What the last session did, in a sentence or two."
+    }
+  }
+}

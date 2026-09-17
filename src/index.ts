@@ -1,0 +1,47 @@
+export { FenceBuilder } from './builder.js';
+export { Fence } from './fence.js';
+export { Result } from './result.js';
+export { FORMAT_VERSION, NESTED_FENCE_KEY } from './serialize.js';
+export {
+    EmptyFenceError,
+    FenceError,
+    type FenceErrorOptions,
+    HydrationError,
+    type HydrationErrorOptions,
+    InvalidOutcomeError,
+    RegistrationError,
+    SerializationError,
+} from './errors.js';
+export type {
+    EmptyRegistry,
+    Extend,
+    Failure,
+    Fluent,
+    IsUnion,
+    IsWide,
+    JsonPrimitive,
+    JsonValue,
+    KnownKeys,
+    MemoizeOptions,
+    Merge,
+    Mergeable,
+    DuplicateKeys,
+    Outcome,
+    Registrable,
+    Registry,
+    RegistryEntries,
+    RegistryEntry,
+    ReservedName,
+    SerializedFence,
+    SerializedOutcome,
+    SerializedResult,
+    SerializedStep,
+    Simplify,
+    Step,
+    StepMethods,
+    StepName,
+    StepOptions,
+    StepOutcome,
+    Validator,
+    ValidatorArgs,
+} from './types.js';

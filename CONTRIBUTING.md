@@ -1,94 +1,87 @@
-# Contributing to 'Chain'
+# Contributing to fence.js
 
-## Support / Questions
+Thanks for helping out. Issues and pull requests are welcome; small, focused changes with a
+test are the fastest to review.
 
-For **support or usage questions** like "How do I do X with Chain." and "My code doesn't work.", please search and ask on **StackOverflow** with a **'Chain' tag** first.
+## Where things are decided and tracked
 
-## Bugs
+The [documentation index](docs/INDEX.md) is the root: architecture in `docs/architecture/`,
+decisions in `docs/adr/`, work items in `docs/work/items/`, and how all of it is governed in
+`docs/toolchain/` (start with [the lifecycle](docs/toolchain/sdlc.md)). Every change beyond a typo
+has a work item; decisions have an ADR; `npm run gates` checks the graph on every commit.
 
-> The ideal GitHub issue (and even some feature requests) is not an issue, it's a PR with a failing test case.
-<br/> [@rauchg](https://twitter.com/rauchg/status/810589655532007424)
+## Setup
 
-**Before filing an issue please [search the issue tracker](https://github.com/dotcarls/Chain/issues); your issue may have already been discussed or fixed in `master`.**
+fence.js has no runtime dependencies. Developing it needs **Node.js 22 (LTS) or 24** (see
+`.nvmrc`; the published package itself runs on Node 20.19+ and evergreen browsers) and npm.
 
-**If you want your issue to get priority, submit it as a PR instead**
-
-**Fill in the template** provided by the issue tracker, try to be as **clear** and **complete** as possible, providing a **[Short, Self Contained, Correct (Compilable), Example (SSCE)](http://sscce.org/)** (**link** to a **repository**) helps a lot .
-
-## Feature / Enhancement Requests
-
-Feature or enhancement requests should be **submitted** in the
-[issue tracker](https://github.com/dotcarls/Chain/issues), with a **description** (follow the template) of the expected behavior & use case, where they’ll remain until **approval** by the **lead maintainer(s) and/or enough interest** from the **community**.
-
-You can **request** a feature by **writing a pull request**, but this is **no guarantee** it will be **merged**.
-
-## 'help wanted' label
-
-There are issues marked with the **['help wanted'](https://github.com/dotcarls/Chain/issues?q=is%3Aissue+is%3Aopen+label%3A%22help+wanted%22)** label. <br/>This is a perfect start if you want to help out with the further development of Chain.
-
-## Pull Requests (PR)
-
-In general, the contribution workflow looks like this:
-
-1. **Fork** the repo.
-2. **Clone** the repo. `git clone https://github.com/your-username/Chain.git`.
-3. Create a **new branch** based off the master branch, provide a **descriptive name** <br/>(ex. '**feat**-add-better-logging', '**bug**-removed-double-method', '**enh**-bumped-eslint')
-4. Before running the code you’ll need to **install** the **dependencies** (`npm install` or `yarn`).
-5. **Implement** your feature / bugfix (using the **watch scripts**), you should **only need to modify `/src`**. Don’t worry about regenerating the build folders (`/cjs`, `/es`, `/dist`), they are **built** in the **prepublish** phase.
-6. Make sure **all tests pass**, **coverage is 100%** and there are **no linting errors**.
-7. Submit a **PR**, referencing what it addresses.
-8. Please try to keep your **PR focused in scope and avoid including unrelated commits**.
-
-After you have submitted your PR, we'll try to **get back to you as soon as possible**. <br/>We will **review** your PR and might **request changes**.
-
-## Development / Watch mode
-
-You can **run the watch scripts**
-
-```console
-npm run build:watch
+```sh
+git clone https://github.com/<you>/fence.js.git
+cd fence.js
+npm install      # also installs the git hooks (simple-git-hooks)
+npm run check    # everything CI runs, in the same order
 ```
 
-and
+## Scripts
 
-```console
-npm run test:watch
+| Script                       | What it does                                                                          |
+| ---------------------------- | ------------------------------------------------------------------------------------- |
+| `npm test`                   | Runs the Vitest suite once, type-level tests included (`npm run test:watch` to watch) |
+| `npm run test:coverage`      | Same, with v8 coverage; thresholds are 95% across the board                           |
+| `npm run typecheck`          | `tsc --noEmit` over `src` and `test`                                                  |
+| `npm run lint`               | ESLint with `typescript-eslint` strict, type-checked rules                            |
+| `npm run format`             | Prettier (`format:check` only verifies)                                               |
+| `npm run build`              | Compiles `src` to `dist` (ESM + `.d.ts`) with `tsc`                                   |
+| `npm run typecheck:examples` | Type-checks `examples/` against the built package's declarations (run `build` first)  |
+| `npm run examples`           | Runs every example in `examples/` against the built package (`dist/`)                 |
+| `npm run check:package`      | `publint` and `@arethetypeswrong/cli` against the packed tarball                      |
+| `npm run bench`              | Compares fence.js with validate.js and Joi (informational)                            |
+| `npm run docs`               | Generates the API reference into `docs/` with TypeDoc                                 |
+| `npm run check`              | Everything CI runs, in the same order                                                 |
+
+## Layout
+
+```
+src/
+  index.ts      public surface
+  builder.ts    FenceBuilder: immutable registry + recorded steps, fluent methods
+  fence.ts      Fence: bound steps, run()
+  result.ts     Result: verdicts, failures(), explain(), toJSON()
+  step.ts       step records, validator binding, memoization, registry view
+  serialize.ts  format v2 (de)serialization and the v1 importer
+  errors.ts     FenceError hierarchy
+  format.ts     value formatting for messages
+  types.ts      public types
+test/
+  *.test.ts        behavior tests (Vitest)
+  types.test-d.ts  type-level tests (expectTypeOf; run by `npm test` via vitest's typecheck mode)
+  support/         validators shared by the tests and the benchmark
+  bench/           tinybench comparison
+examples/       runnable usage examples; they import `fence.js` by name, so they exercise dist/
+scripts/        release helpers
+tools/          gate tool (tools/gates/), schemas, ontology and lexicon files, Claude Code hooks
+docs/           the documentation graph: index, toolchain and governance, decisions, work items
+.claude/        hooks configuration, skills, subagent definitions
 ```
 
-to make development easier.
+## Conventions
 
-## Coding Guidelines
+- TypeScript strict mode with `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess` and
+  `erasableSyntaxOnly`; relative imports use the `.js` extension.
+- Public API changes need: a behavior test, a type test when types are involved, an entry in
+  `CHANGELOG.md` (hand-maintained, Keep a Changelog format) under the upcoming version, and a
+  doc comment on the exported symbol.
+- Errors the library raises about validation input or state are subclasses of `FenceError`;
+  `TypeError` is reserved for arguments of the wrong JavaScript type (constructors, the `base`
+  argument of `fromJSON`).
+- Prettier, ESLint and the related Vitest files run on staged files in the pre-commit hook;
+  `typecheck` and the full test suite run before push.
 
-Please **follow** the **conventions** already established in the code.
+## Releasing
 
-Guidelines are enforced using **[ESLint](http://eslint.org/)**.
-
-
-You can **run the linting script** by using
-
-```console
-$ npm run lint
-```
-
-
-## Testing
-
-Include updated (or add new) tests in the `__tests__` directory as part of your PR.
-
-You can **run the test script** by using
-
-```console
-$ npm run test
-```
-
-or with coverage
-
-```console
-$ npm run test:coverage
-```
-
-Aim for **100% [coverage](https://en.wikipedia.org/wiki/Code_coverage)**.
-
-## Hooks
-
-We added **pre-commit** and **pre-push** **hooks** to make sure you **don't commit non-working code.**
+Maintainers release from `master`: add the `## [X.Y.Z] - YYYY-MM-DD` section to
+`CHANGELOG.md`, then run `npm run release`, which runs the full check, bumps the version,
+verifies the changelog section exists, commits, tags `vX.Y.Z` and pushes. Pushing the tag
+triggers `.github/workflows/release.yml`, which publishes to npm with provenance (npm trusted
+publishing, no token) under `latest`, or `next` for prereleases, and creates the GitHub
+release with that changelog section as its notes.

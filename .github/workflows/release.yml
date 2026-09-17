@@ -1,0 +1,57 @@
+# Publishes to npm with provenance when a version tag is pushed (release-it pushes the tag).
+# Requires npm "trusted publishing" to be configured for this repository and workflow on
+# npmjs.com; no npm token is stored in GitHub. Prereleases (2.0.0-beta.1) are published under
+# the "next" dist-tag and marked as GitHub prereleases; stable versions become "latest".
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    environment: npm
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+      - run: npm install -g npm@latest
+      - run: npm ci --ignore-scripts
+      - run: npm run check
+      - name: Determine version, dist-tag and release notes
+        id: meta
+        run: |
+          version="${GITHUB_REF_NAME#v}"
+          if [ "$version" != "$(node -p "require('./package.json').version")" ]; then
+            echo "tag $GITHUB_REF_NAME does not match package.json version" >&2
+            exit 1
+          fi
+          case "$version" in
+            *-*) echo "tag=next" >> "$GITHUB_OUTPUT"; echo "prerelease=--prerelease" >> "$GITHUB_OUTPUT" ;;
+            *)   echo "tag=latest" >> "$GITHUB_OUTPUT"; echo "prerelease=" >> "$GITHUB_OUTPUT" ;;
+          esac
+          for section in "$version" "${version%%-*}"; do
+            awk -v v="$section" '
+              $0 ~ "^## \\[" v "\\]" { on = 1; next }
+              on && /^## \[/ { exit }
+              on { print }
+            ' CHANGELOG.md > release-notes.md
+            [ -s release-notes.md ] && break
+          done
+          if [ ! -s release-notes.md ]; then
+            echo "CHANGELOG.md has no section for $version" >&2
+            exit 1
+          fi
+      - run: npm publish --provenance --access public --tag "${{ steps.meta.outputs.tag }}"
+      - name: GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file release-notes.md ${{ steps.meta.outputs.prerelease }}
