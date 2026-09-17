@@ -26,8 +26,7 @@ A TypeScript rewrite. See [MIGRATING.md](MIGRATING.md) for the upgrade path.
 - `Result.passed`, `Result.anyPassed`, `Result.for(name)`, `Result.failures()` (flattened, with
   nested paths), `Result.explain()` returning text, `Result.toJSON()`.
 - Serialization format 2: one JSON document via `toJSON()`, nested fences tagged with `$fence`,
-  `FenceBuilder.fromJSON(json, base)` with shape validation, `FenceBuilder.fromLegacyJSON` for
-  1.x output.
+  `FenceBuilder.fromJSON(json, base)` with shape validation.
 - `FenceError` hierarchy: `RegistrationError`, `EmptyFenceError`, `SerializationError`,
   `HydrationError` (with `missing`), `InvalidOutcomeError`.
 - Memoization options: `{ memoize: true | { key } }` per registration.
@@ -38,7 +37,7 @@ A TypeScript rewrite. See [MIGRATING.md](MIGRATING.md) for the upgrade path.
 
 - **Breaking:** `register(name, fn, options)`; the name comes first.
 - **Breaking:** builders are immutable. Step methods, `register` and `registerAll` return a new
-  builder; `fork()` is a deprecated no-op.
+  builder.
 - **Breaking:** `Fence.run(subject)` takes a single subject.
 - **Breaking:** ES modules only, Node ≥ 20.19. No CommonJS or UMD builds; `require()` works on
   Node 20.19+/22.12+ and browsers import from an ESM CDN.
@@ -47,12 +46,15 @@ A TypeScript rewrite. See [MIGRATING.md](MIGRATING.md) for the upgrade path.
 - Memoization caches are per built fence, keyed by SameValueZero or object identity, and cache
   `false` outcomes.
 - `explain()` returns a string instead of logging.
-- Deprecated: `fork()`, `serialize()`, `hydrate()`, `forAll()`, `forAny()`, `forOne()`, default
-  export.
 
 ### Removed
 
-- **Breaking:** `Invokable` class, `dememoize()`, the UMD bundle, the `window.fence` global.
+- **Breaking:** the 1.x API surface that the rewrite replaced: `fork()`, `serialize()`,
+  `hydrate()`, `forAll()`, `forAny()`, `forOne()`, the default export and the `Invokable` class.
+  No compatibility aliases ship in 2.0; see [MIGRATING.md](MIGRATING.md) for each replacement.
+- **Breaking:** the 1.x serialization format is not read. MIGRATING.md shows how to convert a
+  stored 1.x blob to the version 2 document.
+- **Breaking:** `dememoize()`, the UMD bundle, the `window.fence` global.
 
 ### Fixed
 

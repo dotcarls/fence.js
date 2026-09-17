@@ -9,11 +9,11 @@
 > so the same validation can run on another runtime that registered the same names.
 
 fence.js is not a schema library and ships no validators. It is the composition layer: a fence
-is _data_ (a list of named steps and their arguments), which is what makes it forkable,
+is _data_ (a list of named steps and their arguments), which is what makes it derivable,
 serializable and deterministic across environments.
 
 - **Immutable builder.** Every operation returns a new builder; derive as many fences from a
-  base as you like without copying or forking.
+  base as you like without copying.
 - **Typed from your validators.** `register('min', (v: string, n: number) => …)` gives you
   `.min(n: number)` with autocompletion; unknown or misspelled steps are compile errors.
 - **Nested results.** A validator may run other fences, so a "policy of fences" (one per
@@ -172,8 +172,7 @@ every argument is a JSON value, and throws
 `HydrationError` whose `missing` property lists **every** validator name (nested included) the
 base registry lacks. Only JSON values and fences may appear in step arguments; anything else
 throws `SerializationError` when serializing (trailing `undefined` arguments are dropped when a
-step is recorded, so optional parameters left out stay serializable). `FenceBuilder.fromLegacyJSON(text, base)` reads the
-v1 `serialize()` format.
+step is recorded, so optional parameters left out stay serializable).
 
 Because fences refer to validators by name, the two sides only need validators that are
 _functionally equivalent_ under the same names; they can be different implementations.

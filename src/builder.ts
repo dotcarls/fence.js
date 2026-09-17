@@ -1,12 +1,6 @@
 import { HydrationError, RegistrationError } from './errors.js';
 import { Fence } from './fence.js';
-import {
-    collectStepNames,
-    parseLegacySerializedFence,
-    parseSerializedFence,
-    reviveArgs,
-    serializeSteps,
-} from './serialize.js';
+import { collectStepNames, parseSerializedFence, reviveArgs, serializeSteps } from './serialize.js';
 import { createStep, registryOf } from './step.js';
 import type {
     EmptyRegistry,
@@ -88,15 +82,6 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
      */
     static fromJSON<T extends Registry>(json: unknown, base: FenceBuilder<T> | T): Fluent<T> {
         return FenceBuilder.#hydrate<T>(entriesOf(base), parseSerializedFence(json));
-    }
-
-    /**
-     * Restores a builder from the string produced by v1's `serialize()`.
-     *
-     * @throws {@link HydrationError}
-     */
-    static fromLegacyJSON<T extends Registry>(json: string, base: FenceBuilder<T> | T): Fluent<T> {
-        return FenceBuilder.#hydrate<T>(entriesOf(base), parseLegacySerializedFence(json));
     }
 
     /** The registered validators by name. */
@@ -182,27 +167,6 @@ export class FenceBuilder<R extends Registry = EmptyRegistry> {
     /** @throws {@link SerializationError} when a step argument is not a JSON value or a fence. */
     toJSON(): SerializedFence {
         return serializeSteps(this.#steps);
-    }
-
-    /**
-     * @deprecated Builders are immutable; every operation already returns a new builder.
-     * Returns `this`.
-     */
-    fork(): this {
-        return this;
-    }
-
-    /** @deprecated Use `JSON.stringify(builder)`. */
-    serialize(): string {
-        return JSON.stringify(this);
-    }
-
-    /**
-     * @deprecated Use {@link FenceBuilder.fromJSON}. Note that v1 `serialize()` output is
-     * no longer accepted here; use {@link FenceBuilder.fromLegacyJSON} for that.
-     */
-    hydrate(json: string): Fluent<R> {
-        return FenceBuilder.fromJSON(json, this);
     }
 
     /** Node.js `util.inspect` support, so `console.log(builder)` shows registry and steps. */

@@ -5,7 +5,7 @@ import { isEmail, isString, max, min, policy, required } from './validators.js';
 
 const base = FenceBuilder.create().registerAll({ required, isString, isEmail, min, max, policy });
 
-// Shared prefix, then two derivations. No fork() needed: builders are values.
+// Shared prefix, then two derivations: builders are values.
 const text = base.required().isString().max(255);
 const user = base
     .policy({

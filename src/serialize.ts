@@ -57,7 +57,7 @@ export function parseSerializedFence(input: unknown, path = 'serialized fence'):
 
     if (Array.isArray(value)) {
         throw new HydrationError(
-            `${path} is a JSON array, which looks like v1 serialize() output; use FenceBuilder.fromLegacyJSON`,
+            `${path} is a JSON array; fence.js 2 reads only the { fence: 2, steps } document (v1 output must be converted, see MIGRATING.md)`,
         );
     }
     if (isFenceLike(value) || isBuilderLike(value)) {
@@ -69,7 +69,7 @@ export function parseSerializedFence(input: unknown, path = 'serialized fence'):
     if (value.fence !== FORMAT_VERSION) {
         throw new HydrationError(
             `${path} has unsupported version ${formatValue(value.fence)}; ` +
-                `expected ${String(FORMAT_VERSION)} (use fromLegacyJSON for v1 output)`,
+                `expected ${String(FORMAT_VERSION)}`,
         );
     }
     if (!Array.isArray(value.steps)) {
@@ -93,50 +93,6 @@ export function parseSerializedFence(input: unknown, path = 'serialized fence'):
             name: step.name,
             args: Array.from(step.args as readonly unknown[], (arg, argIndex) =>
                 assertJsonValue(arg, `${stepPath}.args[${String(argIndex)}]`),
-            ),
-        };
-    });
-
-    return { fence: FORMAT_VERSION, steps };
-}
-
-/**
- * Parses the v1 `serialize()` output: a JSON array of JSON strings, each an object with
- * `_name` and `_args`. Nested fences were never serializable in v1, so arguments are taken
- * as they are.
- *
- * @throws {@link HydrationError}
- */
-export function parseLegacySerializedFence(input: string): SerializedFence {
-    let outer: unknown;
-    try {
-        outer = JSON.parse(input);
-    } catch (cause) {
-        throw new HydrationError('Legacy serialized fence is not valid JSON', { cause });
-    }
-    if (!Array.isArray(outer)) {
-        throw new HydrationError('Legacy serialized fence must be a JSON array of strings');
-    }
-
-    const steps = outer.map((raw: unknown, index): SerializedStep => {
-        let inner: unknown = raw;
-        if (typeof raw === 'string') {
-            try {
-                inner = JSON.parse(raw);
-            } catch (cause) {
-                throw new HydrationError(`Legacy step ${String(index)} is not valid JSON`, {
-                    cause,
-                });
-            }
-        }
-        if (!isPlainObject(inner) || typeof inner._name !== 'string') {
-            throw new HydrationError(`Legacy step ${String(index)} is missing "_name"`);
-        }
-        const args = Array.isArray(inner._args) ? (inner._args as readonly unknown[]) : [];
-        return {
-            name: inner._name,
-            args: Array.from(args, (arg, argIndex) =>
-                assertJsonValue(arg, `legacy step ${String(index)} args[${String(argIndex)}]`),
             ),
         };
     });

@@ -106,21 +106,6 @@ export class Result {
         };
     }
 
-    /** @deprecated Use {@link Result.passed}. */
-    forAll(): boolean {
-        return this.passed;
-    }
-
-    /** @deprecated Use {@link Result.anyPassed}. */
-    forAny(): boolean {
-        return this.anyPassed;
-    }
-
-    /** @deprecated Use {@link Result.for}. */
-    forOne(name: string): Outcome[] {
-        return this.for(name);
-    }
-
     /** Node.js `util.inspect` support, so `console.log(result)` shows the outcomes. */
     [Symbol.for('nodejs.util.inspect.custom')](): {
         subject: unknown;

@@ -179,30 +179,6 @@ describe('FenceBuilder composition', () => {
     });
 });
 
-describe('FenceBuilder deprecated aliases', () => {
-    /* eslint-disable @typescript-eslint/no-deprecated */
-    test('fork() returns the same builder', () => {
-        expect(base.fork()).toBe(base);
-    });
-
-    test('serialize() and hydrate() route through toJSON/fromJSON', () => {
-        const builder = base.required().min(4);
-        const serialized = builder.serialize();
-
-        expect(JSON.parse(serialized)).toEqual(builder.toJSON());
-        expect(base.hydrate(serialized).steps).toEqual(builder.steps);
-        expect(base.max(1).hydrate(serialized).steps).toEqual(builder.steps); // base steps are not kept
-    });
-
-    test('hydrate() points v1 output at fromLegacyJSON', () => {
-        const v1 = JSON.stringify([JSON.stringify({ _name: 'min', _args: [1] })]);
-        expect(() => base.hydrate(v1)).toThrow(
-            /looks like v1 serialize\(\) output; use FenceBuilder.fromLegacyJSON/,
-        );
-    });
-    /* eslint-enable @typescript-eslint/no-deprecated */
-});
-
 describe('FenceBuilder review follow-ups', () => {
     test('trailing undefined arguments are dropped when a step is recorded', () => {
         const between = (v: number, lo: number, hi?: number) =>
@@ -235,9 +211,6 @@ describe('FenceBuilder review follow-ups', () => {
         expect(() =>
             FenceBuilder.fromJSON(json, { min: 5 as unknown as typeof v.minLength }),
         ).toThrow(/must be a function/);
-        expect(() => FenceBuilder.fromLegacyJSON('[]', { toString: v.required })).toThrow(
-            /reserved/,
-        );
     });
 
     test('fromJSON accepts a live fence or builder in place of its JSON', () => {

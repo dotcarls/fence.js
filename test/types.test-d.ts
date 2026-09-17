@@ -130,7 +130,6 @@ describe('fluent method types', () => {
     test('fromJSON accepts a builder or a registry and returns a builder typed by it', () => {
         expectTypeOf(FenceBuilder.fromJSON({}, base)).toEqualTypeOf(base);
         expectTypeOf(FenceBuilder.fromJSON({}, base.registry)).toEqualTypeOf(base);
-        expectTypeOf(FenceBuilder.fromLegacyJSON('', base.registry)).toEqualTypeOf(base);
     });
 
     test('generic code can accept any builder', () => {

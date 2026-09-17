@@ -65,6 +65,7 @@
     "@eslint/js": "^10.0.1",
     "@types/node": "^22.20.3",
     "@vitest/coverage-v8": "^5.0.1",
+    "ajv": "^8.20.0",
     "eslint": "^10.10.0",
     "eslint-config-prettier": "^10.1.8",
     "fast-check": "^4.10.1",
@@ -82,7 +83,8 @@
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.70.0",
     "validate.js": "^0.13.1",
-    "vitest": "^5.0.1"
+    "vitest": "^5.0.1",
+    "yaml": "^2.9.1"
   },
   "simple-git-hooks": {
     "pre-commit": "npx lint-staged",

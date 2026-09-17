@@ -213,7 +213,7 @@ describe('fromJSON', () => {
         [
             'v1 output',
             ['{"_name":"min"}'],
-            /looks like v1 serialize\(\) output; use FenceBuilder.fromLegacyJSON/,
+            /is a JSON array; fence.js 2 reads only the \{ fence: 2, steps \} document/,
         ],
         ['a wrong version', { fence: 1, steps: [] }, /version 1/],
         ['non-array steps', { fence: 2, steps: {} }, /\.steps must be an array/],
@@ -276,55 +276,6 @@ describe('fromJSON', () => {
             expect.objectContaining({
                 name: 'HydrationError',
                 missing: [],
-                cause: expect.any(SyntaxError) as SyntaxError,
-            }) as Error,
-        );
-    });
-});
-
-describe('fromLegacyJSON', () => {
-    const legacy = JSON.stringify([
-        JSON.stringify({ _name: 'required', _args: [], _memoize: false }),
-        JSON.stringify({ _name: 'min', _args: [4], _memoize: false }),
-    ]);
-
-    test('reads the v1 double-encoded format against a builder or a registry', () => {
-        const restored = FenceBuilder.fromLegacyJSON(legacy, base);
-
-        expect(restored.steps).toEqual([
-            { name: 'required', args: [] },
-            { name: 'min', args: [4] },
-        ]);
-        expect(restored.build().run('abcd').passed).toBe(true);
-        expect(FenceBuilder.fromLegacyJSON(legacy, base.registry).steps).toEqual(restored.steps);
-    });
-
-    test('tolerates already-parsed inner objects and missing _args', () => {
-        const restored = FenceBuilder.fromLegacyJSON(JSON.stringify([{ _name: 'required' }]), base);
-
-        expect(restored.steps).toEqual([{ name: 'required', args: [] }]);
-    });
-
-    test.each([
-        ['invalid JSON', '[', /not valid JSON/],
-        ['a non-array', '{}', /must be a JSON array/],
-        ['a malformed inner string', '["{not json"]', /Legacy step 0 is not valid JSON/],
-        ['a step without _name', '["{}"]', /missing "_name"/],
-        [
-            'a $fence tag with extra keys',
-            JSON.stringify([{ _name: 'eq', _args: [{ $fence: {}, x: 1 }] }]),
-            /mixes "\$fence"/,
-        ],
-        ['unregistered names', JSON.stringify([JSON.stringify({ _name: 'zzz' })]), /zzz/],
-    ])('rejects %s', (_label, input, message) => {
-        expect(() => FenceBuilder.fromLegacyJSON(input, base)).toThrow(HydrationError);
-        expect(() => FenceBuilder.fromLegacyJSON(input, base)).toThrow(message);
-    });
-
-    test('a malformed inner string carries the parse error as cause', () => {
-        expect(() => FenceBuilder.fromLegacyJSON('["{"]', base)).toThrow(
-            expect.objectContaining({
-                name: 'HydrationError',
                 cause: expect.any(SyntaxError) as SyntaxError,
             }) as Error,
         );

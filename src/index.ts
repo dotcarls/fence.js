@@ -45,6 +45,3 @@ export type {
     Validator,
     ValidatorArgs,
 } from './types.js';
-
-/** @deprecated Import the named export: `import { FenceBuilder } from 'fence.js'`. */
-export { FenceBuilder as default } from './builder.js';

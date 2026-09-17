@@ -221,16 +221,6 @@ describe('Result queries', () => {
         expect(inspect(result)).toContain("step: 'min(2)'");
         expect(inspect(result)).toContain('passed: false');
     });
-
-    test('deprecated aliases delegate to the new API', () => {
-        const result = base.min(1).min(5).build().run('abc');
-
-        /* eslint-disable @typescript-eslint/no-deprecated */
-        expect(result.forAll()).toBe(result.passed);
-        expect(result.forAny()).toBe(result.anyPassed);
-        expect(result.forOne('min')).toEqual(result.for('min'));
-        /* eslint-enable @typescript-eslint/no-deprecated */
-    });
 });
 
 describe('Result review follow-ups', () => {

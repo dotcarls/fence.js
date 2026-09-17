@@ -46,7 +46,7 @@ src/
   format.ts     value formatting for messages
   types.ts      public types
 test/
-  *.test.ts        behaviour tests (Vitest)
+  *.test.ts        behavior tests (Vitest)
   types.test-d.ts  type-level tests (expectTypeOf; run by `npm test` via vitest's typecheck mode)
   support/         validators shared by the tests and the benchmark
   bench/           tinybench comparison
@@ -58,7 +58,7 @@ scripts/        release helpers
 
 - TypeScript strict mode with `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess` and
   `erasableSyntaxOnly`; relative imports use the `.js` extension.
-- Public API changes need: a behaviour test, a type test when types are involved, an entry in
+- Public API changes need: a behavior test, a type test when types are involved, an entry in
   `CHANGELOG.md` (hand-maintained, Keep a Changelog format) under the upcoming version, and a
   doc comment on the exported symbol.
 - Errors the library raises about validation input or state are subclasses of `FenceError`;
