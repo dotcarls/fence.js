@@ -14,12 +14,6 @@ Template: [TEMPLATE.md](TEMPLATE.md). Create with `npm run work -- new --title "
 <!-- BEGIN GENERATED: work-index -->
 _25 items. Generated from front matter; run `npm run gates:fix`._
 
-### in-progress (1)
-
-| id | title | type | priority | milestone | parent |
-|---|---|---|---|---|---|
-| [FJ-0024](items/FJ-0024-release-2-0-2.md) | Release 2.0.2 | release | p0 | 2.0.2 | — |
-
 ### ready (1)
 
 | id | title | type | priority | milestone | parent |
@@ -34,7 +28,7 @@ _25 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0012](items/FJ-0012-verify-browser-consumption-from-an-esm-cdn.md) | Verify browser consumption from an ESM CDN | task | p2 | 2.x | — |
 | [FJ-0013](items/FJ-0013-decide-the-1-x-maintenance-line.md) | Decide the 1.x maintenance line | decision | p3 | — | — |
 
-### done (18)
+### done (19)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
@@ -56,6 +50,7 @@ _25 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0021](items/FJ-0021-fence-run-is-2-4-3-3x-slower-since-the-first-review-round.md) | Fence.run is 2.4-3.3x slower since the first review round | bug | p0 | 2.0.1 | — |
 | [FJ-0022](items/FJ-0022-codeql-js-incomplete-sanitization-in-the-ontology-table-gene.md) | CodeQL js/incomplete-sanitization in the ontology table generator stops 2.0.1 | bug | p0 | 2.0.2 | — |
 | [FJ-0023](items/FJ-0023-run-codeql-locally-with-the-same-cli-and-queries-as-ci.md) | Run CodeQL locally with the same CLI and queries as CI | task | p0 | 2.0.2 | — |
+| [FJ-0024](items/FJ-0024-release-2-0-2.md) | Release 2.0.2 | release | p0 | 2.0.2 | — |
 
 ### cancelled (2)
 
