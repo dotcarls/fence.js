@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.0.1] - 2026-09-19
+
 The first 2.x release on npm: 2.0.0 was tagged but its release pipeline failed before
 publishing. Besides how the package is built, checked and released, `Fence.run()` is faster.
 

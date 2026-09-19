@@ -1,6 +1,6 @@
 {
   "name": "fence.js",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Composable, portable validations: register named validation steps, derive and extend them, serialize them to JSON and run them anywhere the same names are registered",
   "keywords": [
     "validation",

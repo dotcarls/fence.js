@@ -12,13 +12,13 @@ blocks: []
 blocked_by: []
 acceptance_criteria:
   - text: 'Every other item with milestone 2.0.1 is done (FJ-0019, the publish, follows the tag)'
-    satisfied: false
-    evidence: null
-    verified_by: null
+    satisfied: true
+    evidence: 'docs/work/README.md'
+    verified_by: 'work index: FJ-0014, FJ-0015, FJ-0016, FJ-0017, FJ-0020, FJ-0021 done; FJ-0019 follows the tag'
   - text: 'CHANGELOG.md has a dated 2.0.1 section and package.json says 2.0.1'
-    satisfied: false
-    evidence: null
-    verified_by: null
+    satisfied: true
+    evidence: 'CHANGELOG.md'
+    verified_by: 'changelog gate; node scripts/changelog.mjs check 2.0.1'
   - text: 'The Release v2.0.1 commit on main is tagged v2.0.1'
     satisfied: false
     evidence: null

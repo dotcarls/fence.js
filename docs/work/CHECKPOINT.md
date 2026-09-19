@@ -2,7 +2,7 @@
 doc_type: checkpoint
 milestone: '2.0.1'
 updated: '2026-09-19'
-next_action: 'Finish FJ-0018: commit the fixes, date the 2.0.1 changelog section, bump to 2.0.1, run npm run check:clean, commit Release v2.0.1 and tag v2.0.1; then hand FJ-0019 (push) to the owner.'
+next_action: 'Finish FJ-0018: tag the Release v2.0.1 commit v2.0.1, then record the tag in FJ-0018 and hand FJ-0019 (push) to the owner.'
 in_progress_items:
   - FJ-0018
 session: '2026-09-19 — fixed what stopped 2.0.0 from publishing (FJ-0014 hermetic targets, FJ-0015 gated pipeline), updated dependencies (FJ-0016), renamed the default branch to main (FJ-0017), adopted mise with the Active LTS default and the upcoming LTS as the only other tested line (FJ-0020), fixed a 2.4–3.3x run() regression (FJ-0021), and applied a review of all of it.'
@@ -24,7 +24,7 @@ stays tagged and unpublished (its pipeline failed; a pushed tag is not moved).
 
 ## In progress
 
-- **FJ-0018 — Release 2.0.1.** The fixes are verified; the release commit and tag remain.
+- **FJ-0018 — Release 2.0.1.** This is the release commit; the tag follows it.
 
 ## Next action
 
