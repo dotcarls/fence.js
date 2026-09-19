@@ -74,3 +74,8 @@ FJ-0020); the hooks resolve Node 24.21.0 through mise while the shell's default 
 ## Links
 
 FJ-0020 · ADR-0009 · ADR-0010 · ADR-0002 · [environment](../toolchain/environment.md)
+
+## Amendment A1 — 2026-09-19: the devEngines floor
+
+release-it is gone (ADR-0013). The Node 24 floor in `devEngines` is now semantic-release's,
+`^24.10.0 || >=26.0.0`.

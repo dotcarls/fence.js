@@ -21,7 +21,7 @@ export default {
         ],
         [
             '@semantic-release/github',
-            { successComment: false, failComment: false, releasedLabels: false },
+            { successCommentCondition: false, failCommentCondition: false, releasedLabels: false },
         ],
     ],
 };

@@ -1,12 +1,15 @@
 version: 2
 updates:
-  # Commit messages are Conventional Commits (FJ-0026): `build(deps)` and `ci(deps)` release nothing.
+  # Commit messages are Conventional Commits (FJ-0026). A runtime dependency update is a fix and
+  # releases a patch (`fix(deps)`); development dependencies and actions release nothing
+  # (`build(deps-dev)`, `ci(deps)`). fence.js has no runtime dependencies today.
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
     commit-message:
-      prefix: build
+      prefix: fix
+      prefix-development: build
       include: scope
     groups:
       dev-dependencies:

@@ -8,7 +8,7 @@ milestone: '2.0.2'
 created: 2026-09-19
 updated: 2026-09-19
 parent: null
-blocks: []
+blocks: [FJ-0028]
 blocked_by: [FJ-0024]
 owner: 'Tim Carlson'
 acceptance_criteria:
@@ -57,6 +57,6 @@ https://registry.npmjs.org/fence.js - OIDC permission denied for this action`.
   1. On npmjs.com, fence.js, Settings, the trusted publisher (`release.yml`, environment `npm`):
      allow `npm publish`.
   2. Re-run the failed `publish` job of run 35456319225. It publishes the tarball its checks
-     verified.
+     verified. That tarball artifact expires at 2026-09-26T16:52Z; after that, a re-run fails.
 
   Future releases are automated (FJ-0027, ADR-0013).

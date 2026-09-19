@@ -30,14 +30,21 @@ const COMMIT_PLUGINS = [
 
 type Env = Record<string, string | undefined>;
 
-const git = (cwd: string, ...args: string[]): string =>
-    execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'] }).trim();
+/** git in `cwd` with exactly the environment the caller passed, as semantic-release runs it. */
+const git = (cwd: string, env: Env, ...args: string[]): string =>
+    execFileSync('git', args, {
+        cwd,
+        env,
+        encoding: 'utf8',
+        stdio: ['ignore', 'pipe', 'pipe'],
+    }).trim();
 
 /** The last release reachable from HEAD: the highest `vX.Y.Z` tag that is not a prerelease. */
-export function lastRelease(cwd: string): string | null {
+export function lastRelease(cwd: string, env: Env): string | null {
     try {
         return git(
             cwd,
+            env,
             'describe',
             '--tags',
             '--abbrev=0',
@@ -87,18 +94,22 @@ const rcNumber = (tag: string): number => Number(RC.exec(tag)?.[1] ?? 0);
  * The release candidate tag for `version` on HEAD: the one HEAD already carries (a re-run), else
  * one more than the highest candidate for that version so far. Creates it locally when new.
  */
-export function candidateTag(cwd: string, version: string): { tag: string; created: boolean } {
+export function candidateTag(
+    cwd: string,
+    env: Env,
+    version: string,
+): { tag: string; created: boolean } {
     const pattern = `v${version}-rc.*`;
     const highest = (tags: string) =>
         tags
             .split('\n')
             .filter((tag) => RC.test(tag))
             .sort((a, b) => rcNumber(b) - rcNumber(a))[0];
-    const onHead = highest(git(cwd, 'tag', '--points-at', 'HEAD', '--list', pattern));
+    const onHead = highest(git(cwd, env, 'tag', '--points-at', 'HEAD', '--list', pattern));
     if (onHead) return { tag: onHead, created: false };
-    const previous = highest(git(cwd, 'tag', '--list', pattern));
+    const previous = highest(git(cwd, env, 'tag', '--list', pattern));
     const tag = `v${version}-rc.${String(previous ? rcNumber(previous) + 1 : 1)}`;
-    git(cwd, 'tag', tag, 'HEAD');
+    git(cwd, env, 'tag', tag, 'HEAD');
     return { tag, created: true };
 }
 
@@ -119,12 +130,12 @@ export async function candidate(options: {
     repositoryUrl?: string;
     log?: Config['stdout'];
 }): Promise<Candidate> {
-    const { cwd, push, remote = 'origin' } = options;
+    const { cwd, env, push, remote = 'origin' } = options;
     const version = await nextVersion(options);
-    if (!version) return { release: false, version: lastRelease(cwd), tag: null };
+    if (!version) return { release: false, version: lastRelease(cwd, env), tag: null };
     if (!push) return { release: true, version, tag: null };
-    const { tag, created } = candidateTag(cwd, version);
-    if (created) git(cwd, 'push', remote, `refs/tags/${tag}`);
+    const { tag, created } = candidateTag(cwd, env, version);
+    if (created) git(cwd, env, 'push', remote, `refs/tags/${tag}`);
     return { release: true, version, tag };
 }
 
@@ -203,6 +214,13 @@ async function main(argv: string[], env: Env): Promise<void> {
     const [command, version] = argv;
     if (command === 'candidate') {
         const dryRun = argv.includes('--dry-run');
+        const branch = git(process.cwd(), env, 'rev-parse', '--abbrev-ref', 'HEAD');
+        if (dryRun && !env.GITHUB_ACTIONS && branch !== 'main') {
+            console.log(
+                `release: only main releases; this is ${branch}, so nothing would be released`,
+            );
+            return;
+        }
         const result = await candidate({ cwd: process.cwd(), env, push: !dryRun });
         console.log(
             result.release

@@ -47,7 +47,7 @@ On 2026-09-19 the owner directed:
 
 - It restricts creating, updating and deleting the branch, and forbids non-fast-forward pushes.
 - It requires a linear history.
-- It exempts the maintain and admin roles and one integration.
+- It exempts the maintain and admin roles and one integration, Dependabot (app 29110).
 - It does not cover tags.
 
 ## Options considered
@@ -67,17 +67,19 @@ On 2026-09-19 the owner directed:
    `@commitlint/config-conventional` in three places:
    - the git `commit-msg` hook;
    - CI on every pull request, for its commits and its title (a squash merge writes the title);
-   - CI on every push to `main`, for the commits that push adds, so a nonconforming commit fails
-     its own run and no later one.
+   - CI on every push to `main`, for the commits that push adds (`before..sha`), so a
+     nonconforming commit fails the run that brought it and no later one. A push whose run was
+     replaced while it waited, or a manual run (only HEAD), is covered only by the other two
+     checks. The run on `main` is a backstop for maintainers' direct pushes.
 
    What each type releases is semantic-release's `conventionalcommits` rules:
 
-   | Commit                                 | Release |
-   | -------------------------------------- | ------- |
-   | `!` or a `BREAKING CHANGE:` footer     | major   |
-   | `feat`                                 | minor   |
-   | `fix`, `perf`, `revert`                | patch   |
-   | Any other type, `build(deps)` included | nothing |
+   | Commit                                     | Release |
+   | ------------------------------------------ | ------- |
+   | `!` or a `BREAKING CHANGE:` footer         | major   |
+   | `feat`                                     | minor   |
+   | `fix`, `perf`, `revert`                    | patch   |
+   | Any other type, `build(deps-dev)` included | nothing |
 
 2. **Trunk.** `main` is the only branch that releases. Changes reach it through short-lived
    pull requests, or through a maintainer's push that bypasses the ruleset. There are no
@@ -107,8 +109,11 @@ On 2026-09-19 the owner directed:
    - The generated notes are the GitHub releases.
    - `CHANGELOG.md` stays as the hand-written record through 2.0.2.
    - The `changelog` gate refuses an `[Unreleased]` section there.
-7. **One run at a time.** `release.yml` runs in one concurrency group that never cancels a run
-   in progress, so each candidate is named against the releases before it.
+7. **One run at a time.** `release.yml` runs in one concurrency group per branch that never
+   cancels a run in progress, so each candidate is named against the releases before it. A
+   newer push waiting in the group replaces an older one that has not started; the newer run
+   covers its commits. Pages deploys after the promotion, so the documentation never shows a
+   version that is not on npm.
 8. **Tooling:**
    - semantic-release 25.0.9, with its bundled commit analyzer, notes generator and GitHub
      plugins;
@@ -122,16 +127,28 @@ On 2026-09-19 the owner directed:
    - what reaches `main`, which now means what is released;
    - the npm trusted publisher: `release.yml`, environment `npm`, with `npm publish` among its
      allowed actions;
-   - the repository's rulesets and settings.
+   - the repository's rulesets and settings. Two are recommended, not yet in place:
+     - a tag ruleset on `v*` that only the pipeline and administrators may bypass, so that
+       "only the pipeline tags" is enforced rather than conventional;
+     - a deployment-branch policy of `main` on the `npm` environment.
+
+     Dependabot being able to bypass `main`'s ruleset is the owner's call.
 
 ## Consequences
 
 - **Every push that warrants a release ships** within one pipeline run. That is continuous
   delivery from trunk: merging a `feat` releases a minor.
 - **A version is lost only after npm has it.** Before, a failed check or publish after the tag
-  cost the version; now a failure costs a candidate tag. The one leftover case: npm has the
-  version but the tag push failed. The next run then sees the same bytes on npm and completes
-  the tag.
+  cost the version; now a failure costs a candidate tag.
+
+  Two failures after publishing need a person:
+  - npm has the version but the tag push failed;
+  - the tag exists but creating the GitHub release failed.
+
+  A re-run of that job completes both only while `main` has not moved, and while the checks'
+  tarball artifact exists (7 days). Otherwise [release-process](../toolchain/release-process.md#when-something-fails)
+  gives the manual steps.
+
 - **Candidate tags accumulate** (`v2.1.0-rc.1`, `-rc.2`, …). They record what was tried.
 - **Release notes are exactly the commits.** A commit's message is its changelog entry, so
   messages matter: [CONTRIBUTING](../../CONTRIBUTING.md) says how to write them.
@@ -148,10 +165,11 @@ On 2026-09-19 the owner directed:
 - `test/toolchain/release.test.ts` runs real git repositories with a local bare remote:
   - candidate naming and numbering, and re-runs;
   - releases for `feat`, `fix`, `perf`, `revert` and breaking changes, and none for `docs`,
-    `chore`, `build(deps)` or `ci(deps)`;
+    `chore`, `build(deps-dev)` or `ci(deps)`, and a patch for `fix(deps)`;
   - a failed publish leaving no tag, and the retry tagging the candidate's commit;
   - the verify and publish guards, with a stand-in for npm.
-- The commit-msg hook refuses a nonconforming message and accepts a conforming one.
+- The commit-msg hook refuses a nonconforming message and accepts a conforming one: run by
+  hand, and by a real `git commit` that it refused (FJ-0026 notes).
 - actionlint accepts the workflows.
 - Not verifiable here: the GitHub and npm ends. Those are the first run on `main` (FJ-0027).
 

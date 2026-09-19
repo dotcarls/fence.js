@@ -2,10 +2,10 @@
 #   1. candidate: when its Conventional Commits warrant a release, semantic-release names the
 #      version and HEAD is tagged vX.Y.Z-rc.N, N counting the candidates for that version;
 #   2. checks: every check, on the tarball stamped with that version (checks.yml);
-#   3. pages: the checked API reference, deployed;
-#   4. release: the candidate promoted with no human step: semantic-release tags vX.Y.Z on the same
-#      commit, publishes the verified tarball to npm with provenance (npm trusted publishing, which
-#      names this file and the `npm` environment) and creates the GitHub release with its notes.
+#   3. release: the candidate promoted with no human step: semantic-release publishes the verified
+#      tarball to npm with provenance (npm trusted publishing, which names this file and the `npm`
+#      environment), then tags vX.Y.Z on the same commit and creates the GitHub release;
+#   4. pages: the checked API reference, deployed after the promotion (or when there is none).
 # A failed check leaves only the candidate tag; the next push makes the next candidate. Nothing is
 # committed to main by the pipeline. The toolchain is the one mise.toml pins (ADR-0011).
 name: Release
@@ -19,9 +19,10 @@ permissions:
   contents: read
 
 concurrency:
-  # One run at a time and none cancelled midway: each candidate is named after the releases before
-  # it. A newer push waiting here replaces an older one that has not started.
-  group: release-main
+  # One run per branch at a time and none cancelled midway: each candidate is named after the
+  # releases before it. A newer push waiting here replaces an older one that has not started; the
+  # newer run's checks and release include the older push's commits.
+  group: release-${{ github.ref }}
   cancel-in-progress: false
 
 jobs:
@@ -67,8 +68,13 @@ jobs:
       commits-to: ${{ github.sha }}
 
   pages:
+    # After the promotion, when there is one, so the documentation never shows a version that is
+    # not on npm.
     name: deploy Pages
-    needs: checks
+    needs: [checks, release]
+    if: >-
+      !cancelled() && needs.checks.result == 'success' &&
+      (needs.release.result == 'success' || needs.release.result == 'skipped')
     runs-on: ubuntu-latest
     permissions:
       pages: write

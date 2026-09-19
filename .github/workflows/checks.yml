@@ -156,8 +156,9 @@ jobs:
             console.log('require(esm) ok on', process.version);"
 
   commits:
-    # Conventional Commits (FJ-0026): the release is computed from these messages. A push is
-    # checked for the commits it adds, so one nonconforming commit fails its own run and no later one.
+    # Conventional Commits (FJ-0026): the release is computed from these messages. The range is
+    # `git log FROM..TO`: a pull request's commits since its base, or the commits a push added, so a
+    # nonconforming commit fails the run that brought it and no later one.
     name: commit messages
     if: inputs.commits-to != ''
     runs-on: ubuntu-latest
@@ -177,10 +178,10 @@ jobs:
           FROM: ${{ inputs.commits-from }}
           TO: ${{ inputs.commits-to }}
         run: |
-          if [ -n "$FROM" ] && git merge-base --is-ancestor "$FROM" "$TO" 2>/dev/null; then
+          if [ -n "$FROM" ] && git cat-file -e "$FROM^{commit}" 2>/dev/null; then
             npx commitlint --from "$FROM" --to "$TO" --verbose
           else
-            # A new branch, a forced push or a manual run: only the last commit has a known range.
+            # A new branch (before is all zeros) or a manual run: no earlier commit to count from.
             git log -1 --format=%B "$TO" | npx commitlint --verbose
           fi
       - name: Check the pull request title

@@ -43,12 +43,12 @@ on pull requests.
 
 The commit's type decides, by semantic-release's `conventionalcommits` rules:
 
-| Commit                                                      | Release | Example                                        |
-| ----------------------------------------------------------- | ------- | ---------------------------------------------- |
-| `!` after the type, or a `BREAKING CHANGE:` footer          | major   | `feat!: fromJSON refuses format 1`             |
-| `feat`                                                      | minor   | `feat: accept a custom message per step`       |
-| `fix`, `perf`, `revert`                                     | patch   | `fix: explain() names the failing step`        |
-| `build`, `chore`, `ci`, `docs`, `refactor`, `style`, `test` | nothing | `build(deps): bump the dev-dependencies group` |
+| Commit                                                      | Release | Example                                            |
+| ----------------------------------------------------------- | ------- | -------------------------------------------------- |
+| `!` after the type, or a `BREAKING CHANGE:` footer          | major   | `feat!: fromJSON refuses format 1`                 |
+| `feat`                                                      | minor   | `feat: accept a custom message per step`           |
+| `fix`, `perf`, `revert`                                     | patch   | `fix: explain() names the failing step`            |
+| `build`, `chore`, `ci`, `docs`, `refactor`, `style`, `test` | nothing | `build(deps-dev): bump the dev-dependencies group` |
 
 The [change classes](taxonomy.md#version-change-classes) say which type a change is. A push
 releases the highest bump among its commits since the last release. The notes list them under
@@ -59,8 +59,10 @@ The same messages are checked in three places:
 - the `commit-msg` hook, locally;
 - `ci.yml`, for every commit of a pull request and for its title (a squash merge writes the
   title);
-- `release.yml`, for the commits each push adds. A nonconforming commit fails its own run, so
-  that push is not released; it blocks no later push.
+- `release.yml`, for the commits each push adds (`before..sha`). A nonconforming commit fails
+  the run that brought it, so that push is not released; it blocks no later push. A push whose
+  run was replaced while waiting, and a manual run (HEAD only), are covered by the hook and the
+  pull request checks alone: the run on `main` is a backstop.
 
 ## The steps, all automated
 
@@ -86,12 +88,26 @@ The same messages are checked in three places:
 
 ## When something fails
 
-| Failure                                | What is left                                                      | What happens next                                                                           |
-| -------------------------------------- | ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------- |
-| A check fails                          | the candidate tag `vX.Y.Z-rc.N`                                   | Push a fix; its run tags `vX.Y.Z-rc.N+1` (or a higher version, if the fix warrants one)     |
-| The publish fails (npm, the network)   | the candidate tag; no release tag, since publish precedes tagging | Re-run the failed job, or push again: the same version is promoted                          |
-| npm has the version but the tag failed | the version on npm                                                | The next run sees the same bytes on npm, skips publishing and completes the tag and release |
-| A newer push arrived during the checks | the older candidate tag                                           | The newer run promotes, including the older commits                                         |
+| Failure                                 | What is left                                                      | What happens next                                                                                              |
+| --------------------------------------- | ----------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------- |
+| A check fails                           | the candidate tag `vX.Y.Z-rc.N`                                   | Push a fix; its run tags `vX.Y.Z-rc.N+1` (or a higher version, if the fix warrants one)                        |
+| The publish fails (npm, the network)    | the candidate tag; no release tag, since publish precedes tagging | Re-run the failed job, or push again: the same version is promoted                                             |
+| npm has the version but the tag failed  | the version on npm                                                | Re-run the job while `main` has not moved: it finds the same bytes on npm and tags. Otherwise, by hand (below) |
+| The GitHub release failed after the tag | the version on npm and the tag                                    | By hand (below): a re-run finds the tag and releases nothing                                                   |
+| A newer push arrived during the checks  | the older candidate tag                                           | The newer run promotes, including the older commits                                                            |
+
+A re-run needs the checks' tarball artifact, which is kept for 7 days.
+
+**By hand, after a partial promotion** (a maintainer, once):
+
+- **npm has vX.Y.Z but there is no tag.** Tag the candidate that was published:
+  `git tag vX.Y.Z vX.Y.Z-rc.N && git push origin vX.Y.Z`. The provenance statement on npm names
+  its commit. Then `gh release create vX.Y.Z --verify-tag --generate-notes`.
+- **The tag exists but there is no GitHub release.** Run
+  `gh release create vX.Y.Z --verify-tag --generate-notes`.
+
+Until the tag exists, every later run computes vX.Y.Z again and stops: npm already has that
+version with different bytes.
 
 ## Owner settings the pipeline depends on
 
@@ -100,10 +116,13 @@ The same messages are checked in three places:
   - allowed actions must include **`npm publish`**. A configuration made after 2026-09-03
     allows only `npm stage publish` by default, and npm then answers
     `403 … OIDC permission denied for this action`.
-- **`main`'s ruleset** limits updates to maintainers. The pipeline never pushes to `main`; it
-  pushes tags only, which the ruleset does not cover.
-- **The `npm` environment** holds the publishing job. Limiting its deployment branches to `main`
-  is optional hardening.
+- **`main`'s ruleset** limits updates to maintainers (and, today, Dependabot). The pipeline never
+  pushes to `main`; it pushes tags (and semantic-release's `refs/notes`), which the ruleset does
+  not cover.
+- **Recommended, not yet in place:**
+  - a tag ruleset on `v*` that only the pipeline (GitHub Actions) and administrators may bypass,
+    so no one else can create a release or candidate tag;
+  - a deployment-branch policy of `main` on the `npm` environment.
 
 ## Versioning
 

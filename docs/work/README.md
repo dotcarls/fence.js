@@ -12,20 +12,14 @@ Template: [TEMPLATE.md](TEMPLATE.md). Create with `npm run work -- new --title "
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: work-index -->
-_27 items. Generated from front matter; run `npm run gates:fix`._
+_28 items. Generated from front matter; run `npm run gates:fix`._
 
-### in-progress (2)
-
-| id | title | type | priority | milestone | parent |
-|---|---|---|---|---|---|
-| [FJ-0026](items/FJ-0026-enforce-conventional-commits-on-every-commit.md) | Enforce Conventional Commits on every commit | task | p0 | — | — |
-| [FJ-0027](items/FJ-0027-automate-releases-from-trunk-release-candidates-promoted-whe.md) | Automate releases from trunk: release candidates promoted when every check passes | task | p0 | — | — |
-
-### ready (1)
+### ready (2)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
 | [FJ-0025](items/FJ-0025-publish-2-0-2-push-main-then-the-v2-0-2-tag-once-ci-on-main.md) | Publish 2.0.2: push main, then the v2.0.2 tag once CI on main is green | task | p0 | 2.0.2 | — |
+| [FJ-0028](items/FJ-0028-verify-the-automated-release-on-github-first-push-first-pull.md) | Verify the automated release on GitHub: first push, first pull request, first promotion | task | p1 | — | — |
 
 ### backlog (3)
 
@@ -35,7 +29,7 @@ _27 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0012](items/FJ-0012-verify-browser-consumption-from-an-esm-cdn.md) | Verify browser consumption from an ESM CDN | task | p2 | 2.x | — |
 | [FJ-0013](items/FJ-0013-decide-the-1-x-maintenance-line.md) | Decide the 1.x maintenance line | decision | p3 | — | — |
 
-### done (19)
+### done (21)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
@@ -58,6 +52,8 @@ _27 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0022](items/FJ-0022-codeql-js-incomplete-sanitization-in-the-ontology-table-gene.md) | CodeQL js/incomplete-sanitization in the ontology table generator stops 2.0.1 | bug | p0 | 2.0.2 | — |
 | [FJ-0023](items/FJ-0023-run-codeql-locally-with-the-same-cli-and-queries-as-ci.md) | Run CodeQL locally with the same CLI and queries as CI | task | p0 | 2.0.2 | — |
 | [FJ-0024](items/FJ-0024-release-2-0-2.md) | Release 2.0.2 | release | p0 | 2.0.2 | — |
+| [FJ-0026](items/FJ-0026-enforce-conventional-commits-on-every-commit.md) | Enforce Conventional Commits on every commit | task | p0 | — | — |
+| [FJ-0027](items/FJ-0027-automate-releases-from-trunk-release-candidates-promoted-whe.md) | Automate releases from trunk: release candidates promoted when every check passes | task | p0 | — | — |
 
 ### cancelled (2)
 

@@ -103,7 +103,7 @@ describe('candidate', () => {
             const r = released();
             r.commit('docs: explain');
             r.commit('chore: tidy');
-            r.commit('build(deps): bump the dev-dependencies group with 3 updates');
+            r.commit('build(deps-dev): bump the dev-dependencies group with 3 updates');
             r.commit('ci(deps): bump the actions group with 2 updates');
             expect(await next(r)).toEqual({ release: false, version: '1.0.0', tag: null });
             expect(r.remoteTags()).toEqual(['v1.0.0']);
@@ -136,6 +136,18 @@ describe('candidate', () => {
             expect(await next(r)).toEqual({ release: true, version: '1.1.0', tag: 'v1.1.0-rc.1' });
             r.commit('feat!: four');
             expect((await next(r)).tag).toBe('v2.0.0-rc.1');
+        },
+        SLOW,
+    );
+
+    test(
+        'a runtime dependency update releases a patch; a BREAKING CHANGE footer a major',
+        async () => {
+            const r = released();
+            r.commit('fix(deps): bump a runtime dependency');
+            expect((await next(r)).version).toBe('1.0.1');
+            r.commit('refactor: drop the old format\n\nBREAKING CHANGE: format 1 is refused');
+            expect((await next(r)).version).toBe('2.0.0');
         },
         SLOW,
     );
