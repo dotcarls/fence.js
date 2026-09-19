@@ -2,7 +2,7 @@
 id: FJ-0022
 title: 'CodeQL js/incomplete-sanitization in the ontology table generator stops 2.0.1'
 type: bug
-status: in-progress
+status: done
 priority: p0
 milestone: '2.0.2'
 created: 2026-09-19
@@ -15,10 +15,10 @@ acceptance_criteria:
     satisfied: true
     evidence: 'docs/work/items/FJ-0022-codeql-js-incomplete-sanitization-in-the-ontology-table-gene.md#notes'
     verified_by: 'scripts/codeql.mjs on a worktree of 6cb6613, CodeQL 2.27.0, codeql/javascript-queries@2.4.5'
-  - text: 'The ontology and taxonomy documents show every target pattern byte for byte, whatever it holds, including \| and backticks'
+  - text: 'The ontology and taxonomy documents show every target pattern byte for byte, including \| and backtick runs; what Markdown would normalize (carriage returns, NUL, edge spaces in a pattern) is refused, not mangled'
     satisfied: true
     evidence: 'test/toolchain/generate.test.ts'
-    verified_by: 'vitest: codeBlock round-trips regexes, escaped pipes, backslashes, Markdown syntax and backtick runs'
+    verified_by: "vitest: codeBlock round-trips regexes, escaped pipes, backslashes, Markdown syntax, backtick runs and fence lines under CommonMark's closing-fence rule; a fixed three-backtick fence fails two cases"
   - text: 'npm run codeql reports no finding on the fixed tree'
     satisfied: true
     evidence: 'docs/work/items/FJ-0022-codeql-js-incomplete-sanitization-in-the-ontology-table-gene.md#notes'
@@ -69,3 +69,8 @@ Pages did not deploy and 2.0.1 was not published.
   ```
 
   After the fix, the same command reports `codeql: 0 findings` and exits 0.
+
+- 2026-09-19: review (fence-reviewer) of dbd8fa8. It confirmed the rendering with markdown-it and
+  marked, and found the test helper laxer than CommonMark and the byte-for-byte claim untrue for
+  carriage returns and NUL. Fixed: the helper applies the closing-fence rule, `codeBlock`
+  refuses carriage returns and NUL, and a pattern with edge spaces is refused. Done.

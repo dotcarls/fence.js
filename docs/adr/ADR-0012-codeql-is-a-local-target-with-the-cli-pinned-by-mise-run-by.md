@@ -30,7 +30,8 @@ checks.
 
 Measured on 2026-09-19:
 
-- The CodeQL CLI 2.27.0 takes 2.7 GB installed, with every language's extractor.
+- The CodeQL CLI 2.27.0 takes 2.7 GB installed on macOS, with every language's extractor; the
+  Linux download is 410 MB zipped.
 - An analysis of this tree takes about 18 s on the owner's machine.
 - mise 2026.6.14 fails GitHub artifact attestation verification of the CodeQL release ("TSA
   timestamp verification failed"). mise 2026.9.11 verifies it.
@@ -55,8 +56,9 @@ machine, in the pre-push hook and in CI.
      `codeql/javascript-queries@2.4.5`, `javascript-security-and-quality`,
      `/language:javascript-typescript`.
    - The two pins move together.
-2. **What it analyzes.** The files git would commit: the gate walker's list, copied to a
-   temporary directory.
+2. **What it analyzes.** The gate walker's list (tracked files plus untracked ones the root
+   `.gitignore` does not ignore), copied to a temporary directory. On the export `check:clean`
+   makes, that is exactly the commit.
 3. **Which CLI it uses.** Only the pinned one: `mise which codeql`, or a `codeql` on PATH at
    exactly that version. Any other version is refused, with `mise install` as the remedy.
 4. **When it fails.** On any result. It prints each result as `rule at file:line`.
@@ -70,12 +72,12 @@ machine, in the pre-push hook and in CI.
      whether or not it holds findings.
    - Its failure stops Pages and publishing (ADR-0010).
    - Every other job installs Node alone (`install_args: node`).
-7. **mise.** The `min_version` hard floor rises to 2026.9.11, the oldest release verified to
-   install the pinned CLI. Attestation verification is never turned off to install an older one.
+7. **mise.** The `min_version` hard floor rises to 2026.9.11, the release verified to install
+   the pinned CLI (2026.6.14 fails its attestation check; releases in between were not tried). Attestation verification is never turned off to install an older one.
 
 ## Consequences
 
-- A contributor who pushes needs mise 2026.9.11 or later and 2.7 GB for CodeQL.
+- A contributor who pushes needs mise 2026.9.11 or later and room for CodeQL (2.7 GB on macOS).
 - The pre-push hook takes about 20 s longer.
 - The first run fetches the query pack from GitHub's container registry by exact version, a
   network dependency of the same kind as `npm ci`.

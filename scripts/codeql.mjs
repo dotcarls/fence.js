@@ -3,8 +3,10 @@
 // (ADR-0012). check:clean runs it on the exported HEAD, so the pre-push hook runs it too.
 // Usage: node scripts/codeql.mjs [--sarif <path>]  (CI keeps the SARIF to upload it)
 //
-// Files: the gate walker's list (`git ls-files --cached --others --exclude-from=.gitignore`),
-// copied to a temporary directory, so a local dist/, site/ or scratch file is never analyzed.
+// Files: the gate walker's list (`git ls-files --cached --others --exclude-from=.gitignore`):
+// tracked files plus untracked ones the root .gitignore does not ignore, copied to a temporary
+// directory, so dist/, site/ and node_modules are never analyzed. check:clean runs it on an
+// export of HEAD, where the two lists are the same.
 // The query pack is fetched once into ~/.codeql/packages, by exact version.
 import { execFileSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync } from 'node:fs';
@@ -16,9 +18,19 @@ const QUERY_PACK = 'codeql/javascript-queries@2.4.5';
 const SUITE = `${QUERY_PACK}:codeql-suites/javascript-security-and-quality.qls`;
 const CATEGORY = '/language:javascript-typescript';
 
-const args = process.argv.slice(2);
-const sarifIndex = args.indexOf('--sarif');
-const keepSarif = sarifIndex >= 0 ? resolve(args[sarifIndex + 1] ?? '') : null;
+function sarifPath(args) {
+    const usage = 'usage: node scripts/codeql.mjs [--sarif <path>]';
+    if (args.length === 0) return null;
+    const [flag, value, ...rest] = args[0].startsWith('--sarif=')
+        ? ['--sarif', args[0].slice('--sarif='.length), ...args.slice(1)]
+        : args;
+    if (flag !== '--sarif' || !value || value.startsWith('-') || rest.length > 0) {
+        console.error(usage);
+        process.exit(2);
+    }
+    return resolve(value);
+}
+const keepSarif = sarifPath(process.argv.slice(2));
 
 const quiet = (command, argv) =>
     execFileSync(command, argv, {
@@ -34,17 +46,31 @@ function pinnedCodeql() {
     const found = [];
     const candidates = [() => quiet('mise', ['which', 'codeql']), () => 'codeql'];
     for (const candidate of candidates) {
+        let binary;
         try {
-            const binary = candidate();
+            binary = candidate();
+        } catch (error) {
+            // mise refused (too old for min_version, untrusted, not installed): keep its reason
+            const said = String(error.stderr ?? '')
+                .trim()
+                .split('\n')
+                .slice(0, 2)
+                .join(' / ');
+            if (said) found.push(`mise said: ${said}`);
+            continue;
+        }
+        try {
             const version = quiet(binary, ['version', '--format=terse']);
             if (version === pinned) return binary;
             found.push(`${binary} is ${version}`);
         } catch {
-            // not installed this way; try the next
+            // no such binary on PATH; try the next
         }
     }
-    const seen = found.length > 0 ? ` (found: ${found.join('; ')})` : '';
-    throw new Error(`CodeQL ${pinned} (mise.toml) is not installed${seen}; run mise install`);
+    const seen = found.length > 0 ? ` (${found.join('; ')})` : '';
+    throw new Error(
+        `CodeQL ${pinned} (mise.toml) was not found${seen}; upgrade mise if it says so, then run mise install`,
+    );
 }
 
 const work = mkdtempSync(join(tmpdir(), 'fence-codeql-'));

@@ -149,9 +149,13 @@ export function loadLexicon(ctx: Context): Lexicon {
  * `text` as a fenced code block, which shows it byte for byte. A table cell cannot: GFM splits the
  * row on `|` before inline parsing and honors `\|` even inside a code span, while a code span takes
  * no other escape, so a pattern holding `\|` has no correct spelling there. A fence needs no escape,
- * only to be longer than any run of backticks inside it (CommonMark 4.5).
+ * only to be longer than any run of backticks inside it (CommonMark 4.5). Carriage returns and NUL
+ * are refused: Markdown normalizes them, so no block could show them unchanged.
  */
 export function codeBlock(text: string): string {
+    if (/[\r\0]/.test(text)) {
+        throw new Error('A code block cannot show a carriage return or NUL unchanged');
+    }
     const longest = Math.max(0, ...Array.from(text.matchAll(/`+/g), (run) => run[0].length));
     const fence = '`'.repeat(Math.max(3, longest + 1));
     return `${fence}text\n${text}\n${fence}`;
@@ -165,8 +169,13 @@ function ontologyKinds(ctx: Context): string {
     }
     const width = Math.max(...kinds.map(([kind]) => kind.length));
     const patterns = kinds.map(([kind, spec]) => {
-        if (/[\r\n]/.test(spec.target_pattern)) {
-            throw new Error(`The target pattern of kind '${kind}' spans lines`);
+        if (
+            /[\r\n]/.test(spec.target_pattern) ||
+            spec.target_pattern !== spec.target_pattern.trim()
+        ) {
+            throw new Error(
+                `The target pattern of kind '${kind}' spans lines or starts or ends with a space`,
+            );
         }
         return `${kind.padEnd(width)}  ${spec.target_pattern}`;
     });

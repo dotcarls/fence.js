@@ -2,7 +2,7 @@
 id: FJ-0023
 title: 'Run CodeQL locally with the same CLI and queries as CI'
 type: task
-status: in-progress
+status: done
 priority: p0
 milestone: '2.0.2'
 created: 2026-09-19
@@ -18,11 +18,11 @@ acceptance_criteria:
   - text: 'It refuses any CodeQL but the pinned version and names the remedy'
     satisfied: true
     evidence: 'docs/work/items/FJ-0023-run-codeql-locally-with-the-same-cli-and-queries-as-ci.md#notes'
-    verified_by: 'run with no codeql on PATH and with a fake 2.26.0: both exit 1 with "run mise install"'
+    verified_by: "no codeql, a fake 2.26.0, and mise 2026.6.14 below the floor: each exits 1 naming the cause (mise's own error for the last); malformed --sarif arguments exit 2 before any analysis"
   - text: 'The pre-push hook runs it on the exported HEAD (npm run check:clean)'
-    satisfied: false
-    evidence: null
-    verified_by: null
+    satisfied: true
+    evidence: 'scripts/check-clean.mjs'
+    verified_by: 'npm run check:clean on dbd8fa8 under mise 2026.9.11, Node 24.21.0 and 26.9.0: passes npm run check and npm run codeql (0 findings); the reviewer ran it through with-pinned-node.sh as the hook does'
   - text: "CI's CodeQL job runs the same command and uploads its SARIF to code scanning; the other jobs install Node alone; actionlint accepts the workflows"
     satisfied: true
     evidence: '.github/workflows/checks.yml'
@@ -74,3 +74,16 @@ project's gate and hook checks. Decided in ADR-0012.
     `codeql: CodeQL 2.27.0 (mise.toml) is not installed; run mise install`, exit 1.
   - With a fake `codeql` printing 2.26.0:
     `... is not installed (found: codeql is 2.26.0); run mise install`, exit 1.
+- 2026-09-19: review (fence-reviewer) of dbd8fa8: no blocker. It confirmed the pins match
+  codeql-action 4.38.1 (`defaults.json` cliVersion 2.27.0; `javascript-queries` 2.4.5 at tag
+  `codeql-cli/v2.27.0`). It found the local suite is a superset of what CI ran (all 89
+  code-scanning queries are in the 203 of security-and-quality), and that Node-only mise
+  installs work with CodeQL missing. Fixed from its findings:
+  - `codeql.mjs` quoted no reason when mise refused; it now quotes mise's error.
+  - `--sarif=<path>` was ignored and a bare `--sarif` failed only after the analysis; both are
+    now usage errors that exit 2 before it.
+  - Comments and documents said "the files git would commit" and "the oldest mise"; they now
+    describe the file list and the versions actually tried.
+  - The 2.0.1 changelog section claimed that release was on npm; it was not.
+- 2026-09-19: `--sarif=<path>` writes one run with 0 results under category
+  `/language:javascript-typescript/`. Done.

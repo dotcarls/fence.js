@@ -9,9 +9,9 @@ All notable changes to this project are documented here. The format follows
 ### Fixed
 
 - 2.0.1 was tagged but never published: CodeQL failed its release pipeline on a finding in the
-  repository's documentation generator (`js/incomplete-sanitization`). The generator now writes
-  the ontology's target patterns into a code block that shows them byte for byte, and CodeQL
-  reports nothing (FJ-0022). The package's code is unchanged from 2.0.1.
+  repository's documentation generator (`js/incomplete-sanitization`), not in the package. The
+  generator now writes the ontology's target patterns into a fenced code block, which shows them
+  unchanged, and CodeQL reports nothing (FJ-0022).
 
 ### Changed
 
@@ -24,8 +24,9 @@ All notable changes to this project are documented here. The format follows
 
 ## [2.0.1] - 2026-09-19
 
-The first 2.x release on npm: 2.0.0 was tagged but its release pipeline failed before
-publishing. Besides how the package is built, checked and released, `Fence.run()` is faster.
+Tagged but never published to npm: CodeQL failed its release pipeline before the publish step,
+and a pushed tag is not moved. 2.0.2 publishes these changes. Besides how the package is built,
+checked and released, `Fence.run()` is faster.
 
 ### Fixed
 
@@ -57,7 +58,7 @@ publishing. Besides how the package is built, checked and released, `Fence.run()
 A TypeScript rewrite. See [MIGRATING.md](MIGRATING.md) for the upgrade path.
 
 Tagged but never published to npm: the release pipeline failed before the publish step, and a
-pushed tag is not moved. 2.0.1 is the first 2.x release on npm and ships this code unchanged.
+pushed tag is not moved. 2.0.2 is the first 2.x release on npm.
 
 ### Added
 

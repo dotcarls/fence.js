@@ -20,7 +20,7 @@ Node 24+ and evergreen browsers.
 ```sh
 git clone https://github.com/<you>/fence.js.git
 cd fence.js
-mise trust && mise install    # the pinned Node and CodeQL (2.7 GB; needs mise ≥ 2026.9.11)
+mise trust && mise install    # the pinned Node and CodeQL (2.7 GB on macOS; needs mise ≥ 2026.9.11)
 mise exec -- npm install      # also installs the git hooks (simple-git-hooks)
 mise exec -- npm run check    # everything CI runs, in the same order
 ```
