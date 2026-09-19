@@ -87,3 +87,12 @@ LTS, both installed with mise; the `consume` job no longer tests Node 20.19.0 an
   failed test instead of only being uploaded.
 - `ci.yml`'s concurrency group includes the event name, so a scheduled or manual run can no
   longer cancel a pending push run and skip its Pages deployment.
+
+## Amendment A1 — 2026-09-19: the trigger is a push to main
+
+Under [ADR-0013](ADR-0013-trunk-based-continuous-release-conventional-commits-semantic.md),
+`release.yml` runs on every push to `main`, not on a pushed tag: it tags a release candidate,
+runs this reusable workflow on it with the version stamped into the package, deploys Pages, and
+promotes the candidate only after every job here passed. `ci.yml` runs the same workflow on pull
+requests. The rule of this record is unchanged: nothing is deployed or published while any check
+is failing, and what is published is the tarball the checks verified.

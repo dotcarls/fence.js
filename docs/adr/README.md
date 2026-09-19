@@ -11,7 +11,7 @@ Create with `npm run adr -- new --title "..."`. A record is `proposed` until the
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: adr-index -->
-_13 decision records. Generated from front matter; run `npm run gates:fix`._
+_14 decision records. Generated from front matter; run `npm run gates:fix`._
 
 | id | title | status | date | tags |
 |---|---|---|---|---|
@@ -23,10 +23,11 @@ _13 decision records. Generated from front matter; run `npm run gates:fix`._
 | [ADR-0005](ADR-0005-no-compatibility-surface-in-2-0.md) | 2.0 ships no 1.x compatibility surface | accepted | 2026-09-16 | api, compatibility, semver |
 | [ADR-0006](ADR-0006-agentic-toolchain-and-sdlc.md) | The documentation graph, work tracking, gates, checkpoint and the agent commit policy | accepted | 2026-09-16 | process, toolchain, governance, sdlc |
 | [ADR-0007](ADR-0007-vocabulary-governance.md) | Vocabulary governance: metamodel, ontology, taxonomy and lexicon as data | accepted | 2026-09-16 | governance, vocabulary, ontology |
-| [ADR-0008](ADR-0008-release-process.md) | Release process: semantic versioning, Keep a Changelog, a release commit and tag, tag-triggered trusted publishing | accepted | 2026-09-16 | release, process, npm |
+| [ADR-0008](ADR-0008-release-process.md) | Release process: semantic versioning, Keep a Changelog, a release commit and tag, tag-triggered trusted publishing | superseded | 2026-09-16 | release, process, npm |
 | [ADR-0009](ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md) | Hermetic targets: every check depends only on the tracked tree and the pinned toolchain | accepted | 2026-09-19 | toolchain, ci, reproducibility |
 | [ADR-0010](ADR-0010-one-reusable-check-workflow-gates-pages-deployment-and-npm-p.md) | One reusable check workflow gates Pages deployment and npm publishing; main is the default branch | accepted | 2026-09-19 | ci, release, pages, process |
 | [ADR-0011](ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md) | mise manages the toolchain; the Active LTS Node is the default and the upcoming LTS the only other line tested | accepted | 2026-09-19 | toolchain, ci, node, mise |
 | [ADR-0012](ADR-0012-codeql-is-a-local-target-with-the-cli-pinned-by-mise-run-by.md) | CodeQL is a local target with the CLI pinned by mise, run by the pre-push hook and by CI | accepted | 2026-09-19 | toolchain, ci, security, codeql, mise |
+| [ADR-0013](ADR-0013-trunk-based-continuous-release-conventional-commits-semantic.md) | Trunk-based continuous release: Conventional Commits, semantic-release, candidates promoted when every check passes | accepted | 2026-09-19 | release, process, ci, npm, git |
 <!-- END GENERATED: adr-index -->
 <!-- prettier-ignore-end -->

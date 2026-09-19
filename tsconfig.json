@@ -19,5 +19,5 @@
       "fence.js": ["./src/index.ts"]
     }
   },
-  "include": ["src", "test", "examples", "tools/gates", "*.config.ts"]
+  "include": ["src", "test", "examples", "tools/gates", "tools/release", "*.config.ts"]
 }

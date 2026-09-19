@@ -34,7 +34,7 @@ index or document.
 - [gates](toolchain/gates.md) — what each gate checks and how to fix a finding
 - [agents-and-skills](toolchain/agents-and-skills.md) — hooks, skills, subagents and how work is routed to them
 - [environment](toolchain/environment.md) — required tools and versions
-- [release-process](toolchain/release-process.md) — semver, Keep a Changelog, release-it, the tag-triggered publish
+- [release-process](toolchain/release-process.md) — Conventional Commits, semantic-release, release candidates promoted from `main` when every check passes
 - **Vocabulary**
   - [metamodel](toolchain/metamodel.md) — the kinds of governed artifact and the relations between them
   - [ontology](toolchain/ontology.md) — the domain concepts and the code-to-document annotation vocabulary
@@ -66,5 +66,5 @@ index or document.
 
 - [README](../README.md) — the user-facing guide, shipped in the npm package
 - [MIGRATING](../MIGRATING.md) — 1.x to 2.0, shipped in the package
-- [CHANGELOG](../CHANGELOG.md) — Keep a Changelog, shipped in the package
+- [CHANGELOG](../CHANGELOG.md) — the hand-written record through 2.0.2, shipped in the package; later notes are GitHub releases
 - [CONTRIBUTING](../CONTRIBUTING.md) — setup, scripts, conventions

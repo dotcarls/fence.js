@@ -16,8 +16,8 @@ Decided in [ADR-0006](../adr/ADR-0006-agentic-toolchain-and-sdlc.md); the vocabu
 Every change beyond a typo is a **work item** (`docs/work/items/FJ-NNNN-<slug>.md`,
 [work-tracking](work-tracking.md)). An item carries its **acceptance criteria**, written before
 work starts, and is closed only by **evidence**: a link into the repository that proves each
-criterion. Items are grouped by **milestone**, which for this project is a release version
-(`2.0.0`, `2.1.0`) or a line (`2.x`).
+criterion. Items may be grouped by **milestone**: a goal such as `2.1.0` or a line (`2.x`). The
+version a change actually ships in is decided by the release pipeline from its commit type.
 
 Decisions that shape more than one item are **decision records** (`docs/adr/`,
 [ADR-0000](../adr/ADR-0000-adr-process.md)). An item links the ADRs that constrain it; code that
@@ -78,11 +78,12 @@ stateDiagram-v2
 
 ## Releases
 
-A release closes a milestone: `CHANGELOG.md` gains a `## [x.y.z] - YYYY-MM-DD` section, the
-version is bumped, a `Release vx.y.z` commit is tagged `vx.y.z`, and pushing the tag publishes
-with provenance. Semantic versioning decides the version: a breaking change to the public API
-or the serialization format is a major; new capability is a minor; everything else is a patch.
-The full procedure is [release-process](release-process.md).
+Releases are automated from `main` (ADR-0013). Every commit is a Conventional Commit whose type
+says what it releases: a breaking change to the public API or the serialization format is a
+major (`!`), new capability a minor (`feat`), a fix or a speedup a patch (`fix`, `perf`), and
+everything else nothing. A push that warrants a release is tagged as a release candidate,
+checked, and promoted: published with provenance, tagged `vX.Y.Z`, announced with generated
+notes. The full procedure is [release-process](release-process.md).
 
 ## Sessions
 

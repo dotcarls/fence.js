@@ -30,22 +30,24 @@ LTS line; run it locally with `MISE_NODE_VERSION=26.9.0 mise exec -- npm run che
 
 ## Scripts
 
-| Script                   | What it does                                                                                                       |
-| ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
-| `npm test`               | Runs the Vitest suite once, type-level tests included (`npm run test:watch` to watch)                              |
-| `npm run test:coverage`  | Same, with v8 coverage; thresholds are 95% across the board                                                        |
-| `npm run typecheck`      | `tsc --noEmit` over `src` and `test`                                                                               |
-| `npm run lint`           | ESLint with `typescript-eslint` strict, type-checked rules                                                         |
-| `npm run format`         | Prettier (`format:check` only verifies)                                                                            |
-| `npm run build`          | Compiles `src` to `dist` (ESM + `.d.ts`) with `tsc`                                                                |
-| `npm run examples`       | Builds `dist/`, then type-checks and runs every example in `examples/` against the built package                   |
-| `npm run check:package`  | `publint` and `@arethetypeswrong/cli` against the packed tarball                                                   |
-| `npm run bench`          | Compares fence.js with validate.js and Joi (informational)                                                         |
-| `npm run docs`           | Generates the API reference into `docs/` with TypeDoc                                                              |
-| `npm run verify:install` | Fails when `node_modules` differs from `package-lock.json` (run `npm ci`); first step of `check`                   |
-| `npm run codeql`         | CodeQL with the CLI and queries CI uses, over the files a commit would contain; fails on any finding               |
-| `npm run check:clean`    | `npm run check` and `npm run codeql` on the HEAD commit in a clean export with `npm ci`; the pre-push hook runs it |
-| `npm run check`          | Everything CI runs, in the same order                                                                              |
+| Script                    | What it does                                                                                                        |
+| ------------------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `npm test`                | Runs the Vitest suite once, type-level tests included (`npm run test:watch` to watch)                               |
+| `npm run test:coverage`   | Same, with v8 coverage; thresholds are 95% across the board                                                         |
+| `npm run typecheck`       | `tsc --noEmit` over `src` and `test`                                                                                |
+| `npm run lint`            | ESLint with `typescript-eslint` strict, type-checked rules                                                          |
+| `npm run format`          | Prettier (`format:check` only verifies)                                                                             |
+| `npm run build`           | Compiles `src` to `dist` (ESM + `.d.ts`) with `tsc`                                                                 |
+| `npm run examples`        | Builds `dist/`, then type-checks and runs every example in `examples/` against the built package                    |
+| `npm run check:package`   | `publint` and `@arethetypeswrong/cli` against the packed tarball                                                    |
+| `npm run bench`           | Compares fence.js with validate.js and Joi (informational)                                                          |
+| `npm run docs`            | Generates the API reference into `docs/` with TypeDoc                                                               |
+| `npm run verify:install`  | Fails when `node_modules` differs from `package-lock.json` (run `npm ci`); first step of `check`                    |
+| `npm run codeql`          | CodeQL with the CLI and queries CI uses, over the files a commit would contain; fails on any finding                |
+| `npm run check:clean`     | `npm run check` and `npm run codeql` on the HEAD commit in a clean export with `npm ci`; the pre-push hook runs it  |
+| `npm run check`           | Everything CI runs, in the same order                                                                               |
+| `npm run commitlint`      | Checks commit messages, e.g. `npm run commitlint -- --from origin/main`; the commit-msg hook runs it on each commit |
+| `npm run release:dry-run` | What the commits since the last release would release; tags and publishes nothing                                   |
 
 ## Layout
 
@@ -77,22 +79,36 @@ docs/           the documentation graph: index, toolchain and governance, decisi
 
 - TypeScript strict mode with `exactOptionalPropertyTypes`, `noUncheckedIndexedAccess` and
   `erasableSyntaxOnly`; relative imports use the `.js` extension.
-- Public API changes need: a behavior test, a type test when types are involved, an entry in
-  `CHANGELOG.md` (hand-maintained, Keep a Changelog format) under the upcoming version, and a
-  doc comment on the exported symbol.
+- Public API changes need: a behavior test, a type test when types are involved, a doc comment
+  on the exported symbol, and a commit message that says what changed for users: it becomes the
+  release note.
 - Errors the library raises about validation input or state are subclasses of `FenceError`;
   `TypeError` is reserved for arguments of the wrong JavaScript type (constructors, the `base`
   argument of `fromJSON`).
 - Prettier, ESLint and the related Vitest files run on staged files in the pre-commit hook; the
   pre-push hook runs `npm run check:clean`, the whole chain and CodeQL on the commit being pushed.
 
+## Commit messages
+
+Every commit is a [Conventional Commit](https://www.conventionalcommits.org/en/v1.0.0/):
+`type(optional scope): subject`, then an optional body and footers. The `commit-msg` hook refuses
+anything else, and CI checks every commit of a pull request and its title, because a squash
+merge writes the title as the commit. The type decides the release:
+
+| Type                                                        | Release | Use for                                                      |
+| ----------------------------------------------------------- | ------- | ------------------------------------------------------------ |
+| `feat`                                                      | minor   | a new capability for users of the package                    |
+| `fix`, `perf`, `revert`                                     | patch   | a bug fix, a speedup, undoing an earlier commit              |
+| `!` after the type, or a `BREAKING CHANGE:` footer          | major   | anything that can break a correct consumer                   |
+| `docs`, `test`, `refactor`, `style`, `build`, `ci`, `chore` | none    | documentation, tests, internals, dependencies, the toolchain |
+
+The subject is the release note, so write it for users of the package, and name the work item
+(`fix: explain() names the failing step (FJ-0042)`).
+
 ## Releasing
 
-Maintainers release from `main`: add the `## [X.Y.Z] - YYYY-MM-DD` section to
-`CHANGELOG.md`, then run `npm run release`, which runs the full check and CodeQL, bumps the
-version, verifies the changelog section exists, commits and tags `vX.Y.Z`, and does not push.
-Push `main` first and wait for CI to pass on the release commit, then push the tag
-([release process](docs/toolchain/release-process.md#steps)). Pushing the tag
-triggers `.github/workflows/release.yml`, which publishes to npm with provenance (npm trusted
-publishing, no token) under `latest`, or `next` for prereleases, and creates the GitHub
-release with that changelog section as its notes.
+There is nothing to do by hand. Every push to `main` whose commits warrant a release is tagged
+as a release candidate (`vX.Y.Z-rc.N`), checked, and, once every check passes, published to npm
+with provenance, tagged `vX.Y.Z` and announced as a GitHub release with notes generated from the
+commits ([release process](docs/toolchain/release-process.md)). `npm run release:dry-run` shows
+what the next release would be.

@@ -1,14 +1,14 @@
 ---
 id: ADR-0008
 title: 'Release process: semantic versioning, Keep a Changelog, a release commit and tag, tag-triggered trusted publishing'
-status: accepted
+status: superseded
 date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
 tags: [release, process, npm]
 supersedes: null
-superseded_by: null
+superseded_by: ADR-0013
 related: []
 ---
 
@@ -60,3 +60,9 @@ the tagged commit and publishes only after every job in it passes, and it refuse
 not on `main` (ADR-0010). The branch named `master` above is now `main`. The first 2.x on npm is
 2.0.1: the pushed `v2.0.0` tag is left where it is because its pipeline failed before
 publishing, and a pushed tag is not moved.
+
+## Superseded — 2026-09-19
+
+By [ADR-0013](ADR-0013-trunk-based-continuous-release-conventional-commits-semantic.md):
+releases are computed from Conventional Commits by semantic-release and made by the pipeline on
+every push to `main`, with no release commit, hand-pushed tag or hand-written changelog section.

@@ -490,7 +490,10 @@ export const lexicon: Gate = {
     },
 };
 
-/** CHANGELOG.md follows Keep a Changelog and covers the package version. */
+/**
+ * CHANGELOG.md is the hand-written record of releases through 2.0.2, in Keep a Changelog form.
+ * Release notes are generated from commits since (ADR-0013), so it takes no `[Unreleased]` entries.
+ */
 export const changelog: Gate = {
     name: 'changelog',
     run(ctx) {
@@ -503,7 +506,7 @@ export const changelog: Gate = {
             const where = `line ${String(index + 1)}`;
             if (line.startsWith('## ')) {
                 const m =
-                    /^## \[(Unreleased|\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)\](?: - (\d{4}-\d{2}-\d{2}))?\s*$/.exec(
+                    /^## \[(\d+\.\d+\.\d+(?:-[0-9A-Za-z.]+)?)\] - (\d{4}-\d{2}-\d{2})\s*$/.exec(
                         line,
                     );
                 if (!m) {
@@ -511,22 +514,14 @@ export const changelog: Gate = {
                         finding(
                             'changelog',
                             file,
-                            `${where}: heading must be '## [Unreleased]' or '## [x.y.z] - YYYY-MM-DD'`,
+                            line.startsWith('## [Unreleased]')
+                                ? `${where}: no [Unreleased] section: release notes are generated from Conventional Commits (ADR-0013)`
+                                : `${where}: heading must be '## [x.y.z] - YYYY-MM-DD'`,
                         ),
                     );
                     continue;
                 }
-                if (m[1] !== 'Unreleased') {
-                    if (!m[2])
-                        out.push(
-                            finding(
-                                'changelog',
-                                file,
-                                `${where}: released version ${m[1] ?? ''} needs a date`,
-                            ),
-                        );
-                    versions.push(m[1] ?? '');
-                }
+                versions.push(m[1] ?? '');
             } else if (line.startsWith('### ')) {
                 const category = line.slice(4).trim();
                 if (!categories.includes(category))
@@ -544,21 +539,6 @@ export const changelog: Gate = {
                         `versions must descend: ${versions[i - 1] ?? ''} then ${versions[i] ?? ''}`,
                     ),
                 );
-        }
-        const pkg = JSON.parse(ctx.read('package.json')) as { version: string };
-        const base = pkg.version.split('-')[0] ?? pkg.version;
-        if (
-            !versions.includes(pkg.version) &&
-            !versions.includes(base) &&
-            !ctx.read(file).includes('## [Unreleased]')
-        ) {
-            out.push(
-                finding(
-                    'changelog',
-                    file,
-                    `no section for package version ${pkg.version} and no [Unreleased] section`,
-                ),
-            );
         }
         return out;
     },

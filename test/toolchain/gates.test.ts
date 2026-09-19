@@ -53,7 +53,7 @@ function fixture(): string {
     write(
         root,
         'CHANGELOG.md',
-        '# Changelog\n\n## [Unreleased]\n\n## [2.0.0] - 2026-09-16\n\n### Added\n\n- Everything (FJ-0001).\n',
+        '# Changelog\n\n## [2.0.0] - 2026-09-16\n\n### Added\n\n- Everything (FJ-0001).\n',
     );
     write(
         root,
@@ -276,24 +276,22 @@ describe('gate suite', () => {
         expect(messages).toContain("line 9: 'artefact' — use 'artifact'");
     });
 
-    test('changelog: bad heading, unknown category, non-descending versions, missing package version', () => {
+    test('changelog: bad heading, [Unreleased], unknown category, non-descending versions', () => {
         const root = fixture();
         write(
             root,
             'CHANGELOG.md',
-            '# Changelog\n\n## 2.0.0\n\n### Broke\n\n## [1.0.0] - 2020-01-01\n\n## [1.5.0] - 2021-01-01\n',
+            '# Changelog\n\n## [Unreleased]\n\n## 2.0.0\n\n### Broke\n\n## [1.0.0] - 2020-01-01\n\n## [1.5.0] - 2021-01-01\n',
         );
         const messages = errors(run(root, 'changelog'));
         expect(
-            messages.some((m) =>
-                m.includes("heading must be '## [Unreleased]' or '## [x.y.z] - YYYY-MM-DD'"),
-            ),
+            messages.some((m) => m.includes("line 5: heading must be '## [x.y.z] - YYYY-MM-DD'")),
         ).toBe(true);
+        expect(messages.some((m) => m.includes('line 3: no [Unreleased] section'))).toBe(true);
         expect(messages.some((m) => m.includes("unknown category 'Broke'"))).toBe(true);
         expect(messages.some((m) => m.includes('versions must descend: 1.0.0 then 1.5.0'))).toBe(
             true,
         );
-        expect(messages.some((m) => m.includes('no section for package version 2.0.0'))).toBe(true);
     });
 
     test('ignore-files: a nested .gitignore or an .eslintignore is refused', () => {

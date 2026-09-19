@@ -1,10 +1,11 @@
 # Changelog
 
-All notable changes to this project are documented here. The format follows
-[Keep a Changelog](https://keepachangelog.com/en/1.1.0/); versions follow
+Releases after 2.0.2 are made by the release pipeline from
+[Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/): their notes are the
+[GitHub releases](https://github.com/dotcarls/fence.js/releases), generated from the commits each
+release contains. This file is the hand-written record of 2.0.2 and earlier, in
+[Keep a Changelog](https://keepachangelog.com/en/1.1.0/) form; versions follow
 [Semantic Versioning](https://semver.org/).
-
-## [Unreleased]
 
 ## [2.0.2] - 2026-09-19
 

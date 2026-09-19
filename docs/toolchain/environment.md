@@ -23,16 +23,18 @@ CodeQL included
 | Node (default)          | `mise.toml` — the current Active LTS release, used by contributors and every CI job           | 24.21.0                                                                                                                                |
 | Node (also tested)      | `MISE_NODE_VERSION` on the second leg of `check` and `consume` in `checks.yml`                | 26.9.0, the upcoming LTS (LTS from 2026-10-28); no other line is tested                                                                |
 | CodeQL                  | `mise.toml` (CLI); `QUERY_PACK` in [`scripts/codeql.mjs`](../../scripts/codeql.mjs) (queries) | CLI 2.27.0, `codeql/javascript-queries@2.4.5`, suite `javascript-security-and-quality`: what codeql-action 4.38.1 bundled (2026-09-19) |
-| Supported dev toolchain | `package.json` `devEngines` with `onFail: "error"`: npm refuses to install or run outside it  | Node `^24.15.0 \|\| >=26.0.0`, npm `>=10.9.0`                                                                                          |
+| Supported dev toolchain | `package.json` `devEngines` with `onFail: "error"`: npm refuses to install or run outside it  | Node `^24.10.0 \|\| >=26.0.0`, npm `>=10.9.0`                                                                                          |
 | Node for consumers      | `package.json` `engines`                                                                      | `^24.0.0 \|\| >=26.0.0`: the tested LTS lines, each at its latest release                                                              |
 | Dependencies            | `package-lock.json`, installed with `npm ci`                                                  | every devDependency at its latest release; see below                                                                                   |
 | Actions                 | commit SHAs in the workflows, version in a comment, updated weekly by Dependabot              | checkout 7.0.1, mise-action 4.3.0, upload-pages-artifact 5.0.0, deploy-pages 5.0.1, codeql-action/upload-sarif 4.38.1                  |
 
-The `devEngines` floor on the Node 24 line is release-it's (`^24.15.0`). The hooks — Claude
+The `devEngines` floor on the Node 24 line is semantic-release's (`^24.10.0`); `tools/release/` runs on Node's type stripping. The hooks — Claude
 Code's and git's — find the pinned Node with `mise which node`, so they work even when another
 Node is your shell's default ([agents-and-skills](agents-and-skills.md#hooks)).
 
-**The one dependency not at its latest release** is TypeScript: 6.0.3, the newest release the
+**Two dependencies are not at their latest release.** `conventional-changelog-conventionalcommits`
+is 9.3.1: its 10.x line needs `conventional-changelog-writer` 9, and semantic-release 25.0.9's
+plugins use 8 (ADR-0013); it moves when they do. TypeScript is 6.0.3, the newest release the
 latest typescript-eslint (8.70.0, `typescript <6.1.0`) and TypeDoc (0.28.20, `6.0.x`) accept.
 TypeScript 7 is adopted when both do ([ADR-0004 A1](../adr/ADR-0004-typescript-toolchain.md#amendment-a1--2026-09-19-dependency-currency-and-the-pinned-toolchain)).
 
@@ -94,6 +96,9 @@ Every CI job that does not run CodeQL installs Node alone (`install_args: node`)
   the next even-numbered release (once published) becomes the tested upcoming LTS, `devEngines`
   follows, and `engines` rises in the next major release (ADR-0011).
 - **mise:** raise the version in the workflows and `min_version` in `mise.toml` together.
+- **Release tooling:** Dependabot proposes semantic-release, its plugins and commitlint with the
+  other development dependencies; `test/toolchain/release.test.ts` runs the real semantic-release
+  against a local repository, so a behavior change fails the check.
 - **CodeQL:** move the CLI in `mise.toml` and `QUERY_PACK` in `scripts/codeql.mjs` together, to
   what the current codeql-action bundles; run `npm run codeql` and fix what it reports.
   Dependabot does not read `mise.toml`.

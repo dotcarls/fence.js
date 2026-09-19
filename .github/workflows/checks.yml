@@ -1,6 +1,6 @@
 # Every check a change must pass, as one reusable workflow (ADR-0010). Nothing runs after it
-# unless all of it succeeds: ci.yml deploys Pages only after it passes on main, and release.yml
-# publishes to npm only after it passes on the tagged commit.
+# unless all of it succeeds: ci.yml runs it on pull requests, and release.yml runs it on every push
+# to main, deploying Pages and promoting the release candidate only after it passes (ADR-0013).
 #
 # Every job installs the toolchain with mise from mise.toml, every check leg runs
 # `npm run check` and the CodeQL job runs `npm run codeql`, the same commands a contributor and
@@ -17,6 +17,24 @@ on:
         description: Upload the API reference built by the check as the Pages artifact.
         type: boolean
         default: false
+      version:
+        description: >-
+          The version to stamp into package.json before checking and packing: the release
+          candidate's, so the tarball verified is the one published. Empty leaves it as committed.
+        type: string
+        default: ''
+      commits-from:
+        description: Check the messages of the commits after this one (a push's `before`, a PR's base).
+        type: string
+        default: ''
+      commits-to:
+        description: The last commit whose message is checked; empty skips the commits job.
+        type: string
+        default: ''
+      title:
+        description: A pull request title, checked as the message a squash merge would write.
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -46,6 +64,11 @@ jobs:
           install_args: node
           cache_key_prefix: mise-node-${{ matrix.node-override || 'mise.toml' }}
       - run: npm ci --ignore-scripts
+      - name: Stamp the release version
+        if: inputs.version != ''
+        env:
+          VERSION: ${{ inputs.version }}
+        run: npm version "$VERSION" --no-git-tag-version --allow-same-version
       - run: npm run check
       - name: Upload the API reference for Pages
         if: matrix.primary && inputs.pages-artifact
@@ -68,6 +91,11 @@ jobs:
           install_args: node
           cache_key_prefix: mise-node-mise.toml
       - run: npm ci --ignore-scripts
+      - name: Stamp the release version
+        if: inputs.version != ''
+        env:
+          VERSION: ${{ inputs.version }}
+        run: npm version "$VERSION" --no-git-tag-version --allow-same-version
       - run: npm run build
       - name: Pack without lifecycle scripts (dist/ was just built)
         run: |
@@ -126,6 +154,40 @@ jobs:
             const { FenceBuilder } = require('fence.js');
             if (typeof FenceBuilder.create !== 'function') throw new Error('missing export');
             console.log('require(esm) ok on', process.version);"
+
+  commits:
+    # Conventional Commits (FJ-0026): the release is computed from these messages. A push is
+    # checked for the commits it adds, so one nonconforming commit fails its own run and no later one.
+    name: commit messages
+    if: inputs.commits-to != ''
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          version: 2026.9.11
+          install_args: node
+          cache_key_prefix: mise-node-mise.toml
+      - run: npm ci --ignore-scripts
+      - name: Check the commit messages
+        env:
+          FROM: ${{ inputs.commits-from }}
+          TO: ${{ inputs.commits-to }}
+        run: |
+          if [ -n "$FROM" ] && git merge-base --is-ancestor "$FROM" "$TO" 2>/dev/null; then
+            npx commitlint --from "$FROM" --to "$TO" --verbose
+          else
+            # A new branch, a forced push or a manual run: only the last commit has a known range.
+            git log -1 --format=%B "$TO" | npx commitlint --verbose
+          fi
+      - name: Check the pull request title
+        if: inputs.title != ''
+        env:
+          TITLE: ${{ inputs.title }}
+        run: printf '%s\n' "$TITLE" | npx commitlint --verbose
 
   codeql:
     # `npm run codeql` with the CLI mise.toml pins (ADR-0012). The SARIF goes to code scanning

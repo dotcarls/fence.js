@@ -1,9 +1,13 @@
 version: 2
 updates:
+  # Commit messages are Conventional Commits (FJ-0026): `build(deps)` and `ci(deps)` release nothing.
   - package-ecosystem: npm
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: build
+      include: scope
     groups:
       dev-dependencies:
         dependency-type: development
@@ -11,10 +15,16 @@ updates:
       # TypeScript 7 is held back until typescript-eslint and TypeDoc accept it (ADR-0004 A1).
       - dependency-name: typescript
         update-types: ['version-update:semver-major']
+      # 10.x needs conventional-changelog-writer 9; semantic-release's plugins use 8 (ADR-0013).
+      - dependency-name: conventional-changelog-conventionalcommits
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:
       interval: weekly
+    commit-message:
+      prefix: ci
+      include: scope
     groups:
       actions:
         patterns: ['*']

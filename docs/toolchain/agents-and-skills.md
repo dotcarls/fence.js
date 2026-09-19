@@ -25,6 +25,7 @@ and to run `mise trust && mise install`, rather than failing something else or r
 | `Stop`                                             | [`tools/hooks/stop-checkpoint.sh`](../../tools/hooks/stop-checkpoint.sh)                                                              | Blocks the stop while `docs/work/CHECKPOINT.md` is older than the newest change under `docs/work/items/` or `docs/adr/` (needs no toolchain), or fails `npm run checkpoint`; if the pinned Node is missing, reports that the content check did not run (`systemMessage`) instead of blocking. Honors `stop_hook_active`. |
 | `SessionStart` · `startup\|resume\|compact\|clear` | [`tools/hooks/session-start-context.sh`](../../tools/hooks/session-start-context.sh)                                                  | Prints the checkpoint summary (milestone, next action, in progress) and whether the pinned Node is installed.                                                                                                                                                                                                            |
 | git `pre-commit`                                   | `simple-git-hooks` → [`with-pinned-node.sh`](../../tools/hooks/with-pinned-node.sh) → `lint-staged` + `npm run gates`                 | Formats and lints staged files, runs the related tests, then the gate suite.                                                                                                                                                                                                                                             |
+| git `commit-msg`                                   | `simple-git-hooks` → `with-pinned-node.sh` → `commitlint --edit`: the message must be a Conventional Commit (FJ-0026)                 |
 | git `pre-push`                                     | `simple-git-hooks` → `with-pinned-node.sh` → `npm run check:clean`: the whole chain, then `npm run codeql`, on a clean export of HEAD |
 
 ## Skills (`.claude/skills/`)
@@ -33,7 +34,6 @@ and to run `mise trust && mise install`, rather than failing something else or r
 | --------------------------------------------------------- | --------------------------------------------------------------------------------------------- |
 | [`/gates`](../../.claude/skills/gates/SKILL.md)           | Run the suite, apply `--fix`, explain remaining findings.                                     |
 | [`/checkpoint`](../../.claude/skills/checkpoint/SKILL.md) | Refresh `docs/work/CHECKPOINT.md` per the [protocol](checkpoint-protocol.md) and validate it. |
-| [`/release`](../../.claude/skills/release/SKILL.md)       | Cut a release the canonical way, stopping before push and publish.                            |
 
 ## Subagents (`.claude/agents/`)
 

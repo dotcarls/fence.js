@@ -1,11 +1,9 @@
-# Runs every check on pushes to main, on pull requests, weekly (drift outside the pinned
-# toolchain) and on demand. Pages is deployed only from main, only after every check passed,
-# and deploys the exact artifact the checks built (ADR-0010).
+# Runs every check on pull requests, weekly (drift outside the pinned toolchain) and on demand.
+# A pull request's commit messages and title are checked too: a squash merge writes the title as the
+# commit on main (FJ-0026). Pushes to main run release.yml, which deploys and releases (ADR-0013).
 name: CI
 
 on:
-  push:
-    branches: [main]
   pull_request:
   schedule:
     - cron: '17 6 * * 1'
@@ -15,7 +13,6 @@ permissions:
   contents: read
 
 concurrency:
-  # Per event, so a scheduled or manual run never cancels a pending push run (and its Pages deploy).
   group: ci-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
@@ -27,22 +24,6 @@ jobs:
       contents: read
       security-events: write
     with:
-      pages-artifact: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
-
-  pages:
-    name: deploy Pages
-    needs: checks
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    runs-on: ubuntu-latest
-    permissions:
-      pages: write
-      id-token: write
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-    concurrency:
-      group: pages
-      cancel-in-progress: false
-    steps:
-      - id: deployment
-        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+      commits-from: ${{ github.event.pull_request.base.sha || '' }}
+      commits-to: ${{ github.event.pull_request.head.sha || '' }}
+      title: ${{ github.event.pull_request.title || '' }}

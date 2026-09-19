@@ -36,9 +36,12 @@ steps, builds fences, runs them, serializes them to JSON. Zero dependencies, ESM
   `npm run check`; a result that differs between here and CI is a defect
   ([ADR-0009](docs/adr/ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md),
   [ADR-0011](docs/adr/ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)).
-- **Commits are local.** Commit at coherent boundaries with the check chain green and the
-  co-author trailer; never push, never publish, never rewrite shared history. Pushing and
-  publishing are the owner's acts ([release process](docs/toolchain/release-process.md)).
+- **Commits are local and conventional.** Commit at coherent boundaries with the check chain
+  green, a [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0/) message (the
+  `commit-msg` hook enforces it; the type decides the release) and the co-author trailer; never
+  push, never tag, never publish, never rewrite shared history. A push to `main` releases
+  automatically, so pushing is the owner's act
+  ([release process](docs/toolchain/release-process.md)).
 - **Small agent pools.** At most three subagents at a time (owner's preference, 2026-09-16):
   one implementer or scribe plus one reviewer, or two reviewers with distinct mandates.
   Route by [agents-and-skills](docs/toolchain/agents-and-skills.md).

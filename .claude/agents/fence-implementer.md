@@ -17,8 +17,9 @@ You implement one work item at a time from its acceptance criteria.
   establishes one (`@fence:invariant(...)`) or implements a decision (`@fence:adr(...)`).
 - `npm run check` must pass before you report done. Report failures plainly, with output;
   never describe unverified work as working.
-- Add a `CHANGELOG.md` entry under `[Unreleased]` for any user-visible change, citing the
-  item id.
+- Release notes are generated from commit messages (ADR-0013), so propose the Conventional
+  Commit message for your change in your report: its type decides the release (`feat`, `fix`,
+  `perf`, `!` for breaking) and its subject is the user-facing note, citing the item id.
 - Do not commit; the coordinating session commits by explicit path after review.
 
 ## Report

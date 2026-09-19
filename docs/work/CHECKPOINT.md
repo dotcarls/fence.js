@@ -3,7 +3,7 @@ doc_type: checkpoint
 milestone: '2.0.2'
 updated: '2026-09-19'
 next_action: 'Owner: FJ-0025 — upgrade mise to 2026.9.11+, mise install, git push origin main; once CI on main is green (CodeQL included), git push origin v2.0.2; then verify the CDN import (FJ-0012).'
-in_progress_items: []
+in_progress_items: [FJ-0026, FJ-0027]
 session: '2026-09-19 — the owner pushed main and v2.0.1; CodeQL failed both runs (js/incomplete-sanitization in tools/gates/generate.ts), so Pages did not deploy and 2.0.1 was not published. Reproduced locally, fixed (FJ-0022), and made CodeQL a local target run by the pre-push hook and by CI with the same pinned CLI (FJ-0023, ADR-0012).'
 ---
 
@@ -24,7 +24,10 @@ pushed tag is not moved); 2.0.2 is the first 2.x on npm.
 
 ## In progress
 
-Nothing. FJ-0025 is ready and is the owner's.
+- FJ-0026 — Conventional Commits enforced locally and in CI.
+- FJ-0027 — automated trunk-based release (ADR-0013).
+
+FJ-0025 is the owner's: npm refused the v2.0.2 publish (see its notes).
 
 ## Next action
 

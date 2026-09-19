@@ -1,77 +1,121 @@
-# Publishes when a version tag is pushed, and only after every check has passed on the tagged
-# commit (ADR-0010). The tag must be on main and match package.json. npm trusted publishing
-# (OIDC) is configured on npmjs.com for this repository, this workflow file and the `npm`
-# environment; no npm token is stored anywhere. Prereleases publish under `next`. The toolchain
-# is the one mise.toml pins (ADR-0011).
+# Trunk-based continuous release (ADR-0013). Every push to main:
+#   1. candidate: when its Conventional Commits warrant a release, semantic-release names the
+#      version and HEAD is tagged vX.Y.Z-rc.N, N counting the candidates for that version;
+#   2. checks: every check, on the tarball stamped with that version (checks.yml);
+#   3. pages: the checked API reference, deployed;
+#   4. release: the candidate promoted with no human step: semantic-release tags vX.Y.Z on the same
+#      commit, publishes the verified tarball to npm with provenance (npm trusted publishing, which
+#      names this file and the `npm` environment) and creates the GitHub release with its notes.
+# A failed check leaves only the candidate tag; the next push makes the next candidate. Nothing is
+# committed to main by the pipeline. The toolchain is the one mise.toml pins (ADR-0011).
 name: Release
 
 on:
   push:
-    tags: ['v*']
+    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: read
 
 concurrency:
-  group: release-${{ github.ref }}
+  # One run at a time and none cancelled midway: each candidate is named after the releases before
+  # it. A newer push waiting here replaces an older one that has not started.
+  group: release-main
   cancel-in-progress: false
 
 jobs:
+  candidate:
+    name: release candidate
+    # A manual run may be started from any branch; only main releases or deploys.
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write # pushes the candidate tag (tags are outside main's ruleset)
+    outputs:
+      release: ${{ steps.candidate.outputs.release }}
+      version: ${{ steps.candidate.outputs.version }}
+      tag: ${{ steps.candidate.outputs.tag }}
+    steps:
+      # Full history and tags: the version is computed from the commits since the last release.
+      # The credential is kept for this job's one push, of the candidate tag.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          version: 2026.9.11
+          install_args: node
+          cache_key_prefix: mise-node-mise.toml
+      - run: npm ci --ignore-scripts
+      - id: candidate
+        run: node tools/release/release.ts candidate
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+
   checks:
+    needs: candidate
     uses: ./.github/workflows/checks.yml
     permissions:
       actions: read
       contents: read
       security-events: write
+    with:
+      version: ${{ needs.candidate.outputs.version }}
+      pages-artifact: true
+      commits-from: ${{ github.event.before || '' }}
+      commits-to: ${{ github.sha }}
 
-  publish:
+  pages:
+    name: deploy Pages
     needs: checks
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
+
+  release:
+    name: promote ${{ needs.candidate.outputs.tag }}
+    needs: [candidate, checks]
+    if: needs.candidate.outputs.release == 'true'
     runs-on: ubuntu-latest
     environment: npm
     permissions:
-      contents: write # the GitHub release
+      contents: write # the release tag and the GitHub release
       id-token: write # npm trusted publishing and provenance
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           fetch-depth: 0
           persist-credentials: false
-      # The toolchain from mise.toml, restored from no cache: nothing a previous run wrote can reach
-      # the job that holds the publishing credential. npm (bundled with Node 24.21.0: 11.19.0)
-      # exchanges the OIDC token for trusted publishing against the default registry.
+      # Restored from no cache: nothing a previous run wrote can reach the job that holds the
+      # publishing credential. npm (bundled with Node 24.21.0: 11.19.0) does the OIDC exchange.
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: 2026.9.11
           install_args: node
           cache: false
-          github_token: '' # nothing in this job needs GitHub API access from mise
-      - name: Verify the tag and derive the dist-tag and notes
-        id: meta
-        run: |
-          version="${GITHUB_REF_NAME#v}"
-          if [ "$version" != "$(node -p "require('./package.json').version")" ]; then
-            echo "::error::tag $GITHUB_REF_NAME does not match package.json"
-            exit 1
-          fi
-          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
-            echo "::error::$GITHUB_REF_NAME is not on main"
-            exit 1
-          fi
-          node scripts/changelog.mjs notes "$version" > "$RUNNER_TEMP/release-notes.md"
-          case "$version" in
-            *-*) echo "dist-tag=next" >> "$GITHUB_OUTPUT"; echo "prerelease=--prerelease" >> "$GITHUB_OUTPUT" ;;
-            *)   echo "dist-tag=latest" >> "$GITHUB_OUTPUT"; echo "prerelease=" >> "$GITHUB_OUTPUT" ;;
-          esac
+          github_token: ''
+      - run: npm ci --ignore-scripts
       - name: Download the tarball the checks verified
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
         with:
           name: package-tarball
           path: ${{ runner.temp }}/package
-      - name: Publish that tarball
-        run: npm publish "$RUNNER_TEMP"/package/fence.js-*.tgz --provenance --access public --tag "${{ steps.meta.outputs.dist-tag }}"
-      - name: GitHub release
+      # semantic-release refuses to release when main has moved past this commit; the newer run
+      # releases instead. Its verify step refuses a version other than the candidate's.
+      - name: Promote the candidate
+        run: npx semantic-release
         env:
-          GH_TOKEN: ${{ github.token }}
-        run: >-
-          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME"
-          --notes-file "$RUNNER_TEMP/release-notes.md" ${{ steps.meta.outputs.prerelease }}
+          GITHUB_TOKEN: ${{ github.token }}
+          FENCE_VERSION: ${{ needs.candidate.outputs.version }}
+          FENCE_TARBALL: ${{ runner.temp }}/package/fence.js-${{ needs.candidate.outputs.version }}.tgz

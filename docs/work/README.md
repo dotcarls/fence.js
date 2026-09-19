@@ -12,7 +12,14 @@ Template: [TEMPLATE.md](TEMPLATE.md). Create with `npm run work -- new --title "
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: work-index -->
-_25 items. Generated from front matter; run `npm run gates:fix`._
+_27 items. Generated from front matter; run `npm run gates:fix`._
+
+### in-progress (2)
+
+| id | title | type | priority | milestone | parent |
+|---|---|---|---|---|---|
+| [FJ-0026](items/FJ-0026-enforce-conventional-commits-on-every-commit.md) | Enforce Conventional Commits on every commit | task | p0 | — | — |
+| [FJ-0027](items/FJ-0027-automate-releases-from-trunk-release-candidates-promoted-whe.md) | Automate releases from trunk: release candidates promoted when every check passes | task | p0 | — | — |
 
 ### ready (1)
 

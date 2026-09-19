@@ -77,11 +77,15 @@ record, a release note); `superseded` ones stay for history and name what replac
 
 ## Version change classes
 
-| Class | Semver part | Examples                                                                                             |
-| ----- | ----------- | ---------------------------------------------------------------------------------------------------- |
-| major | X           | removing or renaming an export; changing what `fromJSON` accepts; a new serialization format version |
-| minor | Y           | a new method, option or export; accepting an input previously refused                                |
-| patch | Z           | a fix that makes documented behavior true; docs; dependencies; performance                           |
+| Class | Semver part | Commit type                                                 | Examples                                                                                             |
+| ----- | ----------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
+| major | X           | `!` or a `BREAKING CHANGE:` footer                          | removing or renaming an export; changing what `fromJSON` accepts; a new serialization format version |
+| minor | Y           | `feat`                                                      | a new method, option or export; accepting an input previously refused                                |
+| patch | Z           | `fix`, `perf`, `revert`                                     | a fix that makes documented behavior true; performance                                               |
+| none  | —           | `docs`, `build`, `ci`, `chore`, `test`, `refactor`, `style` | documentation, dependencies, the toolchain, tests, internal restructuring                            |
+
+The commit type is the classification: the release pipeline derives the version from it
+([release-process](release-process.md#what-a-commit-releases)).
 
 ## Review finding severities
 
