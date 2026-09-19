@@ -6,6 +6,13 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [2.0.2] - 2026-09-19
+
+The first 2.x release on npm. 2.0.0 and 2.0.1 were tagged but never published: their release
+pipelines failed before the publish step. This release publishes their changes (see the 2.0.1
+and 2.0.0 sections, and [MIGRATING.md](MIGRATING.md) for the upgrade from 1.x); the package's
+code is unchanged from 2.0.1.
+
 ### Fixed
 
 - 2.0.1 was tagged but never published: CodeQL failed its release pipeline on a finding in the
