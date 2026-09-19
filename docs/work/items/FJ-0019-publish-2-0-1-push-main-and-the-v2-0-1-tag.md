@@ -40,3 +40,6 @@ The owner-only half of the 2.0.1 release: agents never push or publish.
 ## Notes
 
 - 2026-09-19: created
+- 2026-09-19: ready. `git push origin main --follow-tags` pushes `main` (CI, then Pages) and `v2.0.1`
+  (the Release workflow: checks on the tagged commit, then publish). The pre-push hook runs
+  `npm run check:clean` first, under mise.

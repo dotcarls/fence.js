@@ -2,35 +2,36 @@
 doc_type: checkpoint
 milestone: '2.0.1'
 updated: '2026-09-19'
-next_action: 'Finish FJ-0018: tag the Release v2.0.1 commit v2.0.1, then record the tag in FJ-0018 and hand FJ-0019 (push) to the owner.'
-in_progress_items:
-  - FJ-0018
-session: '2026-09-19 — fixed what stopped 2.0.0 from publishing (FJ-0014 hermetic targets, FJ-0015 gated pipeline), updated dependencies (FJ-0016), renamed the default branch to main (FJ-0017), adopted mise with the Active LTS default and the upcoming LTS as the only other tested line (FJ-0020), fixed a 2.4–3.3x run() regression (FJ-0021), and applied a review of all of it.'
+next_action: 'Owner: FJ-0019 — git push origin main --follow-tags; confirm CI on main passes before Pages deploys, and that the Release workflow on v2.0.1 runs its checks before publishing; then verify the CDN import (FJ-0012).'
+in_progress_items: []
+session: '2026-09-19 — fixed what stopped 2.0.0 from publishing (FJ-0014, FJ-0015), updated dependencies (FJ-0016), renamed the default branch to main (FJ-0017), adopted mise with the Active LTS default and the upcoming LTS as the only other tested line (FJ-0020), fixed a 2.4–3.3x run() regression (FJ-0021), applied a review, and cut Release v2.0.1 with tag v2.0.1 (FJ-0018). Nothing pushed or published.'
 ---
 
 # Checkpoint
 
 ## Now
 
-**Milestone 2.0.1, at the release step.** FJ-0014 to FJ-0017, FJ-0020 and FJ-0021 are done;
-FJ-0018 (the release commit and tag) is in progress. On GitHub the default branch is already
+**Milestone 2.0.1 is cut**: `main` carries `Release v2.0.1` (6d856bf), tagged `v2.0.1`. Nothing
+is pushed; publishing is the owner's act (FJ-0019). On GitHub the default branch is already
 `main`, Pages builds from Actions, and the `github-pages` environment allows `main` only. 2.0.0
 stays tagged and unpublished (its pipeline failed; a pushed tag is not moved).
 
 ## Done
 
 - 2.0.0 milestone: FJ-0001 to FJ-0009 (FJ-0010 cancelled).
-- 2.0.1 milestone: FJ-0014, FJ-0015, FJ-0016, FJ-0017, FJ-0020, FJ-0021.
+- 2.0.1 milestone: FJ-0014, FJ-0015, FJ-0016, FJ-0017, FJ-0018, FJ-0020, FJ-0021.
 
 ## In progress
 
-- **FJ-0018 — Release 2.0.1.** This is the release commit; the tag follows it.
+Nothing. FJ-0019 is ready and is the owner's.
 
 ## Next action
 
-Commit the fixes; move `[Unreleased]` to `## [2.0.1] - 2026-09-19`; `npm version 2.0.1
---no-git-tag-version`; `npm run check:clean`; commit `Release v2.0.1`; `git tag -a v2.0.1`. Mark
-FJ-0018 done only then, and hand FJ-0019 to the owner: `git push origin main --follow-tags`.
+Owner: `git push origin main --follow-tags` (the pre-push hook runs `npm run check:clean` under
+mise first). Expect CI on `main` to pass every check before the `pages` job deploys, and the
+Release workflow on `v2.0.1` to pass every check on the tagged commit before it publishes the
+verified tarball. Then verify the CDN import (FJ-0012). Local development: `mise trust && mise
+install`, then run npm under mise; npm refuses other Node versions.
 
 ## Open questions
 

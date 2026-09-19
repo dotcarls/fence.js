@@ -2,7 +2,7 @@
 id: FJ-0018
 title: 'Release 2.0.1'
 type: release
-status: in-progress
+status: done
 priority: p0
 milestone: '2.0.1'
 created: 2026-09-19
@@ -20,9 +20,9 @@ acceptance_criteria:
     evidence: 'CHANGELOG.md'
     verified_by: 'changelog gate; node scripts/changelog.mjs check 2.0.1'
   - text: 'The Release v2.0.1 commit on main is tagged v2.0.1'
-    satisfied: false
-    evidence: null
-    verified_by: null
+    satisfied: true
+    evidence: docs/releases/README.md
+    verified_by: 'git describe --exact-match 6d856bf prints v2.0.1 (annotated)'
 links:
   code: []
   docs: []
@@ -41,3 +41,6 @@ links:
 - 2026-09-19: created
 - 2026-09-19: an earlier draft of this item claimed the release commit and tag before they existed;
   the review caught it and the claims were withdrawn. They are written after the tag exists.
+- 2026-09-19: done. `Release v2.0.1` is commit 6d856bf on `main`, tagged `v2.0.1` (annotated), after
+  `npm run check` passed on it and `npm run check:clean` passed on its parent on both Node lines.
+  Not pushed: FJ-0019.
