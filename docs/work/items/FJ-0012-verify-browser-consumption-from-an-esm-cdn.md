@@ -1,10 +1,10 @@
 ---
 id: FJ-0012
-title: "Verify browser consumption from an ESM CDN"
+title: 'Verify browser consumption from an ESM CDN'
 type: task
 status: backlog
 priority: p2
-milestone: "2.x"
+milestone: '2.x'
 created: 2026-09-16
 updated: 2026-09-16
 parent: null
@@ -12,7 +12,7 @@ blocks: []
 blocked_by: []
 owner: agent
 acceptance_criteria:
-  - text: "examples/browser.html loads fence.js from esm.sh and jsDelivr and runs in a current browser"
+  - text: 'examples/browser.html loads fence.js from esm.sh and jsDelivr and runs in a current browser'
     satisfied: false
     evidence: null
     verified_by: human

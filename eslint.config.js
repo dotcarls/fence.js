@@ -1,12 +1,16 @@
 // @ts-check
+import { fileURLToPath } from 'node:url';
+
+import { includeIgnoreFile } from '@eslint/compat';
 import js from '@eslint/js';
 import prettier from 'eslint-config-prettier';
-import { defineConfig, globalIgnores } from 'eslint/config';
+import { defineConfig } from 'eslint/config';
 import globals from 'globals';
 import tseslint from 'typescript-eslint';
 
 export default defineConfig(
-    globalIgnores(['dist/', 'coverage/', 'site/']),
+    // Ignore exactly what git ignores, so a local build or scratch file never changes the result.
+    includeIgnoreFile(fileURLToPath(new URL('.gitignore', import.meta.url))),
     js.configs.recommended,
     tseslint.configs.strictTypeChecked,
     tseslint.configs.stylisticTypeChecked,

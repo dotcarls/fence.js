@@ -1,10 +1,10 @@
 ---
 id: FJ-0002
-title: "Stabilize the 1.x toolchain on the v1 branch"
+title: 'Stabilize the 1.x toolchain on the v1 branch'
 type: story
 status: done
 priority: p1
-milestone: "1.0.2"
+milestone: '1.0.2'
 created: 2026-09-16
 updated: 2026-09-16
 parent: null
@@ -12,18 +12,18 @@ blocks: []
 blocked_by: []
 owner: agent
 acceptance_criteria:
-  - text: "The end-to-end sanity suite runs again (faker replaced) and every test passes"
+  - text: 'The end-to-end sanity suite runs again (faker replaced) and every test passes'
     satisfied: true
     evidence: docs/design/2026-09-16-v2-proposal.md
-    verified_by: "62 tests passing on branch v1 (jest), recorded in the design record appendix A"
-  - text: "The lint script covers src/lib, tests and examples"
+    verified_by: '62 tests passing on branch v1 (jest), recorded in the design record appendix A'
+  - text: 'The lint script covers src/lib, tests and examples'
     satisfied: true
     evidence: docs/design/2026-09-16-v2-proposal.md
-    verified_by: "npm run lint on branch v1"
-  - text: "Travis is replaced by a GitHub Actions matrix"
+    verified_by: 'npm run lint on branch v1'
+  - text: 'Travis is replaced by a GitHub Actions matrix'
     satisfied: true
     evidence: docs/design/2026-09-16-v2-proposal.md
-    verified_by: "human: .github/workflows/ci.yml exists on branch v1"
+    verified_by: 'human: .github/workflows/ci.yml exists on branch v1'
 links:
   code: []
   docs: [docs/design/2026-09-16-v2-proposal.md]

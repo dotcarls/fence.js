@@ -6,18 +6,41 @@ status: living
 
 # Release process
 
-Decided in [ADR-0008](../adr/ADR-0008-release-process.md). Semantic versioning, Keep a Changelog,
-one release commit and one annotated tag on `master`, publication by a tag-triggered workflow
-using npm trusted publishing. Nothing here is published from a laptop.
+Decided in [ADR-0008](../adr/ADR-0008-release-process.md) and
+[ADR-0010](../adr/ADR-0010-one-reusable-check-workflow-gates-pages-deployment-and-npm-p.md).
+Semantic versioning, Keep a Changelog, one release commit and one annotated tag on `main`,
+publication by a tag-triggered workflow that waits for every check to pass and uses npm trusted
+publishing. Nothing is published from a laptop, and nothing is published or deployed while any
+check is failing.
+
+## The pipeline
+
+```mermaid
+flowchart LR
+    subgraph checks["checks.yml (reusable)"]
+        c1["npm run check · Node from .nvmrc"]
+        c2["npm run check · Node 22.23.2"]
+        c3["npm run check · Node 26.9.0"]
+        c4["consume · Node 20.19.0 / 22.12.0"]
+        c5["CodeQL"]
+    end
+    push["push to main"] --> ci["ci.yml"] --> checks
+    checks -->|all passed| pages["deploy Pages (artifact built by the checks)"]
+    tag["push tag vX.Y.Z"] --> rel["release.yml"] --> checks2["checks.yml on the tagged commit"]
+    checks2 -->|all passed| publish["verify tag on main and = package.json → npm publish --provenance → GitHub release"]
+```
 
 ## Versioning
 
-| Change                                                                         | Version part |
-| ------------------------------------------------------------------------------ | ------------ |
-| Public API or serialization format change that can break a correct consumer   | major        |
-| New capability, new export, wider input accepted                               | minor        |
-| Everything else: fixes, docs, dependencies, performance                         | patch        |
-| Not yet stable for a version                                                   | `-beta.N` prerelease; published under the `next` dist-tag |
+| Change                                                                      | Version part                                              |
+| --------------------------------------------------------------------------- | --------------------------------------------------------- |
+| Public API or serialization format change that can break a correct consumer | major                                                     |
+| New capability, new export, wider input accepted                            | minor                                                     |
+| Everything else: fixes, docs, dependencies, performance                     | patch                                                     |
+| Not yet stable for a version                                                | `-beta.N` prerelease; published under the `next` dist-tag |
+
+A tag that has been pushed is never moved or reused. If a tagged release fails before it is
+published, the fix ships as the next patch (2.0.0 → 2.0.1).
 
 ## Steps
 
@@ -25,13 +48,10 @@ using npm trusted publishing. Nothing here is published from a laptop.
    `npm run gates` is green.
 2. **Write the changelog section.** Move the `[Unreleased]` entries into
    `## [x.y.z] - YYYY-MM-DD`, Keep a Changelog categories only (Added · Changed · Deprecated ·
-   Removed · Fixed · Security). Cite work item ids where an entry realizes one. The `changelog`
-   gate checks the shape.
-3. **Run the whole chain.** `npm run check`.
-4. **Bump, commit, tag.** `npm run release` does this from `master` when a remote is configured:
-   it runs the check, bumps `package.json`, verifies the changelog section exists
-   (`scripts/check-changelog.mjs`), commits `Release vx.y.z`, tags `vx.y.z` and pushes. Without
-   a remote, or when an agent prepares the release, the equivalent by hand is:
+   Removed · Fixed · Security), citing work item ids. The `changelog` gate checks the shape;
+   `node scripts/changelog.mjs check x.y.z` checks the section exists.
+3. **Run the whole chain.** `npm run check` (CI runs exactly this).
+4. **Bump, commit, tag.** On `main` with a clean tree:
 
    ```sh
    npm version x.y.z --no-git-tag-version
@@ -39,16 +59,20 @@ using npm trusted publishing. Nothing here is published from a laptop.
    git tag -a vx.y.z -m "Release vx.y.z"
    ```
 
-5. **Publish (owner only).** `git push origin master --follow-tags`. The tag triggers
-   `.github/workflows/release.yml`: check chain, `npm publish --provenance` (dist-tag `latest`,
-   or `next` for a prerelease) and a GitHub release whose notes are the changelog section.
-   Trusted publishing must be configured once on npmjs.com for this repository and workflow.
+   `npm run release` (release-it) does the same and pushes, when the owner runs it.
+
+5. **Publish (owner only).** `git push origin main --follow-tags`. The push runs CI on `main`
+   (and deploys Pages when it passes); the tag runs `release.yml`, which runs every check on
+   the tagged commit and only then publishes under `latest` (or `next`) with provenance and
+   creates the GitHub release from `node scripts/changelog.mjs notes x.y.z`. Trusted publishing
+   is configured on npmjs.com for this repository, `release.yml` and the `npm` environment.
 6. **Checkpoint.** Refresh `docs/work/CHECKPOINT.md`; open the next milestone.
 
 ## What ships
 
 `npm pack` contains `dist/`, `src/`, `README.md`, `MIGRATING.md`, `CHANGELOG.md`, `LICENSE` and
-`package.json`; `publint` and `attw` check the shape in the chain.
+`package.json`; `publint` and `attw` check the shape, and the `consume` job installs the tarball
+by name on the oldest supported Node lines.
 
 ## Maintenance lines
 

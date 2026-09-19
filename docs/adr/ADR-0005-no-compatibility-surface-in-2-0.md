@@ -1,8 +1,8 @@
 ---
 id: ADR-0005
-title: "2.0 ships no 1.x compatibility surface"
+title: '2.0 ships no 1.x compatibility surface'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -23,10 +23,10 @@ and other residual content be removed.
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
+| Option                                                                                            | Pros                                          | Cons                                                              |
+| ------------------------------------------------------------------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------- |
 | Remove every alias and the v1 importer in 2.0; document each replacement and a conversion snippet | One API to learn, test and type; no dead code | 1.x callers must edit every call site (TypeScript points at each) |
-| Keep aliases through 2.x, remove in 3.0 | Gradual | Two names for everything; tests and docs for both |
+| Keep aliases through 2.x, remove in 3.0                                                           | Gradual                                       | Two names for everything; tests and docs for both                 |
 
 ## Decision
 

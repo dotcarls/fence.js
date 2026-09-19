@@ -1,4 +1,5 @@
 {
+  "$comment": "The one project every tool uses (editors, eslint's project service, `npm run typecheck`, TypeDoc). `fence.js` maps to src/ so no tool depends on build output. examples/tsconfig.dist.json checks the same examples against dist/.",
   "compilerOptions": {
     "target": "ES2022",
     "lib": ["ES2022"],
@@ -13,7 +14,10 @@
     "isolatedModules": true,
     "erasableSyntaxOnly": true,
     "skipLibCheck": true,
-    "noEmit": true
+    "noEmit": true,
+    "paths": {
+      "fence.js": ["./src/index.ts"]
+    }
   },
-  "include": ["src", "test", "tools/gates", "*.config.ts"]
+  "include": ["src", "test", "examples", "tools/gates", "*.config.ts"]
 }

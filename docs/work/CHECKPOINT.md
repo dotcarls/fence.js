@@ -1,46 +1,43 @@
 ---
 doc_type: checkpoint
-milestone: "2.0.0"
-updated: "2026-09-16"
-next_action: "Owner: complete FJ-0010 — configure npm trusted publishing for this repository and workflow, then `git push origin master --follow-tags` so the Release workflow publishes 2.0.0; afterwards decide FJ-0013 and open 2.1.0 with FJ-0011."
-in_progress_items: []
-session: "2026-09-16 — removed the 1.x compatibility surface (FJ-0007), scaffolded the agentic toolchain and governance (FJ-0008), merged v2 into master and cut Release v2.0.0 with tag v2.0.0 (FJ-0009). Nothing pushed or published."
+milestone: '2.0.1'
+updated: '2026-09-19'
+next_action: 'Verify FJ-0014 (every target hermetic) in a fresh clone and a stale working tree on all three Node lines, then close FJ-0014 to FJ-0017, rename the GitHub branch and Pages settings, and cut FJ-0018.'
+in_progress_items:
+  - FJ-0014
+  - FJ-0015
+  - FJ-0016
+  - FJ-0017
+session: '2026-09-19 — the owner pushed 2.0.0; CI and the release failed at eslint. Fixing hermeticity (FJ-0014), CI gating (FJ-0015), dependency currency (FJ-0016) and the branch rename (FJ-0017) for 2.0.1.'
 ---
 
 # Checkpoint
 
 ## Now
 
-**Milestone 2.0.0 is cut**: `master` carries the `Release v2.0.0` commit and the `v2.0.0` tag.
-Nothing has been pushed or published; that is the owner's act (FJ-0010). `v1` carries the
-stabilized 1.x toolchain (FJ-0013 decides whether it is released).
+**Milestone 2.0.1.** 2.0.0 was tagged and pushed but never published: CI and the release job
+failed at `eslint`. The fixes are implemented in the working tree on the local `main` branch and
+are being verified.
 
 ## Done
 
-- FJ-0002 — the 1.x toolchain stabilized on `v1`.
-- FJ-0003 — toolchain replaced, code ported to TypeScript.
-- FJ-0004 — the core rewritten; serialization format 2.
-- FJ-0005 — two review rounds; every major finding fixed.
-- FJ-0006 — README, MIGRATING, CHANGELOG.
-- FJ-0007 — the 1.x compatibility surface removed.
-- FJ-0008 — the agentic toolchain and governance scaffold.
-- FJ-0009 — Release 2.0.0: merged, committed, tagged.
+- 2.0.0 milestone: FJ-0001 to FJ-0009 (FJ-0010 cancelled: 2.0.0 is never published).
 
 ## In progress
 
-Nothing. The next items are the owner's (FJ-0010, FJ-0013) or need an ADR first (FJ-0011).
+- **FJ-0014** — hermetic targets: implemented; verification in a fresh clone pending.
+- **FJ-0015** — reusable checks gate Pages and publishing: workflows written, actionlint clean.
+- **FJ-0016** — dependencies at latest (TypeScript held at 6.0.3): lockfile regenerated.
+- **FJ-0017** — `main`: local branch renamed; GitHub branch, Pages and environment pending.
 
 ## Next action
 
-Owner: on npmjs.com, add trusted publishing for `dotcarls/fence.js` with workflow
-`release.yml` (environment `npm`), then `git push origin master --follow-tags`. The Release
-workflow runs the check chain, publishes 2.0.0 under `latest` with provenance and creates the
-GitHub release from the changelog section; the Docs workflow publishes the API reference. Then
-verify the CDN import (FJ-0012), decide the 1.x line (FJ-0013), and start 2.1.0 by writing the
-async-validators ADR (FJ-0011).
+Run every target alone and `npm run check` in a fresh clone (no `dist/`) and in the working tree
+with a stale `dist/`, on Node 24.21.0, 22.23.2 and 26.9.0; record the results in FJ-0014; commit;
+rename the GitHub branch and switch Pages to Actions; cut 2.0.1 (FJ-0018). FJ-0019 is the owner's.
 
 ## Open questions
 
 - FJ-0013 — whether to release 1.0.2 from `v1` (owner).
 - FJ-0011 — async validators need an ADR before they are ready (2.1.0).
-- FJ-0012 — the ESM CDN import is unverified until 2.0.0 is on npm.
+- FJ-0012 — the ESM CDN import is unverified until a 2.x is on npm.

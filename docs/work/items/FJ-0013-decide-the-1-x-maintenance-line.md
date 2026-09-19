@@ -1,6 +1,6 @@
 ---
 id: FJ-0013
-title: "Decide the 1.x maintenance line"
+title: 'Decide the 1.x maintenance line'
 type: decision
 status: backlog
 priority: p3
@@ -12,7 +12,7 @@ blocks: []
 blocked_by: []
 owner: Tim Carlson
 acceptance_criteria:
-  - text: "The owner has decided whether to release 1.0.2 from the v1 branch and the decision is recorded (an ADR or a note here)"
+  - text: 'The owner has decided whether to release 1.0.2 from the v1 branch and the decision is recorded (an ADR or a note here)'
     satisfied: false
     evidence: null
     verified_by: human

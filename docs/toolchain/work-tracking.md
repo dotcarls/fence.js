@@ -13,21 +13,21 @@ index is [`docs/work/README.md`](../work/README.md); the lifecycle is in [sdlc](
 
 ## Front matter
 
-| Field                    | Meaning                                                                                                  |
-| ------------------------ | -------------------------------------------------------------------------------------------------------- |
-| `id`                     | `FJ-NNNN`, allocated by `npm run work -- new`                                                            |
-| `title`                  | 3–120 characters; also the file slug                                                                     |
-| `type`                   | `epic` · `story` · `task` · `bug` · `spike` · `decision` · `release` ([taxonomy](taxonomy.md))            |
-| `status`                 | `backlog` → `ready` → `in-progress` → `review` → `done`; also `blocked`, `cancelled`                     |
-| `priority`               | `p0` (blocks the milestone) · `p1` · `p2` · `p3`                                                          |
-| `milestone`              | The release the item ships in: a version (`2.1.0`), a line (`2.x`) or `null`                              |
-| `parent`                 | The epic or story this belongs to                                                                        |
-| `blocks` / `blocked_by`  | Dependency edges, kept symmetric (the gate refuses a one-sided edge)                                     |
-| `blocked_reason`         | Required when `status: blocked` and `blocked_by` is empty                                                |
-| `owner`                  | Who must act: `agent`, or a person's name when only they can (a push, an approval)                        |
-| `acceptance_criteria[]`  | `{text, satisfied, evidence, verified_by}`                                                               |
-| `links`                  | `code[]`, `docs[]`, `tests[]`, `adrs[]` — repository paths or ids; all must resolve                       |
-| `created` / `updated`    | ISO dates. Status history is git's job (`git log --follow`), not the file's.                              |
+| Field                   | Meaning                                                                                        |
+| ----------------------- | ---------------------------------------------------------------------------------------------- |
+| `id`                    | `FJ-NNNN`, allocated by `npm run work -- new`                                                  |
+| `title`                 | 3–120 characters; also the file slug                                                           |
+| `type`                  | `epic` · `story` · `task` · `bug` · `spike` · `decision` · `release` ([taxonomy](taxonomy.md)) |
+| `status`                | `backlog` → `ready` → `in-progress` → `review` → `done`; also `blocked`, `cancelled`           |
+| `priority`              | `p0` (blocks the milestone) · `p1` · `p2` · `p3`                                               |
+| `milestone`             | The release the item ships in: a version (`2.1.0`), a line (`2.x`) or `null`                   |
+| `parent`                | The epic or story this belongs to                                                              |
+| `blocks` / `blocked_by` | Dependency edges, kept symmetric (the gate refuses a one-sided edge)                           |
+| `blocked_reason`        | Required when `status: blocked` and `blocked_by` is empty                                      |
+| `owner`                 | Who must act: `agent`, or a person's name when only they can (a push, an approval)             |
+| `acceptance_criteria[]` | `{text, satisfied, evidence, verified_by}`                                                     |
+| `links`                 | `code[]`, `docs[]`, `tests[]`, `adrs[]` — repository paths or ids; all must resolve            |
+| `created` / `updated`   | ISO dates. Status history is git's job (`git log --follow`), not the file's.                   |
 
 ## Rules (the `work-items` gate)
 

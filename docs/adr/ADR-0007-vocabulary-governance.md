@@ -1,8 +1,8 @@
 ---
 id: ADR-0007
-title: "Vocabulary governance: metamodel, ontology, taxonomy and lexicon as data"
+title: 'Vocabulary governance: metamodel, ontology, taxonomy and lexicon as data'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -22,10 +22,10 @@ across documents. The owner asked for a canonical metamodel, ontology, taxonomy 
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
+| Option                                                                                                                                                                                         | Pros                                                                   | Cons                                                                           |
+| ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
 | Four documents, each with a machine mirror where enforcement is possible (ontology and lexicon JSON, schema enums), tables rendered from the mirrors, gates enforcing spelling and annotations | Cannot drift; enforceable where it matters; readable where it does not | Two places to edit for a governed term (the JSON and, for prose, the document) |
-| Prose glossary only | Easy | Nothing checks it |
+| Prose glossary only                                                                                                                                                                            | Easy                                                                   | Nothing checks it                                                              |
 
 ## Decision
 

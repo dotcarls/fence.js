@@ -1,7 +1,7 @@
-# Publishes to npm with provenance when a version tag is pushed (release-it pushes the tag).
-# Requires npm "trusted publishing" to be configured for this repository and workflow on
-# npmjs.com; no npm token is stored in GitHub. Prereleases (2.0.0-beta.1) are published under
-# the "next" dist-tag and marked as GitHub prereleases; stable versions become "latest".
+# Publishes when a version tag is pushed, and only after every check has passed on the tagged
+# commit (ADR-0010). The tag must be on main and match package.json. npm trusted publishing
+# (OIDC) is configured on npmjs.com for this repository, this workflow file and the `npm`
+# environment; no npm token is stored anywhere. Prereleases publish under `next`.
 name: Release
 
 on:
@@ -9,49 +9,60 @@ on:
     tags: ['v*']
 
 permissions:
-  contents: write
-  id-token: write
+  contents: read
+
+concurrency:
+  group: release-${{ github.ref }}
+  cancel-in-progress: false
 
 jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+
   publish:
+    needs: checks
     runs-on: ubuntu-latest
     environment: npm
+    permissions:
+      contents: write # the GitHub release
+      id-token: write # npm trusted publishing and provenance
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          node-version: 24
-          cache: npm
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+        with:
+          node-version-file: .nvmrc
           registry-url: https://registry.npmjs.org
-      - run: npm install -g npm@latest
-      - run: npm ci --ignore-scripts
-      - run: npm run check
-      - name: Determine version, dist-tag and release notes
+          package-manager-cache: false
+      - name: Verify the tag and derive the dist-tag and notes
         id: meta
         run: |
           version="${GITHUB_REF_NAME#v}"
           if [ "$version" != "$(node -p "require('./package.json').version")" ]; then
-            echo "tag $GITHUB_REF_NAME does not match package.json version" >&2
+            echo "::error::tag $GITHUB_REF_NAME does not match package.json"
             exit 1
           fi
+          if ! git merge-base --is-ancestor "$GITHUB_SHA" origin/main; then
+            echo "::error::$GITHUB_REF_NAME is not on main"
+            exit 1
+          fi
+          node scripts/changelog.mjs notes "$version" > "$RUNNER_TEMP/release-notes.md"
           case "$version" in
-            *-*) echo "tag=next" >> "$GITHUB_OUTPUT"; echo "prerelease=--prerelease" >> "$GITHUB_OUTPUT" ;;
-            *)   echo "tag=latest" >> "$GITHUB_OUTPUT"; echo "prerelease=" >> "$GITHUB_OUTPUT" ;;
+            *-*) echo "dist-tag=next" >> "$GITHUB_OUTPUT"; echo "prerelease=--prerelease" >> "$GITHUB_OUTPUT" ;;
+            *)   echo "dist-tag=latest" >> "$GITHUB_OUTPUT"; echo "prerelease=" >> "$GITHUB_OUTPUT" ;;
           esac
-          for section in "$version" "${version%%-*}"; do
-            awk -v v="$section" '
-              $0 ~ "^## \\[" v "\\]" { on = 1; next }
-              on && /^## \[/ { exit }
-              on { print }
-            ' CHANGELOG.md > release-notes.md
-            [ -s release-notes.md ] && break
-          done
-          if [ ! -s release-notes.md ]; then
-            echo "CHANGELOG.md has no section for $version" >&2
-            exit 1
-          fi
-      - run: npm publish --provenance --access public --tag "${{ steps.meta.outputs.tag }}"
+      - run: npm ci --ignore-scripts
+      - name: Publish (prepack builds dist/ from a clean tree)
+        run: npm publish --provenance --access public --tag "${{ steps.meta.outputs.dist-tag }}"
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}
-        run: gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME" --notes-file release-notes.md ${{ steps.meta.outputs.prerelease }}
+        run: >-
+          gh release create "$GITHUB_REF_NAME" --verify-tag --title "$GITHUB_REF_NAME"
+          --notes-file "$RUNNER_TEMP/release-notes.md" ${{ steps.meta.outputs.prerelease }}

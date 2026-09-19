@@ -1,7 +1,12 @@
+# The single ignore list for every tool: git, the gate walker (git ls-files), ESLint
+# (includeIgnoreFile) and Prettier (which reads .gitignore by default).
 node_modules/
 dist/
 coverage/
 site/
 *.tsbuildinfo
-.DS_Store
 *.tgz
+.DS_Store
+# Claude Code: per-user settings and agent worktrees are not this tree's content.
+.claude/settings.local.json
+.claude/worktrees/

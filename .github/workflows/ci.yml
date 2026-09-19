@@ -1,57 +1,47 @@
+# Runs every check on pushes to main, on pull requests, weekly (CodeQL, drift in the pinned
+# toolchain) and on demand. Pages is deployed only from main, only after every check passed,
+# and deploys the exact artifact the checks built (ADR-0010).
 name: CI
 
 on:
   push:
-    branches: [master]
+    branches: [main]
   pull_request:
+  schedule:
+    - cron: '17 6 * * 1'
+  workflow_dispatch:
 
 permissions:
   contents: read
 
-jobs:
-  check:
-    name: Node ${{ matrix.node }}
-    runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [22, 24, 26]
-    steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: ${{ matrix.node }}
-          cache: npm
-      - run: npm ci --ignore-scripts
-      - run: npm run gates
-      - run: npm run typecheck
-      - run: npm run lint
-      - run: npm run format:check
-      - run: npm run test:coverage
-      - run: npm run build
-      - run: npm run typecheck:examples
-      - run: npm run examples
-      - run: npm run check:package
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
-  consume:
-    # The published package supports Node >= 20.19 even though the dev toolchain needs 22+.
-    name: Import on Node ${{ matrix.node }}
+jobs:
+  checks:
+    uses: ./.github/workflows/checks.yml
+    permissions:
+      actions: read
+      contents: read
+      security-events: write
+    with:
+      pages-artifact: ${{ github.event_name == 'push' && github.ref == 'refs/heads/main' }}
+
+  pages:
+    name: deploy Pages
+    needs: checks
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        node: [20]
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    concurrency:
+      group: pages
+      cancel-in-progress: false
     steps:
-      - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
-        with:
-          node-version: 22
-          cache: npm
-      - run: npm ci --ignore-scripts
-      - run: npm run build
-      - uses: actions/setup-node@v5
-        with:
-          node-version: ${{ matrix.node }}
-      - name: Import the built package as ESM and as CommonJS
-        run: |
-          node --input-type=module -e "import('./dist/index.js').then((m) => { if (typeof m.FenceBuilder !== 'function') throw new Error('missing export'); console.log('esm ok', process.version); })"
-          node -e "const m = require('./dist/index.js'); if (typeof m.FenceBuilder !== 'function') throw new Error('missing export'); console.log('cjs require(esm) ok', process.version)"
+      - id: deployment
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1

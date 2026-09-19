@@ -9,8 +9,9 @@ status: living
 Format and process: [ADR-0000](ADR-0000-adr-process.md). Template: [TEMPLATE.md](TEMPLATE.md).
 Create with `npm run adr -- new --title "..."`. A record is `proposed` until the owner accepts it.
 
+<!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: adr-index -->
-_9 decision records. Generated from front matter; run `npm run gates:fix`._
+_11 decision records. Generated from front matter; run `npm run gates:fix`._
 
 | id | title | status | date | tags |
 |---|---|---|---|---|
@@ -23,4 +24,7 @@ _9 decision records. Generated from front matter; run `npm run gates:fix`._
 | [ADR-0006](ADR-0006-agentic-toolchain-and-sdlc.md) | The documentation graph, work tracking, gates, checkpoint and the agent commit policy | accepted | 2026-09-16 | process, toolchain, governance, sdlc |
 | [ADR-0007](ADR-0007-vocabulary-governance.md) | Vocabulary governance: metamodel, ontology, taxonomy and lexicon as data | accepted | 2026-09-16 | governance, vocabulary, ontology |
 | [ADR-0008](ADR-0008-release-process.md) | Release process: semantic versioning, Keep a Changelog, a release commit and tag, tag-triggered trusted publishing | accepted | 2026-09-16 | release, process, npm |
+| [ADR-0009](ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md) | Hermetic targets: every check depends only on the tracked tree and the pinned toolchain | accepted | 2026-09-19 | toolchain, ci, reproducibility |
+| [ADR-0010](ADR-0010-one-reusable-check-workflow-gates-pages-deployment-and-npm-p.md) | One reusable check workflow gates Pages deployment and npm publishing; main is the default branch | accepted | 2026-09-19 | ci, release, pages, process |
 <!-- END GENERATED: adr-index -->
+<!-- prettier-ignore-end -->

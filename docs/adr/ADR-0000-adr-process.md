@@ -1,8 +1,8 @@
 ---
 id: ADR-0000
-title: "ADR format and process"
+title: 'ADR format and process'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -22,11 +22,11 @@ work items and code, and mechanically indexed, or they are re-litigated.
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
-| Nygard-style ADRs with an options table (MADR flavored), YAML front matter, one file per record | Boring, universal, greppable, diffable; front matter enables schema validation and a generated index | Writing discipline |
-| Decisions inline in the proposal or README | No new files | Not addressable; edits erase history |
-| GitHub Discussions / issues | Familiar | Off-repository; not versioned with the code |
+| Option                                                                                          | Pros                                                                                                 | Cons                                        |
+| ----------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- | ------------------------------------------- |
+| Nygard-style ADRs with an options table (MADR flavored), YAML front matter, one file per record | Boring, universal, greppable, diffable; front matter enables schema validation and a generated index | Writing discipline                          |
+| Decisions inline in the proposal or README                                                      | No new files                                                                                         | Not addressable; edits erase history        |
+| GitHub Discussions / issues                                                                     | Familiar                                                                                             | Off-repository; not versioned with the code |
 
 ## Decision
 

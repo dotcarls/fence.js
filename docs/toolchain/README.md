@@ -14,20 +14,20 @@ than a review. Decided in [ADR-0006](../adr/ADR-0006-agentic-toolchain-and-sdlc.
 
 ## Pieces
 
-| Piece                                          | Where                                                     | Doc                                                                |
-| ---------------------------------------------- | --------------------------------------------------------- | ------------------------------------------------------------------ |
-| Thin always-loaded entry point                 | [`CLAUDE.md`](../../CLAUDE.md)                            | [documentation-layout](documentation-layout.md)                    |
-| Documentation index (graph root)               | [`docs/INDEX.md`](../INDEX.md)                            | [documentation-layout](documentation-layout.md)                    |
-| Work tracker (one file per item)               | `docs/work/items/`                                        | [work-tracking](work-tracking.md), [sdlc](sdlc.md)                 |
-| Checkpoint / resume                            | [`docs/work/CHECKPOINT.md`](../work/CHECKPOINT.md)        | [checkpoint-protocol](checkpoint-protocol.md)                      |
-| Decision records                               | `docs/adr/`                                               | [ADR-0000](../adr/ADR-0000-adr-process.md)                         |
-| Gate tool                                      | `tools/gates/`, `tools/gates.json`, `tools/schemas/`      | [gates](gates.md)                                                  |
-| Vocabulary (machine mirrors)                   | `tools/ontology.json`, `tools/lexicon.json`               | [ontology](ontology.md), [lexicon](lexicon.md), [taxonomy](taxonomy.md) |
-| Hooks (on edit, on stop, on session start)     | [`.claude/settings.json`](../../.claude/settings.json), `tools/hooks/` | [agents-and-skills](agents-and-skills.md)                |
-| Git hooks (pre-commit, pre-push)               | `package.json` → `simple-git-hooks`, `lint-staged`         | [gates](gates.md)                                                  |
-| Skills and subagents                           | `.claude/skills/`, `.claude/agents/`                      | [agents-and-skills](agents-and-skills.md)                          |
-| The check chain (CI)                           | `npm run check`, `.github/workflows/ci.yml`               | [environment](environment.md)                                      |
-| Release                                        | `.release-it.json`, `.github/workflows/release.yml`       | [release-process](release-process.md)                              |
+| Piece                                             | Where                                                                        | Doc                                                                     |
+| ------------------------------------------------- | ---------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Thin always-loaded entry point                    | [`CLAUDE.md`](../../CLAUDE.md)                                               | [documentation-layout](documentation-layout.md)                         |
+| Documentation index (graph root)                  | [`docs/INDEX.md`](../INDEX.md)                                               | [documentation-layout](documentation-layout.md)                         |
+| Work tracker (one file per item)                  | `docs/work/items/`                                                           | [work-tracking](work-tracking.md), [sdlc](sdlc.md)                      |
+| Checkpoint / resume                               | [`docs/work/CHECKPOINT.md`](../work/CHECKPOINT.md)                           | [checkpoint-protocol](checkpoint-protocol.md)                           |
+| Decision records                                  | `docs/adr/`                                                                  | [ADR-0000](../adr/ADR-0000-adr-process.md)                              |
+| Gate tool                                         | `tools/gates/`, `tools/gates.json`, `tools/schemas/`                         | [gates](gates.md)                                                       |
+| Vocabulary (machine mirrors)                      | `tools/ontology.json`, `tools/lexicon.json`                                  | [ontology](ontology.md), [lexicon](lexicon.md), [taxonomy](taxonomy.md) |
+| Hooks (on edit, on stop, on session start)        | [`.claude/settings.json`](../../.claude/settings.json), `tools/hooks/`       | [agents-and-skills](agents-and-skills.md)                               |
+| Git hooks (pre-commit, pre-push)                  | `package.json` → `simple-git-hooks`, `lint-staged`                           | [gates](gates.md)                                                       |
+| Skills and subagents                              | `.claude/skills/`, `.claude/agents/`                                         | [agents-and-skills](agents-and-skills.md)                               |
+| The check chain (CI runs the same command)        | `npm run check`, `.github/workflows/checks.yml`, `ci.yml`                    | [environment](environment.md)                                           |
+| Release (publishes only after every check passes) | `.release-it.json`, `scripts/changelog.mjs`, `.github/workflows/release.yml` | [release-process](release-process.md)                                   |
 
 ## Principles
 
@@ -42,7 +42,10 @@ than a review. Decided in [ADR-0006](../adr/ADR-0006-agentic-toolchain-and-sdlc.
 4. **Fast enough to run on every edit.** The suite runs in well under two seconds on this
    repository and is wired to the Claude Code `PostToolUse` hook and to the git pre-commit hook.
 5. **Offline.** No gate touches the network.
-6. **Vocabulary is data.** The kinds, invariants, classifications and spellings the documents
+6. **Hermetic.** Every target depends only on the tracked tree and the pinned toolchain, so a
+   result that differs between a laptop and CI is a defect to fix, not a flake to rerun
+   ([ADR-0009](../adr/ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md)).
+7. **Vocabulary is data.** The kinds, invariants, classifications and spellings the documents
    use are held in machine files; the human documents render tables from them, so the two
    cannot drift ([ADR-0007](../adr/ADR-0007-vocabulary-governance.md)).
 

@@ -1,11 +1,10 @@
-import { readdirSync, readFileSync, statSync } from 'node:fs';
-import { join, relative, sep } from 'node:path';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readFileSync, statSync } from 'node:fs';
+import { join } from 'node:path';
 
 import { parse as parseYaml } from 'yaml';
 
 import type { Context, GatesConfig } from './types.js';
-
-const SKIP_DIRS = new Set(['node_modules', '.git', 'dist', 'site', 'coverage']);
 
 /** Converts a repository glob (`**`, `*`, `?`) into an anchored regular expression. */
 export function globToRegExp(glob: string): RegExp {
@@ -29,21 +28,26 @@ export function globToRegExp(glob: string): RegExp {
     return new RegExp(`${out}$`);
 }
 
+/**
+ * The files the gates see: everything git tracks plus untracked files git does not ignore, i.e.
+ * exactly what a commit of the working tree would contain. Listing through git (rather than
+ * walking the disk) means .gitignore is the one ignore list, so a local build, an agent worktree
+ * or a scratch file can never change a gate's result (ADR-0009). Tracked files deleted from the
+ * working tree are dropped.
+ */
 export function walk(root: string): string[] {
-    const found: string[] = [];
-    const visit = (dir: string): void => {
-        for (const entry of readdirSync(dir, { withFileTypes: true })) {
-            if (entry.isDirectory()) {
-                if (!SKIP_DIRS.has(entry.name)) {
-                    visit(join(dir, entry.name));
-                }
-            } else if (entry.isFile()) {
-                found.push(relative(root, join(dir, entry.name)).split(sep).join('/'));
-            }
-        }
-    };
-    visit(root);
-    return found.sort();
+    const output = execFileSync(
+        'git',
+        ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
+        {
+            cwd: root,
+            encoding: 'utf8',
+            maxBuffer: 64 * 1024 * 1024,
+        },
+    );
+    return [
+        ...new Set(output.split('\0').filter((f) => f !== '' && existsSync(join(root, f)))),
+    ].sort();
 }
 
 const FRONT_MATTER = /^---\r?\n([\s\S]*?)\r?\n---\r?\n?/;

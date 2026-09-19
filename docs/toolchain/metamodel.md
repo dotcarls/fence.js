@@ -14,18 +14,18 @@ take are in the [taxonomy](taxonomy.md); the domain concepts the code implements
 
 ## Kinds
 
-| Kind                 | Where                               | Identity                  | Schema                        | Purpose                                                                 |
-| -------------------- | ----------------------------------- | ------------------------- | ----------------------------- | ----------------------------------------------------------------------- |
-| Work item            | `docs/work/items/FJ-NNNN-*.md`      | `FJ-NNNN`                 | `work-item.schema.json`       | A unit of change with acceptance criteria and evidence                  |
-| Decision record      | `docs/adr/ADR-NNNN-*.md`            | `ADR-NNNN`                | `adr.schema.json`             | A decision with context, options, consequences and a status             |
-| Checkpoint           | `docs/work/CHECKPOINT.md`           | singleton                 | `checkpoint.schema.json`      | The hand-off between sessions                                           |
-| Document             | `docs/**/*.md`                      | path                      | `doc.schema.json`             | Indexes, guides, toolchain and governance documents, design records     |
-| Package document     | `README.md`, `MIGRATING.md`, `CHANGELOG.md`, `CONTRIBUTING.md` | path | (Markdown; `CHANGELOG.md` by the `changelog` gate) | What ships in the npm package or greets a contributor |
-| Milestone            | `milestone` field, `CHANGELOG.md` heading, git tag `vX.Y.Z` | semver version | — | A release; the grouping of items and the boundary of a changelog section |
-| Source construct     | `src/**/*.ts`                       | path + name               | TypeScript                    | Code; bound to decisions and invariants by annotations                  |
-| Invariant            | `tools/ontology.json`               | dotted name               | (part of the ontology)        | A property the code promises, defined in an ADR, annotated where kept   |
-| Test                 | `test/**/*.ts`                      | path                      | —                             | Evidence for criteria and invariants                                    |
-| Vocabulary file      | `tools/ontology.json`, `tools/lexicon.json`, `tools/schemas/*.json` | path | JSON | Machine mirrors the documents render from                              |
+| Kind             | Where                                                               | Identity       | Schema                                             | Purpose                                                                  |
+| ---------------- | ------------------------------------------------------------------- | -------------- | -------------------------------------------------- | ------------------------------------------------------------------------ |
+| Work item        | `docs/work/items/FJ-NNNN-*.md`                                      | `FJ-NNNN`      | `work-item.schema.json`                            | A unit of change with acceptance criteria and evidence                   |
+| Decision record  | `docs/adr/ADR-NNNN-*.md`                                            | `ADR-NNNN`     | `adr.schema.json`                                  | A decision with context, options, consequences and a status              |
+| Checkpoint       | `docs/work/CHECKPOINT.md`                                           | singleton      | `checkpoint.schema.json`                           | The hand-off between sessions                                            |
+| Document         | `docs/**/*.md`                                                      | path           | `doc.schema.json`                                  | Indexes, guides, toolchain and governance documents, design records      |
+| Package document | `README.md`, `MIGRATING.md`, `CHANGELOG.md`, `CONTRIBUTING.md`      | path           | (Markdown; `CHANGELOG.md` by the `changelog` gate) | What ships in the npm package or greets a contributor                    |
+| Milestone        | `milestone` field, `CHANGELOG.md` heading, git tag `vX.Y.Z`         | semver version | —                                                  | A release; the grouping of items and the boundary of a changelog section |
+| Source construct | `src/**/*.ts`                                                       | path + name    | TypeScript                                         | Code; bound to decisions and invariants by annotations                   |
+| Invariant        | `tools/ontology.json`                                               | dotted name    | (part of the ontology)                             | A property the code promises, defined in an ADR, annotated where kept    |
+| Test             | `test/**/*.ts`                                                      | path           | —                                                  | Evidence for criteria and invariants                                     |
+| Vocabulary file  | `tools/ontology.json`, `tools/lexicon.json`, `tools/schemas/*.json` | path           | JSON                                               | Machine mirrors the documents render from                                |
 
 ## Relations
 
@@ -47,16 +47,16 @@ erDiagram
     INDEX ||--o{ DOCUMENT : "link (reachability)"
 ```
 
-| Relation                          | Declared in                     | Direction checked                                                        | Gate           |
-| --------------------------------- | ------------------------------- | ------------------------------------------------------------------------ | -------------- |
-| item → item (`parent`, `blocks`, `blocked_by`) | item front matter  | targets exist; `blocks`/`blocked_by` symmetric                           | `work-items`   |
-| item → ADR / code / test / doc (`links.*`, `evidence`) | item front matter | targets resolve; evidence required when done                       | `work-items`   |
-| ADR → ADR (`supersedes`, `superseded_by`) | ADR front matter        | ids resolve                                                              | `xref`         |
-| code → ADR / item / invariant / doc (`@fence:…`) | source comment     | kind is governed, target matches its pattern and resolves                | `binding`      |
-| invariant → ADR (`defined_in`)    | `tools/ontology.json`           | section resolves; each invariant annotated somewhere (warning otherwise) | `binding`      |
-| checkpoint → item                 | checkpoint front matter         | both directions for `in-progress`; next action names open items          | `checkpoint`   |
-| index → document                  | Markdown links                  | every governed document reachable                                        | `reachability` |
-| milestone → changelog section     | `CHANGELOG.md`                  | a section exists for the package version                                 | `changelog`    |
+| Relation                                               | Declared in             | Direction checked                                                        | Gate           |
+| ------------------------------------------------------ | ----------------------- | ------------------------------------------------------------------------ | -------------- |
+| item → item (`parent`, `blocks`, `blocked_by`)         | item front matter       | targets exist; `blocks`/`blocked_by` symmetric                           | `work-items`   |
+| item → ADR / code / test / doc (`links.*`, `evidence`) | item front matter       | targets resolve; evidence required when done                             | `work-items`   |
+| ADR → ADR (`supersedes`, `superseded_by`)              | ADR front matter        | ids resolve                                                              | `xref`         |
+| code → ADR / item / invariant / doc (`@fence:…`)       | source comment          | kind is governed, target matches its pattern and resolves                | `binding`      |
+| invariant → ADR (`defined_in`)                         | `tools/ontology.json`   | section resolves; each invariant annotated somewhere (warning otherwise) | `binding`      |
+| checkpoint → item                                      | checkpoint front matter | both directions for `in-progress`; next action names open items          | `checkpoint`   |
+| index → document                                       | Markdown links          | every governed document reachable                                        | `reachability` |
+| milestone → changelog section                          | `CHANGELOG.md`          | a section exists for the package version                                 | `changelog`    |
 
 ## Identity and allocation
 

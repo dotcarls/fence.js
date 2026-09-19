@@ -1,10 +1,10 @@
 ---
 id: FJ-0011
-title: "Async validators: runAsync and AsyncValidator"
+title: 'Async validators: runAsync and AsyncValidator'
 type: story
 status: backlog
 priority: p2
-milestone: "2.1.0"
+milestone: '2.1.0'
 created: 2026-09-16
 updated: 2026-09-16
 parent: null
@@ -12,15 +12,15 @@ blocks: []
 blocked_by: []
 owner: agent
 acceptance_criteria:
-  - text: "Fence.runAsync awaits every step and returns a Result; run() throws InvalidOutcomeError for a Promise outcome as today"
+  - text: 'Fence.runAsync awaits every step and returns a Result; run() throws InvalidOutcomeError for a Promise outcome as today'
     satisfied: false
     evidence: null
     verified_by: null
-  - text: "Async validators are typed (AsyncValidator) and the fluent methods infer their parameters the same way"
+  - text: 'Async validators are typed (AsyncValidator) and the fluent methods infer their parameters the same way'
     satisfied: false
     evidence: null
     verified_by: null
-  - text: "Memoization works for async steps without caching rejections"
+  - text: 'Memoization works for async steps without caching rejections'
     satisfied: false
     evidence: null
     verified_by: null

@@ -1,8 +1,8 @@
 ---
 id: ADR-0001
-title: "v2 core: an immutable registry-based builder with fluent methods typed from the validators"
+title: 'v2 core: an immutable registry-based builder with fluent methods typed from the validators'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -25,11 +25,11 @@ were no types. The full assessment is the [design record](../design/2026-09-16-v
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
-| Immutable builder: registry as a `Map`, steps as a frozen array, fluent methods attached per instance from a descriptor map cached per registry, the registry carried as a type parameter | Fixes every 1.x defect by construction; typed fluent methods by inference; flat prototype chain | Per-derivation `defineProperties`; a generic type surface to maintain |
-| Proxy-based fluent methods | O(1) derivation | A trap on every property access; harder to debug and to type |
-| Keep the prototype design, add types | Least code | Types cannot describe methods that appear by mutation; the defects stay |
+| Option                                                                                                                                                                                    | Pros                                                                                            | Cons                                                                    |
+| ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Immutable builder: registry as a `Map`, steps as a frozen array, fluent methods attached per instance from a descriptor map cached per registry, the registry carried as a type parameter | Fixes every 1.x defect by construction; typed fluent methods by inference; flat prototype chain | Per-derivation `defineProperties`; a generic type surface to maintain   |
+| Proxy-based fluent methods                                                                                                                                                                | O(1) derivation                                                                                 | A trap on every property access; harder to debug and to type            |
+| Keep the prototype design, add types                                                                                                                                                      | Least code                                                                                      | Types cannot describe methods that appear by mutation; the defects stay |
 
 ## Decision
 

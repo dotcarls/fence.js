@@ -1,10 +1,10 @@
 ---
 id: FJ-0003
-title: "Replace the build, test and lint toolchain; port to TypeScript"
+title: 'Replace the build, test and lint toolchain; port to TypeScript'
 type: story
 status: done
 priority: p0
-milestone: "2.0.0"
+milestone: '2.0.0'
 created: 2026-09-16
 updated: 2026-09-16
 parent: FJ-0001
@@ -12,22 +12,22 @@ blocks: []
 blocked_by: []
 owner: agent
 acceptance_criteria:
-  - text: "TypeScript 6.0 strict configuration compiles src to an ESM dist with declarations"
+  - text: 'TypeScript 6.0 strict configuration compiles src to an ESM dist with declarations'
     satisfied: true
     evidence: tsconfig.build.json
-    verified_by: "npm run build; publint; attw"
-  - text: "Vitest with 95% coverage thresholds and typecheck mode replaces Jest"
+    verified_by: 'npm run build; publint; attw'
+  - text: 'Vitest with 95% coverage thresholds and typecheck mode replaces Jest'
     satisfied: true
     evidence: vitest.config.ts
-    verified_by: "npm run test:coverage"
-  - text: "ESLint 10 flat config with typescript-eslint strict type-checked rules and Prettier run on staged files"
+    verified_by: 'npm run test:coverage'
+  - text: 'ESLint 10 flat config with typescript-eslint strict type-checked rules and Prettier run on staged files'
     satisfied: true
     evidence: eslint.config.js
-    verified_by: "npm run lint; pre-commit hook"
-  - text: "GitHub Actions runs the chain on Node 22, 24 and 26 and imports the built package on Node 20"
+    verified_by: 'npm run lint; pre-commit hook'
+  - text: 'GitHub Actions runs the chain on Node 22, 24 and 26 and imports the built package on Node 20'
     satisfied: true
     evidence: .github/workflows/ci.yml
-    verified_by: "human: workflow read"
+    verified_by: 'human: workflow read'
 links:
   code: [tsconfig.json, package.json]
   docs: [docs/toolchain/environment.md]

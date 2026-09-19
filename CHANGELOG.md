@@ -6,9 +6,31 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+The first 2.x release on npm. The library is unchanged from 2.0.0; what changed is how it is
+built, checked and released.
+
+### Fixed
+
+- The release pipeline failed before publishing 2.0.0: `eslint` checked the examples against
+  whatever `dist/` happened to exist, so it passed locally and failed in CI. Every check now
+  depends only on the tracked tree and the pinned toolchain, and gives the same result locally
+  and in CI (FJ-0014).
+- The published package's `README.md` links point at the `main` branch (FJ-0017).
+
+### Changed
+
+- Documentation is deployed and the package is published only after every check passes: all
+  Node lines, the install-by-name consume test on Node 20.19 and 22.12, and CodeQL (FJ-0015).
+- Development dependencies and GitHub Actions are at their latest releases; TypeScript stays on
+  6.0.3, the newest release typescript-eslint and TypeDoc support (FJ-0016).
+- The default branch is `main` (FJ-0017).
+
 ## [2.0.0] - 2026-09-16
 
 A TypeScript rewrite. See [MIGRATING.md](MIGRATING.md) for the upgrade path.
+
+Tagged but never published to npm: the release pipeline failed before the publish step, and a
+pushed tag is not moved. 2.0.1 is the first 2.x release on npm and ships this code unchanged.
 
 ### Added
 

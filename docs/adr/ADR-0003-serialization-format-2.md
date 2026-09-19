@@ -1,8 +1,8 @@
 ---
 id: ADR-0003
-title: "Serialization format 2: one JSON document with tagged nested fences, validated on the way in"
+title: 'Serialization format 2: one JSON document with tagged nested fences, validated on the way in'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -22,11 +22,11 @@ reported only the first missing validator name.
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
-| One versioned JSON document, nested fences tagged, strict validation on parse | Normal JSON; round-trips nested fences; every problem reported at once | A reserved key (`$fence`) in user data |
-| Keep the 1.x string-of-strings | No migration | Cannot carry nested fences; not a JSON document of the fence |
-| A binary or custom text format | Compact | Nothing else reads it; JSON is the point of the feature |
+| Option                                                                        | Pros                                                                   | Cons                                                         |
+| ----------------------------------------------------------------------------- | ---------------------------------------------------------------------- | ------------------------------------------------------------ |
+| One versioned JSON document, nested fences tagged, strict validation on parse | Normal JSON; round-trips nested fences; every problem reported at once | A reserved key (`$fence`) in user data                       |
+| Keep the 1.x string-of-strings                                                | No migration                                                           | Cannot carry nested fences; not a JSON document of the fence |
+| A binary or custom text format                                                | Compact                                                                | Nothing else reads it; JSON is the point of the feature      |
 
 ## Decision
 

@@ -1,8 +1,8 @@
 ---
 id: ADR-0004
-title: "Toolchain: TypeScript 6.0 pinned, tsc build, Vitest, ESLint flat config, Prettier"
+title: 'Toolchain: TypeScript 6.0 pinned, tsc build, Vitest, ESLint flat config, Prettier'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -25,12 +25,12 @@ tsdown requires Node 22.18 while the development machine runs 22.15; Vitest 5 dr
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
-| TypeScript `~6.0`, `tsc` build, Vitest 5, ESLint 10 flat + typescript-eslint strict type-checked, Prettier 3, tinybench | Every tool supports every other; zero bundler; strict types | Pinned below the newest TypeScript until the ecosystem catches up |
-| TypeScript 7 | Fastest compiler | Lint and docs tooling do not support it yet |
-| tsdown/tsup bundling | Single-file output | Node 22.18 requirement; nothing to bundle in a one-entry, zero-dependency library |
-| Jest with ts-jest | Familiar | Slower; ESM friction; no typecheck mode |
+| Option                                                                                                                  | Pros                                                        | Cons                                                                              |
+| ----------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------- | --------------------------------------------------------------------------------- |
+| TypeScript `~6.0`, `tsc` build, Vitest 5, ESLint 10 flat + typescript-eslint strict type-checked, Prettier 3, tinybench | Every tool supports every other; zero bundler; strict types | Pinned below the newest TypeScript until the ecosystem catches up                 |
+| TypeScript 7                                                                                                            | Fastest compiler                                            | Lint and docs tooling do not support it yet                                       |
+| tsdown/tsup bundling                                                                                                    | Single-file output                                          | Node 22.18 requirement; nothing to bundle in a one-entry, zero-dependency library |
+| Jest with ts-jest                                                                                                       | Familiar                                                    | Slower; ESM friction; no typecheck mode                                           |
 
 ## Decision
 
@@ -53,3 +53,12 @@ TypeScript pin when typescript-eslint and TypeDoc support 7.
 ## Links
 
 [environment](../toolchain/environment.md) · FJ-0003
+
+## Amendment A1 — 2026-09-19: dependency currency and the pinned toolchain
+
+Every dependency is kept at its latest release (FJ-0016). One exception is recorded here:
+**TypeScript stays on the newest 6.x (6.0.3)** although 7.0.2 is the latest release, because the
+latest typescript-eslint (8.70.0) declares `typescript >=4.8.4 <6.1.0` and the latest TypeDoc
+(0.28.20) accepts only up to 6.0.x. Dependabot ignores TypeScript majors until both widen;
+revisit then. The Node toolchain is now pinned (`.nvmrc`) and enforced (`devEngines`) per
+ADR-0009, replacing "Node 22 or 24" above.

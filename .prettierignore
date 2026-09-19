@@ -1,6 +1,2 @@
-dist/
-coverage/
-docs/
+# Only what git tracks but Prettier must not rewrite; everything git ignores is ignored already.
 package-lock.json
-CHANGELOG.md
-site/

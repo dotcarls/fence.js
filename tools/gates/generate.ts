@@ -59,6 +59,20 @@ export function hasMarkers(text: string, name: string): boolean {
     return text.includes(BEGIN(name)) && text.includes(END(name));
 }
 
+/**
+ * A generated block must sit inside Prettier's range-ignore comments, or Prettier and the
+ * generator rewrite the same bytes differently and the `generated` gate can never settle.
+ */
+export function isShieldedFromFormatter(text: string, name: string): boolean {
+    const begin = text.indexOf(BEGIN(name));
+    const end = text.indexOf(END(name));
+    const start = text.lastIndexOf('<!-- prettier-ignore-start -->', begin);
+    const stop = text.indexOf('<!-- prettier-ignore-end -->', end);
+    return (
+        start >= 0 && stop >= 0 && text.lastIndexOf('<!-- prettier-ignore-end -->', begin) < start
+    );
+}
+
 const CHANGELOG_MEANING: Record<string, string> = {
     Added: 'new features',
     Changed: 'changes in existing functionality',

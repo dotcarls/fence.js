@@ -3,11 +3,18 @@ updates:
   - package-ecosystem: npm
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
     groups:
       dev-dependencies:
         dependency-type: development
+    ignore:
+      # TypeScript 7 is held back until typescript-eslint and TypeDoc accept it (ADR-0004 A1).
+      - dependency-name: typescript
+        update-types: ['version-update:semver-major']
   - package-ecosystem: github-actions
     directory: /
     schedule:
-      interval: monthly
+      interval: weekly
+    groups:
+      actions:
+        patterns: ['*']

@@ -1,10 +1,10 @@
 ---
 id: FJ-0001
-title: "fence.js 2.0: the TypeScript rewrite"
+title: 'fence.js 2.0: the TypeScript rewrite'
 type: epic
 status: done
 priority: p0
-milestone: "2.0.0"
+milestone: '2.0.0'
 created: 2026-09-16
 updated: 2026-09-16
 parent: null
@@ -12,22 +12,22 @@ blocks: []
 blocked_by: []
 owner: agent
 acceptance_criteria:
-  - text: "Every defect C1–C12 of the 1.x assessment is fixed by construction and has a regression test"
+  - text: 'Every defect C1–C12 of the 1.x assessment is fixed by construction and has a regression test'
     satisfied: true
     evidence: docs/adr/ADR-0001-immutable-registry-builder-with-inferred-types.md
-    verified_by: "test/builder.test.ts, test/fence.test.ts, test/result.test.ts, test/serialize.test.ts"
-  - text: "The fluent API is typed from the registered validators"
+    verified_by: 'test/builder.test.ts, test/fence.test.ts, test/result.test.ts, test/serialize.test.ts'
+  - text: 'The fluent API is typed from the registered validators'
     satisfied: true
     evidence: test/types.test-d.ts
-    verified_by: "vitest typecheck mode"
-  - text: "The package is ESM only with browser support, Node >= 20.19"
+    verified_by: 'vitest typecheck mode'
+  - text: 'The package is ESM only with browser support, Node >= 20.19'
     satisfied: true
     evidence: docs/adr/ADR-0002-esm-only-distribution.md
-    verified_by: "npm run check:package; CI consume job"
-  - text: "npm run check is green with coverage >= 95% on every metric"
+    verified_by: 'npm run check:package; CI consume job'
+  - text: 'npm run check is green with coverage >= 95% on every metric'
     satisfied: true
     evidence: .github/workflows/ci.yml
-    verified_by: "npm run check (99.7% statements)"
+    verified_by: 'npm run check (99.7% statements)'
 links:
   code: [src/index.ts]
   docs: [docs/design/2026-09-16-v2-proposal.md, docs/architecture/overview.md]

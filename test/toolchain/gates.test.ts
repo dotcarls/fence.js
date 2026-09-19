@@ -2,6 +2,7 @@
  * Each gate rule is shown to fire on a broken copy of a minimal fixture repository. The fixture
  * reuses the real schemas, ontology and lexicon files so the tests track the governed vocabulary.
  */
+import { execFileSync } from 'node:child_process';
 import { cpSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -25,6 +26,8 @@ afterEach(() => {
 function fixture(): string {
     const root = mkdtempSync(join(tmpdir(), 'fence-gates-'));
     roots.push(root);
+    // The gate walker lists files through git, so a fixture is a repository.
+    execFileSync('git', ['init', '-q'], { cwd: root });
     cpSync(join(realRoot, 'tools/schemas'), join(root, 'tools/schemas'), { recursive: true });
     cpSync(join(realRoot, 'tools/ontology.json'), join(root, 'tools/ontology.json'));
     cpSync(join(realRoot, 'tools/lexicon.json'), join(root, 'tools/lexicon.json'));
@@ -60,12 +63,12 @@ function fixture(): string {
     write(
         root,
         'docs/work/README.md',
-        '---\ntitle: Work\ndoc_type: index\nstatus: living\n---\n\n# Work\n\n<!-- BEGIN GENERATED: work-index -->\n<!-- END GENERATED: work-index -->\n',
+        '---\ntitle: Work\ndoc_type: index\nstatus: living\n---\n\n# Work\n\n<!-- prettier-ignore-start -->\n<!-- BEGIN GENERATED: work-index -->\n<!-- END GENERATED: work-index -->\n<!-- prettier-ignore-end -->\n',
     );
     write(
         root,
         'docs/adr/README.md',
-        '---\ntitle: ADRs\ndoc_type: index\nstatus: living\n---\n\n# ADRs\n\n<!-- BEGIN GENERATED: adr-index -->\n<!-- END GENERATED: adr-index -->\n',
+        '---\ntitle: ADRs\ndoc_type: index\nstatus: living\n---\n\n# ADRs\n\n<!-- prettier-ignore-start -->\n<!-- BEGIN GENERATED: adr-index -->\n<!-- END GENERATED: adr-index -->\n<!-- prettier-ignore-end -->\n',
     );
     for (const [file, blocks] of [
         ['docs/toolchain/ontology.md', ['ontology-kinds', 'ontology-invariants']],
@@ -84,7 +87,7 @@ function fixture(): string {
         write(
             root,
             file,
-            `---\ntitle: ${file}\ndoc_type: governance\nstatus: living\n---\n\n# ${file}\n\n${blocks.map((b) => `<!-- BEGIN GENERATED: ${b} -->\n<!-- END GENERATED: ${b} -->`).join('\n\n')}\n`,
+            `---\ntitle: ${file}\ndoc_type: governance\nstatus: living\n---\n\n# ${file}\n\n${blocks.map((b) => `<!-- prettier-ignore-start -->\n<!-- BEGIN GENERATED: ${b} -->\n<!-- END GENERATED: ${b} -->\n<!-- prettier-ignore-end -->`).join('\n\n')}\n`,
         );
     }
     write(
@@ -230,6 +233,19 @@ describe('gate suite', () => {
         expect(errors(run(root, 'generated'))).toEqual([]);
     });
 
+    test('generated: a block outside prettier-ignore comments is reported', () => {
+        const root = fixture();
+        const file = join(root, 'docs/adr/README.md');
+        write(
+            root,
+            'docs/adr/README.md',
+            readFileSyncSafe(file).replace('<!-- prettier-ignore-start -->\n', ''),
+        );
+        expect(errors(run(root, 'generated'))).toContain(
+            "block 'adr-index' is not inside <!-- prettier-ignore-start --> … <!-- prettier-ignore-end -->",
+        );
+    });
+
     test('binding: unknown kind, bad target, unresolved target, unannotated invariant', () => {
         const root = fixture();
         write(
@@ -278,6 +294,21 @@ describe('gate suite', () => {
             true,
         );
         expect(messages.some((m) => m.includes('no section for package version 2.0.0'))).toBe(true);
+    });
+
+    test('the walker sees what git would commit: ignored files are invisible to every gate', () => {
+        const root = fixture();
+        write(root, '.gitignore', 'scratch/\n');
+        write(
+            root,
+            'scratch/orphan.md',
+            '# No front matter, linked from nowhere, spelled behaviour\n',
+        );
+        expect(errors(run(root))).toEqual([]);
+        write(root, 'docs/toolchain/visible.md', '# No front matter\n');
+        expect(errors(run(root, 'schemas'))).toContain(
+            'missing front matter (schema tools/schemas/doc.schema.json)',
+        );
     });
 
     test('slugify follows the GitHub heading rules', () => {

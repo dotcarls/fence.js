@@ -3,7 +3,13 @@ import { join } from 'node:path';
 
 import { Ajv2020, type ValidateFunction } from 'ajv/dist/2020.js';
 
-import { applyBlocks, hasMarkers, loadLexicon, loadOntology } from './generate.js';
+import {
+    applyBlocks,
+    hasMarkers,
+    isShieldedFromFormatter,
+    loadLexicon,
+    loadOntology,
+} from './generate.js';
 import { resolveReference, withoutCode } from './repo.js';
 import type { Finding, Gate } from './types.js';
 
@@ -362,6 +368,14 @@ export const generated: Gate = {
             for (const name of names) {
                 if (!hasMarkers(text, name))
                     out.push(finding('generated', file, `missing markers for block '${name}'`));
+                else if (!isShieldedFromFormatter(text, name))
+                    out.push(
+                        finding(
+                            'generated',
+                            file,
+                            `block '${name}' is not inside <!-- prettier-ignore-start --> … <!-- prettier-ignore-end -->`,
+                        ),
+                    );
             }
             if (applyBlocks(ctx, text, names) !== text)
                 out.push(

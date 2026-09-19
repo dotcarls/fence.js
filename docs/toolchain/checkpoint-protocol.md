@@ -29,8 +29,8 @@ enough to resume without re-deriving) · **Open questions** (each linked to an A
 ## On resume
 
 1. `CLAUDE.md` (automatic) → 2. `CHECKPOINT.md` (the `SessionStart` hook prints its summary) →
-3. `npm run gates` → 4. the in-progress items → 5. execute the next action. Do not re-plan what
-the checkpoint already decided.
+2. `npm run gates` → 4. the in-progress items → 5. execute the next action. Do not re-plan what
+   the checkpoint already decided.
 
 ## Freshness rules
 

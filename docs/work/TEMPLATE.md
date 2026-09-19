@@ -1,6 +1,6 @@
 ---
 id: FJ-0000
-title: "Template — create items with `npm run work -- new`"
+title: 'Template — create items with `npm run work -- new`'
 type: task
 status: backlog
 priority: p2
@@ -11,7 +11,7 @@ parent: null
 blocks: []
 blocked_by: []
 acceptance_criteria:
-  - text: "State the observable outcome that proves this is done"
+  - text: 'State the observable outcome that proves this is done'
     satisfied: false
     evidence: null
     verified_by: null

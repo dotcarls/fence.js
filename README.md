@@ -1,7 +1,7 @@
 # fence.js
 
 [![npm](https://img.shields.io/npm/v/fence.js.svg?style=flat-square)](https://www.npmjs.com/package/fence.js)
-[![CI](https://github.com/dotcarls/fence.js/actions/workflows/ci.yml/badge.svg?branch=master)](https://github.com/dotcarls/fence.js/actions/workflows/ci.yml)
+[![CI](https://github.com/dotcarls/fence.js/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/dotcarls/fence.js/actions/workflows/ci.yml)
 [![license](https://img.shields.io/npm/l/fence.js.svg?style=flat-square)](LICENSE)
 
 > Composable, portable validations. Register the validator functions you already have, compose
@@ -223,7 +223,7 @@ Apple silicon; higher is better, numbers are indicative only):
 ## Examples and API reference
 
 Runnable, type-checked examples live in
-[`examples/`](https://github.com/dotcarls/fence.js/tree/master/examples) (`npm run examples`). The
+[`examples/`](https://github.com/dotcarls/fence.js/tree/main/examples) (`npm run examples`). The
 generated API reference is at <https://dotcarls.github.io/fence.js>.
 
 ## Migrating from 1.x

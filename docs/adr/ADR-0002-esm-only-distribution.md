@@ -1,8 +1,8 @@
 ---
 id: ADR-0002
-title: "ESM-only distribution with browser support; Node 20.19 or newer"
+title: 'ESM-only distribution with browser support; Node 20.19 or newer'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -22,11 +22,11 @@ still be able to consume the package.
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
-| ESM only, `exports` map, no bundler | One artifact; `require(esm)` works on Node 20.19+/22.12+; browsers load ES modules natively and ESM CDNs serve the package | Node < 20.19 CommonJS consumers need a dynamic import |
-| Dual ESM + CJS | Older Node `require()` | The dual-package hazard (two copies of the classes, `instanceof` across formats fails); a bundler |
-| Keep UMD too | `<script src>` global | Nobody bundles that way in 2026; a global is one more surface to keep |
+| Option                              | Pros                                                                                                                       | Cons                                                                                              |
+| ----------------------------------- | -------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| ESM only, `exports` map, no bundler | One artifact; `require(esm)` works on Node 20.19+/22.12+; browsers load ES modules natively and ESM CDNs serve the package | Node < 20.19 CommonJS consumers need a dynamic import                                             |
+| Dual ESM + CJS                      | Older Node `require()`                                                                                                     | The dual-package hazard (two copies of the classes, `instanceof` across formats fails); a bundler |
+| Keep UMD too                        | `<script src>` global                                                                                                      | Nobody bundles that way in 2026; a global is one more surface to keep                             |
 
 ## Decision
 

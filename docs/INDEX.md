@@ -12,15 +12,15 @@ index or document.
 
 ## Start here
 
-| Need                                                      | Go to                                                                        |
-| --------------------------------------------------------- | ---------------------------------------------------------------------------- |
-| What is the state of the project right now?               | [work/CHECKPOINT.md](work/CHECKPOINT.md)                                     |
-| What is this project, and what are the rules?             | [../CLAUDE.md](../CLAUDE.md), [architecture/overview.md](architecture/overview.md) |
-| How does the toolchain (gates, tracker, hooks, agents) work? | [toolchain/README.md](toolchain/README.md)                                |
-| How does work move from idea to release?                  | [toolchain/sdlc.md](toolchain/sdlc.md)                                       |
-| What has been decided, and why?                           | [adr/README.md](adr/README.md)                                               |
-| What do the words mean?                                   | [toolchain/lexicon.md](toolchain/lexicon.md)                                 |
-| How is a release cut?                                     | [toolchain/release-process.md](toolchain/release-process.md)                 |
+| Need                                                         | Go to                                                                              |
+| ------------------------------------------------------------ | ---------------------------------------------------------------------------------- |
+| What is the state of the project right now?                  | [work/CHECKPOINT.md](work/CHECKPOINT.md)                                           |
+| What is this project, and what are the rules?                | [../CLAUDE.md](../CLAUDE.md), [architecture/overview.md](architecture/overview.md) |
+| How does the toolchain (gates, tracker, hooks, agents) work? | [toolchain/README.md](toolchain/README.md)                                         |
+| How does work move from idea to release?                     | [toolchain/sdlc.md](toolchain/sdlc.md)                                             |
+| What has been decided, and why?                              | [adr/README.md](adr/README.md)                                                     |
+| What do the words mean?                                      | [toolchain/lexicon.md](toolchain/lexicon.md)                                       |
+| How is a release cut?                                        | [toolchain/release-process.md](toolchain/release-process.md)                       |
 
 ## Areas
 

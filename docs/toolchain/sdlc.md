@@ -41,13 +41,13 @@ stateDiagram-v2
     cancelled --> [*]
 ```
 
-| Transition                  | What must be true (who checks)                                                                                                                                       |
-| --------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| → `ready`                   | Acceptance criteria are observable outcomes; every decision the item needs exists as an ADR (`proposed` is enough). Reviewer: a person or the coordinating session. |
-| → `in-progress`             | The item is listed in `docs/work/CHECKPOINT.md` (`work-items` gate).                                                                                                 |
-| → `review`                  | Every criterion `satisfied: true` with an `evidence` link that resolves; `npm run check` green (the pre-push hook runs the tests; CI runs the chain).               |
-| → `done`                    | An adversarial review (`fence-reviewer`) found nothing blocking, or the item is small enough that the coordinating session reviewed it; `blocked_by` items are done (`work-items` gate). A user-visible change has a `CHANGELOG.md` entry under `[Unreleased]`. |
-| milestone → release         | Every item with that milestone is `done` or re-milestoned; [release-process](release-process.md).                                                                   |
+| Transition          | What must be true (who checks)                                                                                                                                                                                                                                  |
+| ------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| → `ready`           | Acceptance criteria are observable outcomes; every decision the item needs exists as an ADR (`proposed` is enough). Reviewer: a person or the coordinating session.                                                                                             |
+| → `in-progress`     | The item is listed in `docs/work/CHECKPOINT.md` (`work-items` gate).                                                                                                                                                                                            |
+| → `review`          | Every criterion `satisfied: true` with an `evidence` link that resolves; `npm run check` green (the pre-push hook runs the tests; CI runs the chain).                                                                                                           |
+| → `done`            | An adversarial review (`fence-reviewer`) found nothing blocking, or the item is small enough that the coordinating session reviewed it; `blocked_by` items are done (`work-items` gate). A user-visible change has a `CHANGELOG.md` entry under `[Unreleased]`. |
+| milestone → release | Every item with that milestone is `done` or re-milestoned; [release-process](release-process.md).                                                                                                                                                               |
 
 ## Definition of ready
 
@@ -67,7 +67,7 @@ stateDiagram-v2
 
 ## Branches and commits
 
-- `master` is the release line. Work happens on short-lived branches or directly on `master`
+- `main` is the default branch and the release line. Work happens on short-lived branches or directly on `main`
   for small, gate-clean changes; the owner decides.
 - Agents commit locally at coherent boundaries with the check chain green and the co-author
   trailer, and never push, publish or rewrite shared history
@@ -92,8 +92,8 @@ the checkpoint is older than the newest tracker or ADR change.
 
 ## Roles
 
-| Role                     | Realized by                                                                                   |
-| ------------------------ | --------------------------------------------------------------------------------------------- |
-| Owner                    | Tim Carlson: approves ADRs, accepts releases, pushes and publishes                             |
-| Coordinating session     | The interactive Claude Code session: plans, commits, dispatches at most three agents at a time |
-| Implementer / scribe / reviewer | `.claude/agents/` ([agents-and-skills](agents-and-skills.md))                           |
+| Role                            | Realized by                                                                                    |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- |
+| Owner                           | Tim Carlson: approves ADRs, accepts releases, pushes and publishes                             |
+| Coordinating session            | The interactive Claude Code session: plans, commits, dispatches at most three agents at a time |
+| Implementer / scribe / reviewer | `.claude/agents/` ([agents-and-skills](agents-and-skills.md))                                  |

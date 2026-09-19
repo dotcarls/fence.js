@@ -15,5 +15,7 @@
     "notExported": true,
     "invalidLink": true,
     "notDocumented": false
-  }
+  },
+  "treatWarningsAsErrors": true,
+  "sourceLinkTemplate": "https://github.com/dotcarls/fence.js/blob/{gitRevision}/{path}#L{line}"
 }

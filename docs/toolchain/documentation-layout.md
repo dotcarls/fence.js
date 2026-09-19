@@ -41,5 +41,5 @@ README.md · MIGRATING.md · CHANGELOG.md · CONTRIBUTING.md   package documents
 ## Reading strategy for agents
 
 1. `CLAUDE.md` (automatic) → 2. `docs/work/CHECKPOINT.md` → 3. the area index for the task →
-4. the leaf documents it names → 5. the work item(s) it names. Stop when the question is
-answered; do not bulk-load areas you are not working in.
+2. the leaf documents it names → 5. the work item(s) it names. Stop when the question is
+   answered; do not bulk-load areas you are not working in.

@@ -1,10 +1,10 @@
 ---
 id: FJ-0009
-title: "Release 2.0.0"
+title: 'Release 2.0.0'
 type: release
 status: done
 priority: p0
-milestone: "2.0.0"
+milestone: '2.0.0'
 created: 2026-09-16
 updated: 2026-09-16
 parent: FJ-0001
@@ -12,18 +12,18 @@ blocks: []
 blocked_by: []
 owner: agent
 acceptance_criteria:
-  - text: "Every item with milestone 2.0.0 is done"
+  - text: 'Every item with milestone 2.0.0 is done'
     satisfied: true
     evidence: docs/work/README.md
-    verified_by: "work index"
-  - text: "CHANGELOG.md has a dated 2.0.0 section and package.json says 2.0.0"
+    verified_by: 'work index'
+  - text: 'CHANGELOG.md has a dated 2.0.0 section and package.json says 2.0.0'
     satisfied: true
     evidence: CHANGELOG.md
-    verified_by: "changelog gate"
-  - text: "v2 is merged into master and the Release v2.0.0 commit is tagged v2.0.0"
+    verified_by: 'changelog gate'
+  - text: 'v2 is merged into master and the Release v2.0.0 commit is tagged v2.0.0'
     satisfied: true
     evidence: docs/releases/README.md
-    verified_by: "git log; git tag"
+    verified_by: 'git log; git tag'
 links:
   code: []
   docs: [docs/toolchain/release-process.md]

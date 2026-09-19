@@ -1,8 +1,8 @@
 ---
 id: ADR-0006
-title: "The documentation graph, work tracking, gates, checkpoint and the agent commit policy"
+title: 'The documentation graph, work tracking, gates, checkpoint and the agent commit policy'
 status: accepted
-date: "2026-09-16"
+date: '2026-09-16'
 deciders:
   - Tim Carlson
   - Claude (Fable 5.1)
@@ -26,11 +26,11 @@ the scale reduced.
 
 ## Options considered
 
-| Option | Pros | Cons |
-| ------ | ---- | ---- |
-| In-repository, file-per-artifact governance with a TypeScript gate tool, hooks and a checkpoint | Versioned with the code; offline; checkable on every edit; no external tracker | The tool is ours to maintain |
-| GitHub Issues + Projects | Familiar UI | Off-repository; agents need network and credentials; not gate-checkable |
-| Conventions only, no tooling | No code | Drift is found by readers, late |
+| Option                                                                                          | Pros                                                                           | Cons                                                                    |
+| ----------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | ----------------------------------------------------------------------- |
+| In-repository, file-per-artifact governance with a TypeScript gate tool, hooks and a checkpoint | Versioned with the code; offline; checkable on every edit; no external tracker | The tool is ours to maintain                                            |
+| GitHub Issues + Projects                                                                        | Familiar UI                                                                    | Off-repository; agents need network and credentials; not gate-checkable |
+| Conventions only, no tooling                                                                    | No code                                                                        | Drift is found by readers, late                                         |
 
 ## Decision
 

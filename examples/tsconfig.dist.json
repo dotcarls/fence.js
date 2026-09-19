@@ -1,0 +1,9 @@
+{
+  "$comment": "Type-checks and runs the examples against the BUILT package: `fence.js` resolves through package.json `exports` to dist/. Used only by `npm run examples`, which builds first. Editors, eslint and `npm run typecheck` use the root tsconfig, which maps `fence.js` to src/ so they never depend on build output.",
+  "extends": "../tsconfig.json",
+  "compilerOptions": {
+    "paths": {},
+    "noEmit": true
+  },
+  "include": ["."]
+}

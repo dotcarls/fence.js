@@ -2,7 +2,7 @@
 title: Architecture overview
 doc_type: architecture
 status: living
-updated: "2026-09-16"
+updated: '2026-09-16'
 ---
 
 # Architecture overview
@@ -124,22 +124,25 @@ A non-literal name widens `R` to the plain `Registry`, and a wide registry stays
 The properties the code promises are named in the [ontology](../toolchain/ontology.md#named-invariants),
 defined in ADR-0001 and ADR-0003, annotated in the source (`@fence:invariant(...)`) and tested:
 
-| Invariant                     | Kept in                              | Tested in                                   |
-| ----------------------------- | ------------------------------------ | ------------------------------------------- |
-| `builder.immutable`           | `builder.ts` (`#make`, `step`)       | `test/builder.test.ts`                      |
+| Invariant                     | Kept in                                                  | Tested in                                      |
+| ----------------------------- | -------------------------------------------------------- | ---------------------------------------------- |
+| `builder.immutable`           | `builder.ts` (`#make`, `step`)                           | `test/builder.test.ts`                         |
 | `registry.reserved-names`     | `builder.ts` (`RESERVED_NAMES`), `types.ts` (`StepName`) | `test/builder.test.ts`, `test/types.test-d.ts` |
-| `validator.plain-call`        | `step.ts` (`bindStep`)               | `test/fence.test.ts`                        |
-| `memo.per-fence`              | `step.ts` (`memoize`), `fence.ts`    | `test/fence.test.ts`                        |
-| `result.vacuous-empty`        | `result.ts`                          | `test/result.test.ts`                       |
-| `serialize.json-only`         | `serialize.ts` (`toJsonValue`)       | `test/serialize.test.ts`                    |
-| `hydrate.validate-everything` | `serialize.ts`, `builder.ts` (`#hydrate`) | `test/serialize.test.ts`               |
+| `validator.plain-call`        | `step.ts` (`bindStep`)                                   | `test/fence.test.ts`                           |
+| `memo.per-fence`              | `step.ts` (`memoize`), `fence.ts`                        | `test/fence.test.ts`                           |
+| `result.vacuous-empty`        | `result.ts`                                              | `test/result.test.ts`                          |
+| `serialize.json-only`         | `serialize.ts` (`toJsonValue`)                           | `test/serialize.test.ts`                       |
+| `hydrate.validate-everything` | `serialize.ts`, `builder.ts` (`#hydrate`)                | `test/serialize.test.ts`                       |
 
 ## Distribution
 
 ESM only, `exports` map with a `types` condition, `sideEffects: false`, `engines.node >= 20.19`,
 compiled by `tsc` to `dist/` with declarations and source maps; `src/` ships for the maps.
 Browsers import from an ESM CDN. No Node built-ins are used anywhere in `src/`
-([ADR-0002](../adr/ADR-0002-esm-only-distribution.md)).
+([ADR-0002](../adr/ADR-0002-esm-only-distribution.md)). Every CI run packs the tarball, installs it by
+name and imports it as ESM and CommonJS on Node 20.19.0 and 22.12.0, the floors `engines`
+admits. The package is published only after every check has passed on the tagged commit
+([ADR-0010](../adr/ADR-0010-one-reusable-check-workflow-gates-pages-deployment-and-npm-p.md)).
 
 ## Repository layout
 
