@@ -21,7 +21,7 @@ serializable and deterministic across environments.
 - **Portable.** `JSON.stringify(fence)` is the wire format; `FenceBuilder.fromJSON(json, base)`
   restores it wherever the same validator names are registered (pass a builder or a plain
   registry as `base`). Nested fences round-trip.
-- **Zero dependencies, ESM only,** about 9 KB gzipped unminified, runs on Node 20.19+ and in
+- **Zero dependencies, ESM only,** about 9 KB gzipped unminified, runs on the Node LTS lines (24, 26) and in
   evergreen browsers.
 
 ## Install
@@ -30,8 +30,8 @@ serializable and deterministic across environments.
 npm install fence.js
 ```
 
-fence.js is published as ES modules. Node consumers can `import` it, or `require()` it on Node
-20.19+ / 22.12+ (which support `require(esm)`). Browsers load it natively from any ESM CDN:
+fence.js is published as ES modules. Node consumers on the tested LTS lines (Node 24, and Node 26
+onward) can `import` it or `require()` it. Browsers load it natively from any ESM CDN:
 
 ```html
 <script type="module">
@@ -212,13 +212,13 @@ Types you may want: `Validator`, `Registry`, `Fluent<R>`, `Step`, `Outcome`, `Fa
 ## Performance
 
 Fences do very little at run time: each step is one bound function call and one result record.
-`npm run bench` compares against validate.js and Joi on the same policies (tinybench, Node 22,
-Apple silicon; higher is better, numbers are indicative only):
+`npm run bench` compares against validate.js and Joi on the same policies (tinybench, Node
+24.21.0, Apple silicon; higher is better, numbers are indicative only):
 
-| Case                          | fence.js | validate.js | Joi    |
-| ----------------------------- | -------- | ----------- | ------ |
-| user policy, 20 users (ops/s) | 67,900   | 24,600      | 41,700 |
-| strict equality, 20 values    | 586,600  | 33,800      | 59,400 |
+| Case                          | fence.js  | validate.js | Joi    |
+| ----------------------------- | --------- | ----------- | ------ |
+| user policy, 20 users (ops/s) | 136,600   | 20,300      | 43,400 |
+| strict equality, 20 values    | 1,957,900 | 29,200      | 64,600 |
 
 ## Examples and API reference
 

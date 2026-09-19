@@ -11,6 +11,24 @@ import type {
 type Nested = readonly Result[] | Readonly<Record<string, Result>>;
 
 /**
+ * The entries `createResult` vouches for, set only while it constructs. The constructor trusts
+ * exactly that array (by identity) and validates everything else, so no caller of the public
+ * constructor can skip validation.
+ */
+let trustedEntries: readonly StepOutcome[] | null = null;
+
+/**
+ * Builds a Result from entries `Fence.run` has already validated (`assertOutcome`), without
+ * validating or copying them again. The entries stay private to the Result; callers only ever
+ * see the frozen `outcomes` view (FJ-0021). Internal: not exported from the package.
+ */
+export function createResult(subject: unknown, entries: StepOutcome[]): Result {
+    // The constructor consumes and clears the trust; nothing between here and there can throw.
+    trustedEntries = entries;
+    return new Result(subject, entries);
+}
+
+/**
  * The outcome of running a {@link Fence} against one subject: every step paired with what
  * its validator returned.
  *
@@ -30,7 +48,12 @@ export class Result {
     }
 
     readonly subject: unknown;
-    readonly outcomes: readonly StepOutcome[];
+
+    /** The step outcomes, never exposed: every reader goes through the frozen `outcomes` view. */
+    readonly #entries: readonly StepOutcome[];
+
+    /** The frozen public view of `#entries`, built on first access. */
+    #outcomes: readonly StepOutcome[] | undefined;
 
     /**
      * Results are normally created by {@link Fence.run}. Constructing one directly is useful
@@ -41,22 +64,40 @@ export class Result {
      */
     constructor(subject: unknown, outcomes: readonly StepOutcome[]) {
         this.subject = subject;
-        this.outcomes = freezeOutcomes(outcomes);
+        if (trustedEntries !== null && trustedEntries === outcomes) {
+            this.#entries = trustedEntries;
+            trustedEntries = null;
+        } else {
+            const frozen = freezeOutcomes(outcomes);
+            this.#entries = frozen;
+            this.#outcomes = frozen;
+        }
+    }
+
+    /**
+     * Every step paired with its outcome, in step order. The array and each entry are frozen; the
+     * view is built once, on first access, so runs that only read verdicts never pay for it.
+     */
+    get outcomes(): readonly StepOutcome[] {
+        this.#outcomes ??= Object.freeze(
+            this.#entries.map(({ step, value }) => Object.freeze({ step, value })),
+        );
+        return this.#outcomes;
     }
 
     /** `true` when every step (and every nested result) passed. */
     get passed(): boolean {
-        return this.outcomes.every(({ value }) => outcomePassed(value));
+        return this.#entries.every(({ value }) => outcomePassed(value));
     }
 
     /** `true` when at least one step (or one nested step) passed. */
     get anyPassed(): boolean {
-        return this.outcomes.some(({ value }) => outcomeAnyPassed(value));
+        return this.#entries.some(({ value }) => outcomeAnyPassed(value));
     }
 
     /** The outcomes of every step recorded under `name`, in order. */
     for(name: string): Outcome[] {
-        return this.outcomes.filter(({ step }) => step.name === name).map(({ value }) => value);
+        return this.#entries.filter(({ step }) => step.name === name).map(({ value }) => value);
     }
 
     /**
@@ -66,7 +107,7 @@ export class Result {
     failures(): Failure[] {
         const failures: Failure[] = [];
 
-        for (const { step, value } of this.outcomes) {
+        for (const { step, value } of this.#entries) {
             if (typeof value === 'boolean') {
                 if (!value) {
                     failures.push({ path: [step.name], step, subject: this.subject });
@@ -98,7 +139,7 @@ export class Result {
         return {
             subject: toLenientJsonValue(this.subject, 'subject'),
             passed: this.passed,
-            outcomes: this.outcomes.map(({ step, value }): SerializedOutcome => ({
+            outcomes: this.#entries.map(({ step, value }): SerializedOutcome => ({
                 name: step.name,
                 args: step.args.map((arg, index) =>
                     toLenientJsonValue(arg, `args[${String(index)}]`),
@@ -117,7 +158,7 @@ export class Result {
         return {
             subject: this.subject,
             passed: this.passed,
-            outcomes: this.outcomes.map(({ step, value }) => ({
+            outcomes: this.#entries.map(({ step, value }) => ({
                 step: formatCall(step.name, step.args),
                 value,
             })),
@@ -125,14 +166,14 @@ export class Result {
     }
 
     #lines(indent: string): string[] {
-        const passedCount = this.outcomes.filter(({ value }) => outcomePassed(value)).length;
+        const passedCount = this.#entries.filter(({ value }) => outcomePassed(value)).length;
         const verdict = this.passed ? 'PASSED' : 'FAILED';
         const lines = [
             `${indent}subject: ${formatValue(this.subject)}`,
-            `${indent}${verdict} (${String(passedCount)}/${String(this.outcomes.length)} steps)`,
+            `${indent}${verdict} (${String(passedCount)}/${String(this.#entries.length)} steps)`,
         ];
 
-        for (const { step, value } of this.outcomes) {
+        for (const { step, value } of this.#entries) {
             const mark = outcomePassed(value) ? '[✓]' : '[x]';
             lines.push(`${indent}  ${mark} ${formatCall(step.name, step.args)}`);
 
@@ -177,19 +218,24 @@ function freezeOutcomes(value: unknown): readonly StepOutcome[] {
     if (!Array.isArray(value)) {
         throw new TypeError('Result outcomes must be an array of { step, value }');
     }
-    return Object.freeze(
-        Array.from(value, (entry: unknown, index) => {
-            if (!isStepOutcome(entry)) {
-                throw new TypeError(
-                    `Result outcome ${String(index)} must be { step: { name, args }, value }, ` +
-                        'where value is a boolean, an array of Results or a record of Results',
-                );
-            }
-            return Object.isFrozen(entry)
+    const frozen: StepOutcome[] = [];
+    let index = 0;
+    // for...of visits holes as undefined, so a sparse array is rejected like any other bad entry.
+    for (const entry of value as readonly unknown[]) {
+        if (!isStepOutcome(entry)) {
+            throw new TypeError(
+                `Result outcome ${String(index)} must be { step: { name, args }, value }, ` +
+                    'where value is a boolean, an array of Results or a record of Results',
+            );
+        }
+        frozen.push(
+            Object.isFrozen(entry)
                 ? entry
-                : Object.freeze({ step: entry.step, value: entry.value });
-        }),
-    );
+                : Object.freeze({ step: entry.step, value: entry.value }),
+        );
+        index += 1;
+    }
+    return Object.freeze(frozen);
 }
 
 function isStepOutcome(value: unknown): value is StepOutcome {

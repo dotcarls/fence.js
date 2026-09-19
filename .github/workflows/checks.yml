@@ -2,9 +2,10 @@
 # unless all of it succeeds: ci.yml deploys Pages only after it passes on main, and release.yml
 # publishes to npm only after it passes on the tagged commit.
 #
-# Each leg runs `npm run check`, the same single command a contributor runs locally, on the
-# pinned Node (.nvmrc) and on the other supported toolchain lines, so CI and local runs execute
-# identical targets (ADR-0009).
+# Every job installs the toolchain with mise from mise.toml, and every check leg runs
+# `npm run check`, the same single command a contributor runs, so CI and local runs execute
+# identical targets on identical toolchains (ADR-0009, ADR-0011). Two Node lines are tested:
+# the current Active LTS pinned in mise.toml, and the upcoming LTS through MISE_NODE_VERSION.
 name: Checks
 
 on:
@@ -26,22 +27,21 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - name: Node from .nvmrc
-            node-version-file: .nvmrc
+          - name: Active LTS from mise.toml
+            node-override: ''
             primary: true
-          - name: Node 22.23.2
-            node-version: 22.23.2
-          - name: Node 26.9.0
-            node-version: 26.9.0
+          - name: upcoming LTS 26.9.0
+            node-override: 26.9.0
+    env:
+      MISE_NODE_VERSION: ${{ matrix.node-override }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
-          node-version: ${{ matrix.node-version }}
-          node-version-file: ${{ matrix.node-version-file }}
-          cache: npm
+          version: 2026.9.11
+          cache_key_prefix: mise-node-${{ matrix.node-override || 'mise.toml' }}
       - run: npm ci --ignore-scripts
       - run: npm run check
       - name: Upload the API reference for Pages
@@ -50,37 +50,68 @@ jobs:
         with:
           path: site
 
-  consume:
-    # The published tarball, installed by name, imported as ESM and required as CommonJS on the
-    # oldest Node lines package.json `engines` admits (require(esm) is unflagged from 20.19.0
-    # and 22.12.0).
-    name: consume (Node ${{ matrix.node }})
+  pack:
+    # The one tarball everything after this point uses: the consume jobs install it and the
+    # release publishes it, so what is published is what was verified.
+    name: pack
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        node: [20.19.0, 22.12.0]
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
-          node-version-file: .nvmrc
-          cache: npm
+          version: 2026.9.11
+          cache_key_prefix: mise-node-mise.toml
       - run: npm ci --ignore-scripts
-      - name: Pack (prepack builds dist/ from a clean tree)
-        run: npm pack --pack-destination "$RUNNER_TEMP"
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      - run: npm run build
+      - name: Pack without lifecycle scripts (dist/ was just built)
+        run: |
+          mkdir -p "$RUNNER_TEMP/package"
+          npm pack --ignore-scripts --pack-destination "$RUNNER_TEMP/package"
+      - uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
         with:
-          node-version: ${{ matrix.node }}
-          package-manager-cache: false
+          name: package-tarball
+          path: ${{ runner.temp }}/package/*.tgz
+          if-no-files-found: error
+          retention-days: 7
+
+  consume:
+    # The packed tarball, installed by name in a separate project and imported as ESM and
+    # required as CommonJS, on both tested Node lines.
+    name: consume (${{ matrix.name }})
+    needs: pack
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - name: Active LTS from mise.toml
+            node-override: ''
+          - name: upcoming LTS 26.9.0
+            node-override: 26.9.0
+    env:
+      MISE_NODE_VERSION: ${{ matrix.node-override }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
+        with:
+          version: 2026.9.11
+          cache_key_prefix: mise-node-${{ matrix.node-override || 'mise.toml' }}
+      - name: Put the toolchain's Node on PATH for directories outside the project
+        run: dirname "$(mise which node)" >> "$GITHUB_PATH"
+      - uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: package-tarball
+          path: ${{ runner.temp }}/package
       - name: Install the tarball and import it
         working-directory: ${{ runner.temp }}
         run: |
           mkdir consumer && cd consumer
           npm init -y > /dev/null
-          npm install --no-audit --no-fund "$RUNNER_TEMP"/fence.js-*.tgz
+          npm install --no-audit --no-fund "$RUNNER_TEMP"/package/fence.js-*.tgz
           node --input-type=module -e "
             import { FenceBuilder } from 'fence.js';
             const fence = FenceBuilder.create().register('min', (v, n) => v.length >= n).min(2).build();
@@ -92,6 +123,8 @@ jobs:
             console.log('require(esm) ok on', process.version);"
 
   codeql:
+    # Uploads results to code scanning and fails on any finding, so an alert stops deployment
+    # and publishing like any other failed check.
     name: CodeQL
     runs-on: ubuntu-latest
     permissions:
@@ -109,3 +142,10 @@ jobs:
       - uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
           category: /language:javascript-typescript
+          output: ${{ runner.temp }}/codeql
+      - name: Fail on any finding
+        run: |
+          count=$(jq -s '[.[].runs[].results[]] | length' "$RUNNER_TEMP"/codeql/*.sarif)
+          jq -r '.runs[].results[] | "::error file=\(.locations[0].physicalLocation.artifactLocation.uri),line=\(.locations[0].physicalLocation.region.startLine)::\(.ruleId): \(.message.text)"' "$RUNNER_TEMP"/codeql/*.sarif
+          echo "CodeQL findings: $count"
+          test "$count" -eq 0

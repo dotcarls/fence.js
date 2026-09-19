@@ -29,16 +29,22 @@ export function globToRegExp(glob: string): RegExp {
 }
 
 /**
- * The files the gates see: everything git tracks plus untracked files git does not ignore, i.e.
- * exactly what a commit of the working tree would contain. Listing through git (rather than
- * walking the disk) means .gitignore is the one ignore list, so a local build, an agent worktree
- * or a scratch file can never change a gate's result (ADR-0009). Tracked files deleted from the
- * working tree are dropped.
+ * The files the gates see: everything git tracks plus untracked files the root .gitignore does
+ * not ignore. Only the root .gitignore is applied — not .git/info/exclude, a global excludes file
+ * or nested .gitignore files — because it is the one list ESLint and Prettier read too, so every
+ * tool sees the same files (ADR-0009); the `ignore-files` gate refuses any other ignore file in the
+ * tree. Tracked files deleted from the working tree are dropped.
  */
 export function walk(root: string): string[] {
     const output = execFileSync(
         'git',
-        ['ls-files', '-z', '--cached', '--others', '--exclude-standard'],
+        [
+            'ls-files',
+            '-z',
+            '--cached',
+            '--others',
+            ...(existsSync(join(root, '.gitignore')) ? ['--exclude-from=.gitignore'] : []),
+        ],
         {
             cwd: root,
             encoding: 'utf8',

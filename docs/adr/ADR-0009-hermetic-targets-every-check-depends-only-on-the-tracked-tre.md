@@ -72,7 +72,9 @@ Every npm target is hermetic. Commitments:
    the supported toolchain range — the intersection of every dev tool's `engines`
    (`^22.22.2 || ^24.15.0 || >=26.0.0`) and npm ≥ 10.9 — with `onFail: "error"`, so npm refuses
    to install or run a script under anything else. The other CI legs pin exact versions of the
-   other supported lines (22.23.2, 26.9.0).
+   other supported lines (22.23.2, 26.9.0). Hooks inherit their caller's Node, so the Claude Code
+   and git hooks resolve the pinned release through `tools/hooks/pinned-node.sh`; when it is not
+   installed they name the check that did not run instead of reporting a pass.
 5. **CI runs the same entry point.** Each CI leg runs `npm ci` then `npm run check`, the command
    `CONTRIBUTING.md` tells a contributor to run; the chain is defined once, in `package.json`.
 
@@ -96,3 +98,32 @@ the `generated` gate refusing an unshielded block. CI runs `npm run check` on th
 
 FJ-0014 · [environment](../toolchain/environment.md) · [gates](../toolchain/gates.md) ·
 ADR-0004 · ADR-0010
+
+## Amendment A1 — 2026-09-19: the pin moves to mise.toml
+
+Commitment 4 is carried out with mise
+([ADR-0011](ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)):
+`mise.toml` replaces `.nvmrc` as the pin, CI installs from it with `jdx/mise-action`, the only
+other tested line is the upcoming LTS (26.9.0, through `MISE_NODE_VERSION`), `devEngines` is
+`^24.15.0 || >=26.0.0`, and the hooks resolve Node with `mise which node`.
+
+## Amendment A2 — 2026-09-19: the holes a review found
+
+An adversarial review of this decision reproduced three remaining dependences, each closed:
+
+- **`check:package` read an existing `dist/`**: publint packs with `--ignore-scripts`, so with no
+  `dist/` it failed and with a stale one it passed. `scripts/check-package.mjs` now builds, packs
+  once without lifecycle scripts (so `npm run check` no longer rewrites `.git/hooks` through
+  `prepare`) and lints that tarball with publint (strict) and attw.
+- **Ignore lists still differed**: `git ls-files --exclude-standard` also reads nested
+  `.gitignore` files, `.git/info/exclude` and a global excludes file, which ESLint and Prettier do
+  not. The walker now applies only the root `.gitignore`, and the `ignore-files` gate refuses any
+  other ignore file in the tree.
+- **A drifted `node_modules` went unnoticed**: `npm run check` now starts with `verify:install`,
+  which compares npm's record of the install with `package-lock.json` entry by entry.
+
+What a working tree can still add, uncommitted edits and files not yet added to git, is closed by
+`npm run check:clean`: `npm run check` on the HEAD commit exported with `git archive` and
+installed with `npm ci`. The pre-push hook runs it, so a push has passed the same check CI runs.
+The checkpoint gate's "not in the future" rule is the one rule that reads the clock; it has a
+day of tolerance and can only move from failing to passing as time passes, never the reverse.

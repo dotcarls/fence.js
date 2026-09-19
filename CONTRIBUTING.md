@@ -12,33 +12,39 @@ has a work item; decisions have an ADR; `npm run gates` checks the graph on ever
 
 ## Setup
 
-fence.js has no runtime dependencies. Developing it needs the **Node.js release in `.nvmrc`**
-(npm refuses unsupported versions through `devEngines`; see
-[environment](docs/toolchain/environment.md)). The published package itself runs on Node
-20.19+ and evergreen browsers.
+fence.js has no runtime dependencies. The toolchain is managed by **[mise](https://mise.jdx.dev)**:
+`mise.toml` pins Node to the current Active LTS release, and npm refuses other versions through
+`devEngines` ([environment](docs/toolchain/environment.md)). The published package runs on
+Node 24+ and evergreen browsers.
 
 ```sh
 git clone https://github.com/<you>/fence.js.git
 cd fence.js
-npm install      # also installs the git hooks (simple-git-hooks)
-npm run check    # everything CI runs, in the same order
+mise trust && mise install    # the pinned Node
+mise exec -- npm install      # also installs the git hooks (simple-git-hooks)
+mise exec -- npm run check    # everything CI runs, in the same order
 ```
+
+With `mise activate` in your shell, drop the `mise exec --` prefix. CI also runs the upcoming
+LTS line; run it locally with `MISE_NODE_VERSION=26.9.0 mise exec -- npm run check`.
 
 ## Scripts
 
-| Script                  | What it does                                                                                     |
-| ----------------------- | ------------------------------------------------------------------------------------------------ |
-| `npm test`              | Runs the Vitest suite once, type-level tests included (`npm run test:watch` to watch)            |
-| `npm run test:coverage` | Same, with v8 coverage; thresholds are 95% across the board                                      |
-| `npm run typecheck`     | `tsc --noEmit` over `src` and `test`                                                             |
-| `npm run lint`          | ESLint with `typescript-eslint` strict, type-checked rules                                       |
-| `npm run format`        | Prettier (`format:check` only verifies)                                                          |
-| `npm run build`         | Compiles `src` to `dist` (ESM + `.d.ts`) with `tsc`                                              |
-| `npm run examples`      | Builds `dist/`, then type-checks and runs every example in `examples/` against the built package |
-| `npm run check:package` | `publint` and `@arethetypeswrong/cli` against the packed tarball                                 |
-| `npm run bench`         | Compares fence.js with validate.js and Joi (informational)                                       |
-| `npm run docs`          | Generates the API reference into `docs/` with TypeDoc                                            |
-| `npm run check`         | Everything CI runs, in the same order                                                            |
+| Script                   | What it does                                                                                     |
+| ------------------------ | ------------------------------------------------------------------------------------------------ |
+| `npm test`               | Runs the Vitest suite once, type-level tests included (`npm run test:watch` to watch)            |
+| `npm run test:coverage`  | Same, with v8 coverage; thresholds are 95% across the board                                      |
+| `npm run typecheck`      | `tsc --noEmit` over `src` and `test`                                                             |
+| `npm run lint`           | ESLint with `typescript-eslint` strict, type-checked rules                                       |
+| `npm run format`         | Prettier (`format:check` only verifies)                                                          |
+| `npm run build`          | Compiles `src` to `dist` (ESM + `.d.ts`) with `tsc`                                              |
+| `npm run examples`       | Builds `dist/`, then type-checks and runs every example in `examples/` against the built package |
+| `npm run check:package`  | `publint` and `@arethetypeswrong/cli` against the packed tarball                                 |
+| `npm run bench`          | Compares fence.js with validate.js and Joi (informational)                                       |
+| `npm run docs`           | Generates the API reference into `docs/` with TypeDoc                                            |
+| `npm run verify:install` | Fails when `node_modules` differs from `package-lock.json` (run `npm ci`); first step of `check` |
+| `npm run check:clean`    | `npm run check` on the HEAD commit in a clean export with `npm ci`; the pre-push hook runs it    |
+| `npm run check`          | Everything CI runs, in the same order                                                            |
 
 ## Layout
 
@@ -76,8 +82,8 @@ docs/           the documentation graph: index, toolchain and governance, decisi
 - Errors the library raises about validation input or state are subclasses of `FenceError`;
   `TypeError` is reserved for arguments of the wrong JavaScript type (constructors, the `base`
   argument of `fromJSON`).
-- Prettier, ESLint and the related Vitest files run on staged files in the pre-commit hook;
-  `typecheck` and the full test suite run before push.
+- Prettier, ESLint and the related Vitest files run on staged files in the pre-commit hook; the
+  pre-push hook runs `npm run check:clean`, the whole chain on the commit being pushed.
 
 ## Releasing
 

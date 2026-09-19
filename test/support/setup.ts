@@ -7,4 +7,8 @@ import fc from 'fast-check';
 
 const DEFAULT_SEED = 20_260_916;
 
-fc.configureGlobal({ seed: Number(process.env.FAST_CHECK_SEED ?? DEFAULT_SEED) });
+// An unset or empty FAST_CHECK_SEED means the default seed (an empty string would otherwise be 0).
+const requested = process.env.FAST_CHECK_SEED;
+fc.configureGlobal({
+    seed: requested === undefined || requested.trim() === '' ? DEFAULT_SEED : Number(requested),
+});

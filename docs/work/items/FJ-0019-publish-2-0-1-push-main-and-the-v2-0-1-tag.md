@@ -2,7 +2,7 @@
 id: FJ-0019
 title: 'Publish 2.0.1: push main and the v2.0.1 tag'
 type: task
-status: backlog
+status: ready
 priority: p0
 milestone: '2.0.1'
 created: 2026-09-19
@@ -10,6 +10,7 @@ updated: 2026-09-19
 parent: null
 blocks: []
 blocked_by: []
+owner: 'Tim Carlson'
 acceptance_criteria:
   - text: 'git push origin main --follow-tags succeeds and CI on main is green'
     satisfied: false

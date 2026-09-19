@@ -37,12 +37,12 @@
     "CHANGELOG.md"
   ],
   "engines": {
-    "node": ">=20.19.0"
+    "node": "^24.0.0 || >=26.0.0"
   },
   "devEngines": {
     "runtime": {
       "name": "node",
-      "version": "^22.22.2 || ^24.15.0 || >=26.0.0",
+      "version": "^24.15.0 || >=26.0.0",
       "onFail": "error"
     },
     "packageManager": {
@@ -52,29 +52,31 @@
     }
   },
   "scripts": {
-    "build": "rimraf dist && tsc -p tsconfig.build.json",
-    "clean": "rimraf dist coverage site",
-    "typecheck": "tsc --noEmit",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix",
-    "format": "prettier --write .",
-    "format:check": "prettier --check .",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "adr": "tsx tools/gates/cli.ts adr",
     "bench": "tsx test/bench/compare.bench.ts",
-    "check": "npm run gates && npm run typecheck && npm run lint && npm run format:check && npm run test:coverage && npm run examples && npm run check:package && npm run docs",
-    "check:package": "publint && attw --pack . --profile esm-only",
+    "build": "rimraf dist && tsc -p tsconfig.build.json",
+    "check": "npm run verify:install && npm run gates && npm run typecheck && npm run lint && npm run format:check && npm run test:coverage && npm run examples && npm run check:package && npm run docs",
+    "check:clean": "node scripts/check-clean.mjs",
+    "check:package": "node scripts/check-package.mjs",
+    "checkpoint": "tsx tools/gates/cli.ts checkpoint check",
+    "clean": "rimraf dist coverage site",
     "docs": "typedoc",
     "examples": "npm run build && tsc --noEmit -p examples/tsconfig.dist.json && tsx --tsconfig examples/tsconfig.dist.json examples/run-all.ts",
-    "prepare": "simple-git-hooks",
-    "prepack": "npm run build",
-    "release": "release-it",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
     "gates": "tsx tools/gates/cli.ts gates",
     "gates:fix": "tsx tools/gates/cli.ts gates --fix",
-    "work": "tsx tools/gates/cli.ts item",
-    "adr": "tsx tools/gates/cli.ts adr",
-    "checkpoint": "tsx tools/gates/cli.ts checkpoint check"
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "prepack": "npm run build",
+    "prepare": "simple-git-hooks",
+    "release": "release-it",
+    "test": "vitest run",
+    "test:coverage": "vitest run --coverage",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit",
+    "verify:install": "node scripts/verify-install.mjs",
+    "work": "tsx tools/gates/cli.ts item"
   },
   "devDependencies": {
     "@arethetypeswrong/cli": "^0.18.5",
@@ -104,8 +106,8 @@
     "yaml": "^2.9.1"
   },
   "simple-git-hooks": {
-    "pre-commit": "npx lint-staged && npm run gates",
-    "pre-push": "npm run typecheck && npm test"
+    "pre-commit": "bash tools/hooks/with-pinned-node.sh sh -c \"npx lint-staged && npm run gates\"",
+    "pre-push": "bash tools/hooks/with-pinned-node.sh npm run check:clean"
   },
   "lint-staged": {
     "*.{ts,js}": [

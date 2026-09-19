@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 # Claude Code PostToolUse hook (matcher: Edit|Write). Runs the gate suite after every edit inside
-# the repository and feeds findings back to the model. PostToolUse cannot block an edit; exit 2
-# makes stderr visible to Claude (https://code.claude.com/docs/en/hooks). Exit 0 reports nothing.
+# the repository, under the Node pinned in mise.toml, and feeds findings back to the model.
+# PostToolUse cannot block an edit; exit 2 makes stderr visible to Claude
+# (https://code.claude.com/docs/en/hooks). Exit 0 reports nothing.
 set -uo pipefail
 ROOT="${CLAUDE_PROJECT_DIR:-$(cd "$(dirname "$0")/../.." && pwd)}"
 cd "$ROOT" || exit 0
@@ -18,6 +19,13 @@ esac
 case "$file_path" in
   */node_modules/*|*/dist/*|*/site/*|*/coverage/*|*/.git/*) exit 0 ;;
 esac
+
+# shellcheck source=SCRIPTDIR/pinned-node.sh
+. "$ROOT/tools/hooks/pinned-node.sh"
+if [ "$PINNED_NODE_STATUS" = missing ]; then
+  pinned_node_missing_message "the gates" >&2
+  exit 2
+fi
 [ -d node_modules ] || { echo "gates hook: node_modules missing; run npm install" >&2; exit 2; }
 
 out="$(npx --no-install tsx tools/gates/cli.ts gates --hook 2>&1)"

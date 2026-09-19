@@ -29,10 +29,12 @@ steps, builds fences, runs them, serializes them to JSON. Zero dependencies, ESM
 - **Vocabulary is governed.** American English; the canonical terms are in the
   [lexicon](docs/toolchain/lexicon.md), classifications in the [taxonomy](docs/toolchain/taxonomy.md),
   artifact kinds in the [metamodel](docs/toolchain/metamodel.md).
-- **Targets are hermetic.** Use the Node in `.nvmrc` (npm enforces the supported range). Every
+- **Targets are hermetic.** The toolchain is mise: `mise install`, then run npm under it
+  (`mise exec -- npm …` or an activated shell); npm refuses other Node versions. Every
   target depends only on the tracked tree and that toolchain, and CI runs the same
   `npm run check`; a result that differs between here and CI is a defect
-  ([ADR-0009](docs/adr/ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md)).
+  ([ADR-0009](docs/adr/ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md),
+  [ADR-0011](docs/adr/ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)).
 - **Commits are local.** Commit at coherent boundaries with the check chain green and the
   co-author trailer; never push, never publish, never rewrite shared history. Pushing and
   publishing are the owner's acts ([release process](docs/toolchain/release-process.md)).

@@ -2,7 +2,7 @@
 id: FJ-0018
 title: 'Release 2.0.1'
 type: release
-status: backlog
+status: in-progress
 priority: p0
 milestone: '2.0.1'
 created: 2026-09-19
@@ -11,7 +11,7 @@ parent: null
 blocks: []
 blocked_by: []
 acceptance_criteria:
-  - text: 'Every item with milestone 2.0.1 is done'
+  - text: 'Every other item with milestone 2.0.1 is done (FJ-0019, the publish, follows the tag)'
     satisfied: false
     evidence: null
     verified_by: null
@@ -39,3 +39,5 @@ links:
 ## Notes
 
 - 2026-09-19: created
+- 2026-09-19: an earlier draft of this item claimed the release commit and tag before they existed;
+  the review caught it and the claims were withdrawn. They are written after the tag exists.

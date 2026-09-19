@@ -70,3 +70,20 @@ to `checks.yml` (or to `npm run check`), never to a caller.
 ## Links
 
 FJ-0015 · FJ-0017 · ADR-0008 · ADR-0009 · [release-process](../toolchain/release-process.md)
+
+## Amendment A1 — 2026-09-19: the tested lines
+
+The `check` and `consume` jobs run on the Active LTS pinned in `mise.toml` and on the upcoming
+LTS, both installed with mise; the `consume` job no longer tests Node 20.19.0 and 22.12.0
+([ADR-0011](ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)).
+
+## Amendment A2 — 2026-09-19: one verified tarball, CodeQL as a gate
+
+- A `pack` job in `checks.yml` builds and packs the tarball once; the `consume` jobs install that
+  artifact, and `release.yml` publishes that same file (`npm publish <tarball>`), so what is
+  published is what was verified. The publish job no longer installs dependencies, and mise gives
+  it no GitHub token.
+- The `codeql` job fails on any finding, so an alert stops deployment and publishing like a
+  failed test instead of only being uploaded.
+- `ci.yml`'s concurrency group includes the event name, so a scheduled or manual run can no
+  longer cancel a pending push run and skip its Pages deployment.

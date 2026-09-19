@@ -316,7 +316,9 @@ export const checkpoint: Gate = {
                     finding('checkpoint', file, `next_action names ${id}, which is ${status}`),
                 );
         }
-        if (typeof fm.updated === 'string' && fm.updated > ctx.today()) {
+        // One day of tolerance for writers east or west of UTC. The rule can only move from failing
+        // to passing as time passes, never the reverse, so a commit that passes it once always does.
+        if (typeof fm.updated === 'string' && fm.updated > addDays(ctx.today(), 1)) {
             out.push(finding('checkpoint', file, `updated ${fm.updated} is in the future`));
         }
         return out;
@@ -576,6 +578,36 @@ function compareSemver(a: string, b: string): number {
     return preA ? -1 : 1;
 }
 
+/** The date `days` after an ISO date (YYYY-MM-DD), in UTC. */
+function addDays(iso: string, days: number): string {
+    const date = new Date(`${iso}T00:00:00Z`);
+    date.setUTCDate(date.getUTCDate() + days);
+    return date.toISOString().slice(0, 10);
+}
+
+const IGNORE_FILES = new Set(['.gitignore', '.prettierignore', '.eslintignore', '.npmignore']);
+
+/** The root .gitignore is the only ignore list; other ignore files would make tools disagree. */
+export const ignoreFiles: Gate = {
+    name: 'ignore-files',
+    run(ctx) {
+        const out: Finding[] = [];
+        for (const file of ctx.files) {
+            const name = file.split('/').pop() ?? '';
+            if (!IGNORE_FILES.has(name) || file === '.gitignore' || file === '.prettierignore')
+                continue;
+            out.push(
+                finding(
+                    'ignore-files',
+                    file,
+                    'only the root .gitignore may list ignored files (and the root .prettierignore, for tracked files Prettier must not rewrite); ESLint, Prettier and the gates read no other ignore file',
+                ),
+            );
+        }
+        return out;
+    },
+};
+
 export const ALL_GATES: readonly Gate[] = [
     schemas,
     xref,
@@ -586,4 +618,5 @@ export const ALL_GATES: readonly Gate[] = [
     binding,
     lexicon,
     changelog,
+    ignoreFiles,
 ];

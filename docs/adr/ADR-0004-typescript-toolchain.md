@@ -62,3 +62,9 @@ latest typescript-eslint (8.70.0) declares `typescript >=4.8.4 <6.1.0` and the l
 (0.28.20) accepts only up to 6.0.x. Dependabot ignores TypeScript majors until both widen;
 revisit then. The Node toolchain is now pinned (`.nvmrc`) and enforced (`devEngines`) per
 ADR-0009, replacing "Node 22 or 24" above.
+
+## Amendment A2 — 2026-09-19: mise
+
+The Node toolchain is pinned in `mise.toml`, not `.nvmrc`, and only the Active LTS and upcoming
+LTS lines are tested
+([ADR-0011](ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)).

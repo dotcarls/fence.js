@@ -49,3 +49,12 @@ Node 20 and 22; a grep of `dist/` for Node built-ins in review.
 ## Links
 
 [release process](../toolchain/release-process.md) · FJ-0003 · FJ-0012
+
+## Amendment A1 — 2026-09-19: Node 24 or newer
+
+The Node floor for consumers is now `engines.node: ^24.0.0 || >=26.0.0`, the current Active LTS
+line and the upcoming LTS onward; the
+lines tested are that one and the upcoming LTS
+([ADR-0011](ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)). Node
+20.19 and 22.12 above are no longer claimed or tested. ES modules only and browser support are
+unchanged.

@@ -6,11 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
-The first 2.x release on npm. The library is unchanged from 2.0.0; what changed is how it is
-built, checked and released.
+The first 2.x release on npm: 2.0.0 was tagged but its release pipeline failed before
+publishing. Besides how the package is built, checked and released, `Fence.run()` is faster.
 
 ### Fixed
 
+- `Fence.run()` had become 2.4–3.3× slower in 2.0.0 than in the first version of the rewrite:
+  every run re-validated and re-froze outcomes it had just produced. A result now keeps its
+  entries private and freezes the public `outcomes` view once, on first access; `run()` is
+  1.7–2.8× faster than the first rewrite, and `outcomes` is still immutable (FJ-0021).
 - The release pipeline failed before publishing 2.0.0: `eslint` checked the examples against
   whatever `dist/` happened to exist, so it passed locally and failed in CI. Every check now
   depends only on the tracked tree and the pinned toolchain, and gives the same result locally
@@ -19,11 +23,16 @@ built, checked and released.
 
 ### Changed
 
-- Documentation is deployed and the package is published only after every check passes: all
-  Node lines, the install-by-name consume test on Node 20.19 and 22.12, and CodeQL (FJ-0015).
+- Documentation is deployed and the package is published only after every check passes: both
+  tested Node lines, the install-by-name consume test, and CodeQL (FJ-0015).
 - Development dependencies and GitHub Actions are at their latest releases; TypeScript stays on
   6.0.3, the newest release typescript-eslint and TypeDoc support (FJ-0016).
 - The default branch is `main` (FJ-0017).
+- Supported Node versions are the ones tested: the current Active LTS (24) and the upcoming LTS
+  (26). `engines` is now `^24.0.0 || >=26.0.0`; 2.0.0 declared `>=20.19.0` and was never
+  published. The toolchain is managed with mise (FJ-0020).
+- The published tarball is the one the checks installed and imported; CodeQL findings now fail
+  the checks (FJ-0015).
 
 ## [2.0.0] - 2026-09-16
 
@@ -82,6 +91,10 @@ pushed tag is not moved. 2.0.1 is the first 2.x release on npm and ships this co
 
 ### Fixed
 
+- `Fence.run()` had become 2.4–3.3× slower in 2.0.0 than in the first version of the rewrite:
+  every run re-validated and re-froze outcomes it had just produced. A result now keeps its
+  entries private and freezes the public `outcomes` view once, on first access; `run()` is
+  1.7–2.8× faster than the first rewrite, and `outcomes` is still immutable (FJ-0021).
 - `register()` no longer writes to a shared prototype; registrations cannot leak between
   builders and the prototype chain no longer grows with each `register()`/`fork()`.
 - Deriving two builders from one base no longer produces the same object carrying both steps.

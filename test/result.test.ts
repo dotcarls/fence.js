@@ -274,3 +274,29 @@ describe('Result review follow-ups', () => {
         expect(new Result('s', [{ step, value: {} }]).passed).toBe(true);
     });
 });
+
+describe('Result storage (FJ-0021)', () => {
+    const base = FenceBuilder.create().register('min', v.minLength);
+
+    test('the outcomes view of a run result is frozen, stable and not the internal storage', () => {
+        const result = base.min(1).min(2).build().run('a');
+        const view = result.outcomes;
+
+        expect(result.outcomes).toBe(view);
+        expect(Object.isFrozen(view)).toBe(true);
+        expect(view.every((entry) => Object.isFrozen(entry))).toBe(true);
+        expect(() => {
+            (view[0] as { value: unknown }).value = false;
+        }).toThrow(TypeError);
+        expect(result.passed).toBe(false);
+        expect(result.for('min')).toEqual([true, false]);
+    });
+
+    test('verdicts do not need the outcomes view', () => {
+        const result = base.min(1).build().run('a');
+
+        expect(result.passed).toBe(true);
+        expect(result.failures()).toEqual([]);
+        expect(Object.keys(result)).toEqual(['subject']);
+    });
+});

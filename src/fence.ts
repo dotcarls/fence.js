@@ -1,8 +1,8 @@
 import { EmptyFenceError, RegistrationError } from './errors.js';
-import { Result } from './result.js';
+import { createResult, type Result } from './result.js';
 import { serializeSteps } from './serialize.js';
 import { bindStep, createStep, registryOf, type Runner } from './step.js';
-import type { Registry, RegistryEntries, SerializedFence, Step } from './types.js';
+import type { Registry, RegistryEntries, SerializedFence, Step, StepOutcome } from './types.js';
 
 /**
  * A built, immutable validation. Run it against one subject at a time, as often as needed;
@@ -86,10 +86,11 @@ export class Fence<R extends Registry = Registry> {
      * @throws {@link InvalidOutcomeError} when a validator returns something other than an outcome.
      */
     run(subject: unknown): Result {
-        return new Result(
-            subject,
-            this.#bound.map(({ step, run }) => Object.freeze({ step, value: run(subject) })),
-        );
+        const outcomes: StepOutcome[] = [];
+        for (const { step, run } of this.#bound) {
+            outcomes.push({ step, value: run(subject) });
+        }
+        return createResult(subject, outcomes);
     }
 
     /** @throws {@link SerializationError} when a step argument is not a JSON value or a fence. */

@@ -8,24 +8,26 @@ updated: '2026-09-19'
 # Environment
 
 Every target gives the same result on a contributor's machine and in CI because each one
-depends only on the tracked tree and the pinned toolchain ([ADR-0009](../adr/ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md)).
-This page lists what is pinned and how.
+depends only on the tracked tree and the pinned toolchain
+([ADR-0009](../adr/ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md)),
+and the toolchain is managed by mise everywhere
+([ADR-0011](../adr/ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)).
 
 ## The toolchain
 
-| Concern                 | Pinned by                                                                                    | Value                                                                                                   |
-| ----------------------- | -------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- |
-| Node for development    | [`.nvmrc`](../../.nvmrc) — used by contributors and the primary CI leg                       | 24.21.0 (Active LTS)                                                                                    |
-| Supported dev toolchain | `package.json` `devEngines` with `onFail: "error"`: npm refuses to install or run outside it | Node `^22.22.2 \|\| ^24.15.0 \|\| >=26.0.0`, npm `>=10.9.0`                                             |
-| Other CI legs           | `.github/workflows/checks.yml`                                                               | Node 22.23.2 and 26.9.0                                                                                 |
-| Node for consumers      | `package.json` `engines` (floors tested by the `consume` CI job)                             | `>=20.19.0`; tested on 20.19.0 and 22.12.0                                                              |
-| Dependencies            | `package-lock.json`, installed with `npm ci`                                                 | every devDependency at its latest release; see below                                                    |
-| Actions                 | commit SHAs in the workflows, version in a comment, updated weekly by Dependabot             | checkout 7.0.1, setup-node 7.0.0, upload-pages-artifact 5.0.0, deploy-pages 5.0.1, codeql-action 4.38.1 |
+| Concern                 | Pinned by                                                                                    | Value                                                                                                    |
+| ----------------------- | -------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Toolchain manager       | [`mise.toml`](../../mise.toml) `min_version`; CI pins the mise release in the workflows      | mise ≥ 2026.6.14 (CI: 2026.9.11)                                                                         |
+| Node (default)          | `mise.toml` — the current Active LTS release, used by contributors and every CI job          | 24.21.0                                                                                                  |
+| Node (also tested)      | `MISE_NODE_VERSION` on the second leg of `check` and `consume` in `checks.yml`               | 26.9.0, the upcoming LTS (LTS from 2026-10-28); no other line is tested                                  |
+| Supported dev toolchain | `package.json` `devEngines` with `onFail: "error"`: npm refuses to install or run outside it | Node `^24.15.0 \|\| >=26.0.0`, npm `>=10.9.0`                                                            |
+| Node for consumers      | `package.json` `engines`                                                                     | `^24.0.0 \|\| >=26.0.0`: the tested LTS lines, each at its latest release                                |
+| Dependencies            | `package-lock.json`, installed with `npm ci`                                                 | every devDependency at its latest release; see below                                                     |
+| Actions                 | commit SHAs in the workflows, version in a comment, updated weekly by Dependabot             | checkout 7.0.1, mise-action 4.3.0, upload-pages-artifact 5.0.0, deploy-pages 5.0.1, codeql-action 4.38.1 |
 
-The `devEngines` range is the intersection of the dev tools' own `engines` fields (lint-staged
-and release-it set the Node 22 floor, release-it the Node 24 floor). Switch to the pinned Node
-with your version manager (`n auto`, `nvm use`, `fnm use`, `mise use`); npm names the problem
-if you do not.
+The `devEngines` floor on the Node 24 line is release-it's (`^24.15.0`). The hooks — Claude
+Code's and git's — find the pinned Node with `mise which node`, so they work even when another
+Node is your shell's default ([agents-and-skills](agents-and-skills.md#hooks)).
 
 **The one dependency not at its latest release** is TypeScript: 6.0.3, the newest release the
 latest typescript-eslint (8.70.0, `typescript <6.1.0`) and TypeDoc (0.28.20, `6.0.x`) accept.
@@ -34,34 +36,45 @@ TypeScript 7 is adopted when both do ([ADR-0004 A1](../adr/ADR-0004-typescript-t
 ## Setup
 
 ```sh
-n auto             # or nvm use / fnm use: the Node in .nvmrc
-npm install        # also installs the git hooks (simple-git-hooks)
-npm run check      # everything CI runs: CI runs exactly this command
+mise trust && mise install   # the toolchain in mise.toml (install mise: https://mise.jdx.dev)
+mise exec -- npm install     # or run `mise activate` in your shell once and drop the prefix
+mise exec -- npm run check   # everything CI runs: CI runs exactly this command
+MISE_NODE_VERSION=26.9.0 mise exec -- npm run check   # the upcoming-LTS leg
 ```
 
 ## The check chain
 
-`npm run check` = `gates` → `typecheck` → `lint` → `format:check` → `test:coverage` →
-`examples` → `check:package` → `docs`. Each target is self-contained and can be run alone, in
+`npm run check` = `verify:install` → `gates` → `typecheck` → `lint` → `format:check` →
+`test:coverage` → `examples` → `check:package` → `docs`. Each target is self-contained and can be run alone, in
 any order, from any prior state:
 
-| Target          | Reads                                                  | Notes                                                                                                                 |
-| --------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
-| `gates`         | files git would commit (`git ls-files`)                | [gates](gates.md)                                                                                                     |
-| `typecheck`     | `src/`, `test/`, `examples/`, `tools/gates/`           | `fence.js` resolves to `src/` (root `tsconfig.json` paths)                                                            |
-| `lint`          | the same project; ignores what `.gitignore` ignores    | never reads `dist/`                                                                                                   |
-| `format:check`  | every file git would commit except `package-lock.json` | generated blocks are inside `<!-- prettier-ignore-start/end -->`                                                      |
-| `test:coverage` | `test/`, `src/`                                        | `.only` refused and missing snapshots fail everywhere; property tests use a fixed seed (`FAST_CHECK_SEED` to explore) |
-| `examples`      | a fresh `dist/` it builds itself                       | type-checks and runs `examples/` against the built package (`examples/tsconfig.dist.json`)                            |
-| `check:package` | the packed tarball (`prepack` builds it)               | publint, `attw --profile esm-only`                                                                                    |
-| `docs`          | the root project                                       | TypeDoc into `site/`; warnings fail                                                                                   |
+| Target           | Reads                                                  | Notes                                                                                                                 |
+| ---------------- | ------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------- |
+| `verify:install` | `node_modules` against `package-lock.json`             | fails on any version or integrity drift: run `npm ci`                                                                 |
+| `gates`          | files git would commit under the root `.gitignore`     | [gates](gates.md)                                                                                                     |
+| `typecheck`      | `src/`, `test/`, `examples/`, `tools/gates/`           | `fence.js` resolves to `src/` (root `tsconfig.json` paths)                                                            |
+| `lint`           | the same project; ignores what `.gitignore` ignores    | never reads `dist/`                                                                                                   |
+| `format:check`   | every file git would commit except `package-lock.json` | generated blocks are inside `<!-- prettier-ignore-start/end -->`                                                      |
+| `test:coverage`  | `test/`, `src/`                                        | `.only` refused and missing snapshots fail everywhere; property tests use a fixed seed (`FAST_CHECK_SEED` to explore) |
+| `examples`       | a fresh `dist/` it builds itself                       | type-checks and runs `examples/` against the built package (`examples/tsconfig.dist.json`)                            |
+| `check:package`  | a tarball it builds and packs itself                   | publint (strict) and `attw --profile esm-only` on that tarball; packing runs no lifecycle scripts                     |
+| `docs`           | the root project                                       | TypeDoc into `site/`; warnings fail                                                                                   |
 
 `build` removes `dist/` before compiling, so a deleted source never leaves a stale module
 behind.
+
+**What only a clean export can promise.** A working tree can hold edits not yet committed and
+files not yet added to git; CI sees neither. `npm run check:clean` runs `npm run check` on the
+HEAD commit exported with `git archive` and installed with `npm ci`, and the pre-push hook runs
+it, so a push has passed exactly the check CI will run.
 
 ## Updating the toolchain
 
 - **npm dependencies:** Dependabot opens a grouped weekly PR; `npm run check` decides.
 - **Actions:** Dependabot updates the SHA pins weekly.
-- **Node:** edit `.nvmrc` and the two pinned legs in `checks.yml` together; raise `devEngines`
-  when a tool raises its floor.
+- **Node patch releases:** edit `mise.toml` (default line) and `node-override` in `checks.yml`
+  (upcoming line) together.
+- **LTS transitions:** when the upcoming LTS enters Active LTS, it becomes the `mise.toml` pin,
+  the next even-numbered release (once published) becomes the tested upcoming LTS, `devEngines`
+  follows, and `engines` rises in the next major release (ADR-0011).
+- **mise:** raise the version in the workflows and `min_version` in `mise.toml` together.

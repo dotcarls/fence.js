@@ -18,16 +18,15 @@ check is failing.
 ```mermaid
 flowchart LR
     subgraph checks["checks.yml (reusable)"]
-        c1["npm run check · Node from .nvmrc"]
-        c2["npm run check · Node 22.23.2"]
-        c3["npm run check · Node 26.9.0"]
-        c4["consume · Node 20.19.0 / 22.12.0"]
-        c5["CodeQL"]
+        c1["npm run check · Active LTS (mise.toml)"]
+        c2["npm run check · upcoming LTS 26.9.0"]
+        c5b["pack: the tarball"] --> c4["consume · both lines"]
+        c5["CodeQL · fails on any finding"]
     end
     push["push to main"] --> ci["ci.yml"] --> checks
     checks -->|all passed| pages["deploy Pages (artifact built by the checks)"]
     tag["push tag vX.Y.Z"] --> rel["release.yml"] --> checks2["checks.yml on the tagged commit"]
-    checks2 -->|all passed| publish["verify tag on main and = package.json → npm publish --provenance → GitHub release"]
+    checks2 -->|all passed| publish["verify tag on main and = package.json → npm publish the packed tarball --provenance → GitHub release"]
 ```
 
 ## Versioning
@@ -63,8 +62,8 @@ published, the fix ships as the next patch (2.0.0 → 2.0.1).
 
 5. **Publish (owner only).** `git push origin main --follow-tags`. The push runs CI on `main`
    (and deploys Pages when it passes); the tag runs `release.yml`, which runs every check on
-   the tagged commit and only then publishes under `latest` (or `next`) with provenance and
-   creates the GitHub release from `node scripts/changelog.mjs notes x.y.z`. Trusted publishing
+   the tagged commit and only then publishes the tarball those checks verified under `latest`
+   (or `next`) with provenance and creates the GitHub release from `node scripts/changelog.mjs notes x.y.z`. Trusted publishing
    is configured on npmjs.com for this repository, `release.yml` and the `npm` environment.
 6. **Checkpoint.** Refresh `docs/work/CHECKPOINT.md`; open the next milestone.
 
@@ -72,9 +71,12 @@ published, the fix ships as the next patch (2.0.0 → 2.0.1).
 
 `npm pack` contains `dist/`, `src/`, `README.md`, `MIGRATING.md`, `CHANGELOG.md`, `LICENSE` and
 `package.json`; `publint` and `attw` check the shape, and the `consume` job installs the tarball
-by name on the oldest supported Node lines.
+by name on both tested Node lines.
 
 ## Maintenance lines
 
-Older majors live on branches named after the line (`v1`). A fix there is released from that
-branch with the same steps and a `1.x.y` version.
+Releasing from an older line (`v1`) is **not supported yet**. A tag runs the workflow files of
+the tagged commit: the `v1` branch has no release workflow, and the `main` one would refuse a tag
+that is not on `main` and would publish under `latest`. Whether a 1.x line is released at all
+is FJ-0013; if it is, it needs its own release workflow that checks ancestry against `v1` and
+publishes under a `release-1.x` dist-tag.

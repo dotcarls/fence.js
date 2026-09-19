@@ -136,12 +136,12 @@ defined in ADR-0001 and ADR-0003, annotated in the source (`@fence:invariant(...
 
 ## Distribution
 
-ESM only, `exports` map with a `types` condition, `sideEffects: false`, `engines.node >= 20.19`,
+ESM only, `exports` map with a `types` condition, `sideEffects: false`, `engines.node >= 24`,
 compiled by `tsc` to `dist/` with declarations and source maps; `src/` ships for the maps.
 Browsers import from an ESM CDN. No Node built-ins are used anywhere in `src/`
 ([ADR-0002](../adr/ADR-0002-esm-only-distribution.md)). Every CI run packs the tarball, installs it by
-name and imports it as ESM and CommonJS on Node 20.19.0 and 22.12.0, the floors `engines`
-admits. The package is published only after every check has passed on the tagged commit
+name and imports it as ESM and CommonJS on the current Active LTS and the upcoming LTS, the only
+lines tested ([ADR-0011](../adr/ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md)). The package is published only after every check has passed on the tagged commit
 ([ADR-0010](../adr/ADR-0010-one-reusable-check-workflow-gates-pages-deployment-and-npm-p.md)).
 
 ## Repository layout

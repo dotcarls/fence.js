@@ -12,28 +12,29 @@ Template: [TEMPLATE.md](TEMPLATE.md). Create with `npm run work -- new --title "
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: work-index -->
-_19 items. Generated from front matter; run `npm run gates:fix`._
+_21 items. Generated from front matter; run `npm run gates:fix`._
 
-### in-progress (4)
+### in-progress (1)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
-| [FJ-0014](items/FJ-0014-check-targets-depend-on-build-output-and-local-state-so-lint.md) | Check targets depend on build output and local state, so lint fails in CI | bug | p0 | 2.0.1 | — |
-| [FJ-0015](items/FJ-0015-deploy-docs-and-publish-to-npm-only-after-every-ci-job-passe.md) | Deploy docs and publish to npm only after every CI job passes | story | p0 | 2.0.1 | — |
-| [FJ-0016](items/FJ-0016-update-every-npm-and-github-actions-dependency-to-its-latest.md) | Update every npm and GitHub Actions dependency to its latest version | task | p1 | 2.0.1 | — |
-| [FJ-0017](items/FJ-0017-rename-the-default-branch-from-master-to-main.md) | Rename the default branch from master to main | task | p1 | 2.0.1 | — |
+| [FJ-0018](items/FJ-0018-release-2-0-1.md) | Release 2.0.1 | release | p0 | 2.0.1 | — |
 
-### backlog (5)
+### ready (1)
+
+| id | title | type | priority | milestone | parent |
+|---|---|---|---|---|---|
+| [FJ-0019](items/FJ-0019-publish-2-0-1-push-main-and-the-v2-0-1-tag.md) | Publish 2.0.1: push main and the v2.0.1 tag | task | p0 | 2.0.1 | — |
+
+### backlog (3)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
 | [FJ-0011](items/FJ-0011-async-validators.md) | Async validators: runAsync and AsyncValidator | story | p2 | 2.1.0 | — |
 | [FJ-0012](items/FJ-0012-verify-browser-consumption-from-an-esm-cdn.md) | Verify browser consumption from an ESM CDN | task | p2 | 2.x | — |
 | [FJ-0013](items/FJ-0013-decide-the-1-x-maintenance-line.md) | Decide the 1.x maintenance line | decision | p3 | — | — |
-| [FJ-0018](items/FJ-0018-release-2-0-1.md) | Release 2.0.1 | release | p0 | 2.0.1 | — |
-| [FJ-0019](items/FJ-0019-publish-2-0-1-push-main-and-the-v2-0-1-tag.md) | Publish 2.0.1: push main and the v2.0.1 tag | task | p0 | 2.0.1 | — |
 
-### done (9)
+### done (15)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
@@ -46,6 +47,12 @@ _19 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0007](items/FJ-0007-remove-the-1-x-compatibility-surface.md) | Remove the 1.x compatibility surface | task | p0 | 2.0.0 | FJ-0001 |
 | [FJ-0008](items/FJ-0008-agentic-toolchain-and-governance-scaffold.md) | Agentic toolchain and SDLC governance scaffold | story | p0 | 2.0.0 | FJ-0001 |
 | [FJ-0009](items/FJ-0009-release-2-0-0.md) | Release 2.0.0 | release | p0 | 2.0.0 | FJ-0001 |
+| [FJ-0014](items/FJ-0014-check-targets-depend-on-build-output-and-local-state-so-lint.md) | Check targets depend on build output and local state, so lint fails in CI | bug | p0 | 2.0.1 | — |
+| [FJ-0015](items/FJ-0015-deploy-docs-and-publish-to-npm-only-after-every-ci-job-passe.md) | Deploy docs and publish to npm only after every CI job passes | story | p0 | 2.0.1 | — |
+| [FJ-0016](items/FJ-0016-update-every-npm-and-github-actions-dependency-to-its-latest.md) | Update every npm and GitHub Actions dependency to its latest version | task | p1 | 2.0.1 | — |
+| [FJ-0017](items/FJ-0017-rename-the-default-branch-from-master-to-main.md) | Rename the default branch from master to main | task | p1 | 2.0.1 | — |
+| [FJ-0020](items/FJ-0020-adopt-mise-for-the-toolchain-active-lts-node-by-default-upco.md) | Adopt mise for the toolchain; Active LTS Node by default, upcoming LTS the only other line tested | task | p0 | 2.0.1 | — |
+| [FJ-0021](items/FJ-0021-fence-run-is-2-4-3-3x-slower-since-the-first-review-round.md) | Fence.run is 2.4-3.3x slower since the first review round | bug | p0 | 2.0.1 | — |
 
 ### cancelled (1)
 

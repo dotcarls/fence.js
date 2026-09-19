@@ -1,7 +1,8 @@
 # Publishes when a version tag is pushed, and only after every check has passed on the tagged
 # commit (ADR-0010). The tag must be on main and match package.json. npm trusted publishing
 # (OIDC) is configured on npmjs.com for this repository, this workflow file and the `npm`
-# environment; no npm token is stored anywhere. Prereleases publish under `next`.
+# environment; no npm token is stored anywhere. Prereleases publish under `next`. The toolchain
+# is the one mise.toml pins (ADR-0011).
 name: Release
 
 on:
@@ -35,11 +36,14 @@ jobs:
         with:
           fetch-depth: 0
           persist-credentials: false
-      - uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+      # The toolchain from mise.toml, restored from no cache: nothing a previous run wrote can reach
+      # the job that holds the publishing credential. npm (bundled with Node 24.21.0: 11.19.0)
+      # exchanges the OIDC token for trusted publishing against the default registry.
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
-          node-version-file: .nvmrc
-          registry-url: https://registry.npmjs.org
-          package-manager-cache: false
+          version: 2026.9.11
+          cache: false
+          github_token: '' # nothing in this job needs GitHub API access from mise
       - name: Verify the tag and derive the dist-tag and notes
         id: meta
         run: |
@@ -57,9 +61,13 @@ jobs:
             *-*) echo "dist-tag=next" >> "$GITHUB_OUTPUT"; echo "prerelease=--prerelease" >> "$GITHUB_OUTPUT" ;;
             *)   echo "dist-tag=latest" >> "$GITHUB_OUTPUT"; echo "prerelease=" >> "$GITHUB_OUTPUT" ;;
           esac
-      - run: npm ci --ignore-scripts
-      - name: Publish (prepack builds dist/ from a clean tree)
-        run: npm publish --provenance --access public --tag "${{ steps.meta.outputs.dist-tag }}"
+      - name: Download the tarball the checks verified
+        uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+        with:
+          name: package-tarball
+          path: ${{ runner.temp }}/package
+      - name: Publish that tarball
+        run: npm publish "$RUNNER_TEMP"/package/fence.js-*.tgz --provenance --access public --tag "${{ steps.meta.outputs.dist-tag }}"
       - name: GitHub release
         env:
           GH_TOKEN: ${{ github.token }}

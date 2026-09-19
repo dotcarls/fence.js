@@ -2,42 +2,41 @@
 doc_type: checkpoint
 milestone: '2.0.1'
 updated: '2026-09-19'
-next_action: 'Verify FJ-0014 (every target hermetic) in a fresh clone and a stale working tree on all three Node lines, then close FJ-0014 to FJ-0017, rename the GitHub branch and Pages settings, and cut FJ-0018.'
+next_action: 'Finish FJ-0018: commit the fixes, date the 2.0.1 changelog section, bump to 2.0.1, run npm run check:clean, commit Release v2.0.1 and tag v2.0.1; then hand FJ-0019 (push) to the owner.'
 in_progress_items:
-  - FJ-0014
-  - FJ-0015
-  - FJ-0016
-  - FJ-0017
-session: '2026-09-19 — the owner pushed 2.0.0; CI and the release failed at eslint. Fixing hermeticity (FJ-0014), CI gating (FJ-0015), dependency currency (FJ-0016) and the branch rename (FJ-0017) for 2.0.1.'
+  - FJ-0018
+session: '2026-09-19 — fixed what stopped 2.0.0 from publishing (FJ-0014 hermetic targets, FJ-0015 gated pipeline), updated dependencies (FJ-0016), renamed the default branch to main (FJ-0017), adopted mise with the Active LTS default and the upcoming LTS as the only other tested line (FJ-0020), fixed a 2.4–3.3x run() regression (FJ-0021), and applied a review of all of it.'
 ---
 
 # Checkpoint
 
 ## Now
 
-**Milestone 2.0.1.** 2.0.0 was tagged and pushed but never published: CI and the release job
-failed at `eslint`. The fixes are implemented in the working tree on the local `main` branch and
-are being verified.
+**Milestone 2.0.1, at the release step.** FJ-0014 to FJ-0017, FJ-0020 and FJ-0021 are done;
+FJ-0018 (the release commit and tag) is in progress. On GitHub the default branch is already
+`main`, Pages builds from Actions, and the `github-pages` environment allows `main` only. 2.0.0
+stays tagged and unpublished (its pipeline failed; a pushed tag is not moved).
 
 ## Done
 
-- 2.0.0 milestone: FJ-0001 to FJ-0009 (FJ-0010 cancelled: 2.0.0 is never published).
+- 2.0.0 milestone: FJ-0001 to FJ-0009 (FJ-0010 cancelled).
+- 2.0.1 milestone: FJ-0014, FJ-0015, FJ-0016, FJ-0017, FJ-0020, FJ-0021.
 
 ## In progress
 
-- **FJ-0014** — hermetic targets: implemented; verification in a fresh clone pending.
-- **FJ-0015** — reusable checks gate Pages and publishing: workflows written, actionlint clean.
-- **FJ-0016** — dependencies at latest (TypeScript held at 6.0.3): lockfile regenerated.
-- **FJ-0017** — `main`: local branch renamed; GitHub branch, Pages and environment pending.
+- **FJ-0018 — Release 2.0.1.** The fixes are verified; the release commit and tag remain.
 
 ## Next action
 
-Run every target alone and `npm run check` in a fresh clone (no `dist/`) and in the working tree
-with a stale `dist/`, on Node 24.21.0, 22.23.2 and 26.9.0; record the results in FJ-0014; commit;
-rename the GitHub branch and switch Pages to Actions; cut 2.0.1 (FJ-0018). FJ-0019 is the owner's.
+Commit the fixes; move `[Unreleased]` to `## [2.0.1] - 2026-09-19`; `npm version 2.0.1
+--no-git-tag-version`; `npm run check:clean`; commit `Release v2.0.1`; `git tag -a v2.0.1`. Mark
+FJ-0018 done only then, and hand FJ-0019 to the owner: `git push origin main --follow-tags`.
 
 ## Open questions
 
-- FJ-0013 — whether to release 1.0.2 from `v1` (owner).
+- FJ-0013 — whether to release 1.0.2 from `v1` (owner); releasing an old line is not supported
+  by the pipeline yet ([release-process](../toolchain/release-process.md#maintenance-lines)).
 - FJ-0011 — async validators need an ADR before they are ready (2.1.0).
-- FJ-0012 — the ESM CDN import is unverified until a 2.x is on npm.
+- FJ-0012 — the ESM CDN import is unverified until 2.0.1 is on npm.
+- Optional hardening, not done: a deployment branch policy on the `npm` environment limited to
+  `v*` tags, and required status checks on `main` for pull requests.

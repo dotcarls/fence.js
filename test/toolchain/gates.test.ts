@@ -296,6 +296,40 @@ describe('gate suite', () => {
         expect(messages.some((m) => m.includes('no section for package version 2.0.0'))).toBe(true);
     });
 
+    test('ignore-files: a nested .gitignore or an .eslintignore is refused', () => {
+        const root = fixture();
+        write(root, 'docs/.gitignore', 'local/\n');
+        write(root, '.eslintignore', 'x\n');
+        const messages = run(root, 'ignore-files').map((f) => f.file);
+        expect(messages).toEqual(['.eslintignore', 'docs/.gitignore']);
+    });
+
+    test('the walker applies only the root .gitignore, not .git/info/exclude', () => {
+        const root = fixture();
+        write(root, '.git/info/exclude', 'docs/toolchain/excluded.md\n');
+        write(root, 'docs/toolchain/excluded.md', '# No front matter\n');
+        expect(errors(run(root, 'schemas'))).toContain(
+            'missing front matter (schema tools/schemas/doc.schema.json)',
+        );
+    });
+
+    test('checkpoint: a date one day ahead is tolerated, two days ahead is not', () => {
+        const root = fixture();
+        const file = join(root, 'docs/work/CHECKPOINT.md');
+        write(
+            root,
+            'docs/work/CHECKPOINT.md',
+            readFileSyncSafe(file).replace('updated: "2026-09-16"', 'updated: "2026-09-17"'),
+        );
+        expect(errors(run(root, 'checkpoint'))).toEqual([]);
+        write(
+            root,
+            'docs/work/CHECKPOINT.md',
+            readFileSyncSafe(file).replace('updated: "2026-09-17"', 'updated: "2026-09-18"'),
+        );
+        expect(errors(run(root, 'checkpoint'))).toContain('updated 2026-09-18 is in the future');
+    });
+
     test('the walker sees what git would commit: ignored files are invisible to every gate', () => {
         const root = fixture();
         write(root, '.gitignore', 'scratch/\n');

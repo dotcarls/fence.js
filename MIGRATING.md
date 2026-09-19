@@ -8,11 +8,11 @@ the new serialization API.
 
 ## Requirements
 
-| 1.x                                | 2.0                                                                                                                                                |
-| ---------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Node ≥ 10, ES5 output              | Node ≥ 20.19, ES2022 output                                                                                                                        |
-| CommonJS, ES module and UMD builds | ES modules only. `require()` works on Node 20.19+/22.12+; browsers use `<script type="module">` and an ESM CDN. The `window.fence` global is gone. |
-| No types                           | Bundled `.d.ts`; the fluent API is typed from your validators                                                                                      |
+| 1.x                                | 2.0                                                                                                                                                  |
+| ---------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node ≥ 10, ES5 output              | Node ≥ 24, ES2022 output                                                                                                                             |
+| CommonJS, ES module and UMD builds | ES modules only. `require()` works on every supported Node; browsers use `<script type="module">` and an ESM CDN. The `window.fence` global is gone. |
+| No types                           | Bundled `.d.ts`; the fluent API is typed from your validators                                                                                        |
 
 ## API changes
 
