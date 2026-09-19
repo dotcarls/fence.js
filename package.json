@@ -59,6 +59,7 @@
     "check:clean": "node scripts/check-clean.mjs",
     "check:package": "node scripts/check-package.mjs",
     "checkpoint": "tsx tools/gates/cli.ts checkpoint check",
+    "codeql": "node scripts/codeql.mjs",
     "clean": "rimraf dist coverage site",
     "docs": "typedoc",
     "examples": "npm run build && tsc --noEmit -p examples/tsconfig.dist.json && tsx --tsconfig examples/tsconfig.dist.json examples/run-all.ts",

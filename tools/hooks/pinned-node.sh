@@ -20,7 +20,9 @@ elif command -v mise >/dev/null 2>&1; then
 fi
 pinned_node_missing_message() {
   if command -v mise >/dev/null 2>&1; then
-    echo "Node $PINNED_NODE (mise.toml) is not installed or the project's mise.toml is not trusted, so $1 did not run. In the repository run: mise trust && mise install"
+    # mise's own reason, such as a mise older than mise.toml's min_version, says more than a guess.
+    mise_said="$(cd "${ROOT:-.}" && MISE_EXEC_AUTO_INSTALL=false mise which node 2>&1 >/dev/null | tail -n 3)"
+    echo "Node $PINNED_NODE (mise.toml) is not installed, the project's mise.toml is not trusted, or mise is older than its min_version, so $1 did not run. In the repository run: mise trust && mise install${mise_said:+ (mise said: $mise_said)}"
   else
     echo "mise is not installed, so Node $PINNED_NODE (mise.toml) could not be found and $1 did not run. Install mise (https://mise.jdx.dev), then in the repository run: mise trust && mise install"
   fi

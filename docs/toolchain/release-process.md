@@ -21,7 +21,7 @@ flowchart LR
         c1["npm run check · Active LTS (mise.toml)"]
         c2["npm run check · upcoming LTS 26.9.0"]
         c5b["pack: the tarball"] --> c4["consume · both lines"]
-        c5["CodeQL · fails on any finding"]
+        c5["npm run codeql · uploads SARIF, fails on any finding"]
     end
     push["push to main"] --> ci["ci.yml"] --> checks
     checks -->|all passed| pages["deploy Pages (artifact built by the checks)"]
@@ -49,7 +49,8 @@ published, the fix ships as the next patch (2.0.0 → 2.0.1).
    `## [x.y.z] - YYYY-MM-DD`, Keep a Changelog categories only (Added · Changed · Deprecated ·
    Removed · Fixed · Security), citing work item ids. The `changelog` gate checks the shape;
    `node scripts/changelog.mjs check x.y.z` checks the section exists.
-3. **Run the whole chain.** `npm run check` (CI runs exactly this).
+3. **Run the whole chain.** `npm run check` and `npm run codeql` (CI runs exactly these); the
+   pre-push hook runs both again on a clean export of the release commit.
 4. **Bump, commit, tag.** On `main` with a clean tree:
 
    ```sh
@@ -58,10 +59,13 @@ published, the fix ships as the next patch (2.0.0 → 2.0.1).
    git tag -a vx.y.z -m "Release vx.y.z"
    ```
 
-   `npm run release` (release-it) does the same and pushes, when the owner runs it.
+   `npm run release` (release-it) does the same and does not push.
 
-5. **Publish (owner only).** `git push origin main --follow-tags`. The push runs CI on `main`
-   (and deploys Pages when it passes); the tag runs `release.yml`, which runs every check on
+5. **Publish (owner only), in two pushes.** First `git push origin main`: CI runs every check
+   on the release commit and deploys Pages when they pass. Only when that run is green,
+   `git push origin vx.y.z`. A check that fails on the first push costs a fix commit; one that
+   fails on the tag's run costs the version, because a pushed tag is never moved (2.0.0 and
+   2.0.1 were both lost this way). The tag runs `release.yml`, which runs every check on
    the tagged commit and only then publishes the tarball those checks verified under `latest`
    (or `next`) with provenance and creates the GitHub release from `node scripts/changelog.mjs notes x.y.z`. Trusted publishing
    is configured on npmjs.com for this repository, `release.yml` and the `npm` environment.

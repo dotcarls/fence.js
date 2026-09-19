@@ -119,11 +119,20 @@ record, a release note); `superseded` ones stay for history and name what replac
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: taxonomy-annotations -->
-| Kind | Meaning | Target looks like |
-|---|---|---|
-| `@fence:adr` | This construct implements or depends on a decision record; an anchor names the clause. | `^ADR-\d{4}(#[a-z0-9-]+)?$` |
-| `@fence:item` | This construct is the work tracked by a work item. | `^FJ-\d{4}$` |
-| `@fence:invariant` | This construct establishes or relies on a named invariant from the table below. | `^[a-z0-9]+(\.[a-z0-9-]+)+$` |
-| `@fence:doc` | Reference to a documentation section (the weakest binding; prefer a specific kind). | `^docs/[A-Za-z0-9/._-]+\.md(#[a-z0-9-]+)?$` |
+| Kind | Meaning |
+|---|---|
+| `@fence:adr` | This construct implements or depends on a decision record; an anchor names the clause. |
+| `@fence:item` | This construct is the work tracked by a work item. |
+| `@fence:invariant` | This construct establishes or relies on a named invariant from the table below. |
+| `@fence:doc` | Reference to a documentation section (the weakest binding; prefer a specific kind). |
+
+A target must match its kind's pattern:
+
+```text
+adr        ^ADR-\d{4}(#[a-z0-9-]+)?$
+item       ^FJ-\d{4}$
+invariant  ^[a-z0-9]+(\.[a-z0-9-]+)+$
+doc        ^docs/[A-Za-z0-9/._-]+\.md(#[a-z0-9-]+)?$
+```
 <!-- END GENERATED: taxonomy-annotations -->
 <!-- prettier-ignore-end -->

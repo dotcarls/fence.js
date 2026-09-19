@@ -2,11 +2,15 @@
 # Claude Code hook and CI job runs under it, so a result on a laptop is the result in CI
 # (ADR-0009).
 
-# hard: the oldest mise this configuration is verified with; soft: the release CI pins.
-min_version = { hard = "2026.6.14", soft = "2026.9.11" }
+# hard: the oldest mise this configuration is verified with (older releases fail the attestation
+# check of the CodeQL release, ADR-0012); soft: the release CI pins.
+min_version = { hard = "2026.9.11", soft = "2026.9.11" }
 
 [tools]
 # The current Active LTS release, pinned exactly. CI also tests the upcoming LTS line by
 # overriding this pin with MISE_NODE_VERSION (.github/workflows/checks.yml); run the same leg
 # locally with `MISE_NODE_VERSION=26.9.0 mise exec -- npm run check`.
 node = "24.21.0"
+# CodeQL, pinned to the release CI's codeql-action (4.38.1) bundles, so `npm run codeql` gives the
+# same findings locally and in CI (ADR-0012). The query pack version is pinned in scripts/codeql.mjs.
+codeql = "2.27.0"

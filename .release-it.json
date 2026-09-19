@@ -7,7 +7,8 @@
     "commitMessage": "Release v${version}",
     "tagName": "v${version}",
     "tagAnnotation": "Release v${version}",
-    "changelog": false
+    "changelog": false,
+    "push": false
   },
   "npm": {
     "publish": false
@@ -16,7 +17,7 @@
     "release": false
   },
   "hooks": {
-    "before:init": ["npm run check"],
+    "before:init": ["npm run check", "npm run codeql"],
     "after:bump": "node scripts/changelog.mjs check ${version}"
   }
 }

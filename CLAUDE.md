@@ -18,7 +18,8 @@ steps, builds fences, runs them, serializes them to JSON. Zero dependencies, ESM
 - **Gates are not optional.** `npm run gates` runs on every edit (hook) and every commit (git
   hook) and fails with each finding named. Never bypass a failing gate; fix the artifact or change
   the rule deliberately. `npm run check` is the whole CI chain, run before any commit that
-  touches `src/`, `test/`, `examples/` or the toolchain.
+  touches `src/`, `test/`, `examples/` or the toolchain; `npm run codeql` is CI's CodeQL job,
+  run before a push (the pre-push hook runs both on a clean export).
 - **Work is tracked.** Every change beyond a typo has a work item in `docs/work/items/`
   (`npm run work -- new --title "..."`), with acceptance criteria written before the work starts.
   Done means every criterion satisfied with an evidence link that resolves.

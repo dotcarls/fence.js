@@ -12,13 +12,21 @@ Template: [TEMPLATE.md](TEMPLATE.md). Create with `npm run work -- new --title "
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: work-index -->
-_21 items. Generated from front matter; run `npm run gates:fix`._
+_25 items. Generated from front matter; run `npm run gates:fix`._
+
+### in-progress (3)
+
+| id | title | type | priority | milestone | parent |
+|---|---|---|---|---|---|
+| [FJ-0022](items/FJ-0022-codeql-js-incomplete-sanitization-in-the-ontology-table-gene.md) | CodeQL js/incomplete-sanitization in the ontology table generator stops 2.0.1 | bug | p0 | 2.0.2 | — |
+| [FJ-0023](items/FJ-0023-run-codeql-locally-with-the-same-cli-and-queries-as-ci.md) | Run CodeQL locally with the same CLI and queries as CI | task | p0 | 2.0.2 | — |
+| [FJ-0024](items/FJ-0024-release-2-0-2.md) | Release 2.0.2 | release | p0 | 2.0.2 | — |
 
 ### ready (1)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
-| [FJ-0019](items/FJ-0019-publish-2-0-1-push-main-and-the-v2-0-1-tag.md) | Publish 2.0.1: push main and the v2.0.1 tag | task | p0 | 2.0.1 | — |
+| [FJ-0025](items/FJ-0025-publish-2-0-2-push-main-then-the-v2-0-2-tag-once-ci-on-main.md) | Publish 2.0.2: push main, then the v2.0.2 tag once CI on main is green | task | p0 | 2.0.2 | — |
 
 ### backlog (3)
 
@@ -49,10 +57,11 @@ _21 items. Generated from front matter; run `npm run gates:fix`._
 | [FJ-0020](items/FJ-0020-adopt-mise-for-the-toolchain-active-lts-node-by-default-upco.md) | Adopt mise for the toolchain; Active LTS Node by default, upcoming LTS the only other line tested | task | p0 | 2.0.1 | — |
 | [FJ-0021](items/FJ-0021-fence-run-is-2-4-3-3x-slower-since-the-first-review-round.md) | Fence.run is 2.4-3.3x slower since the first review round | bug | p0 | 2.0.1 | — |
 
-### cancelled (1)
+### cancelled (2)
 
 | id | title | type | priority | milestone | parent |
 |---|---|---|---|---|---|
 | [FJ-0010](items/FJ-0010-publish-2-0-0.md) | Publish 2.0.0: push master and the tag; enable npm trusted publishing | task | p0 | 2.0.0 | FJ-0001 |
+| [FJ-0019](items/FJ-0019-publish-2-0-1-push-main-and-the-v2-0-1-tag.md) | Publish 2.0.1: push main and the v2.0.1 tag | task | p0 | 2.0.1 | — |
 <!-- END GENERATED: work-index -->
 <!-- prettier-ignore-end -->

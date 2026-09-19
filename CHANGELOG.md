@@ -6,6 +6,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Fixed
+
+- 2.0.1 was tagged but never published: CodeQL failed its release pipeline on a finding in the
+  repository's documentation generator (`js/incomplete-sanitization`). The generator now writes
+  the ontology's target patterns into a code block that shows them byte for byte, and CodeQL
+  reports nothing (FJ-0022). The package's code is unchanged from 2.0.1.
+
+### Changed
+
+- CodeQL runs locally as `npm run codeql`, with the CLI pinned in `mise.toml` and the query pack
+  pinned in `scripts/codeql.mjs`, the ones CI uses. The pre-push hook runs it on the commit
+  being pushed, and CI runs the same command and uploads its results to code scanning. mise
+  2026.9.11 or later is required (FJ-0023).
+- Releases are pushed in two steps: `main` first, then the tag once CI passes on the release
+  commit, so a failing check no longer costs a version (FJ-0025).
+
 ## [2.0.1] - 2026-09-19
 
 The first 2.x release on npm: 2.0.0 was tagged but its release pipeline failed before

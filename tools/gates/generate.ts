@@ -145,14 +145,32 @@ export function loadLexicon(ctx: Context): Lexicon {
     return JSON.parse(readFileSync(join(ctx.root, ctx.config.lexicon.config), 'utf8')) as Lexicon;
 }
 
+/**
+ * `text` as a fenced code block, which shows it byte for byte. A table cell cannot: GFM splits the
+ * row on `|` before inline parsing and honors `\|` even inside a code span, while a code span takes
+ * no other escape, so a pattern holding `\|` has no correct spelling there. A fence needs no escape,
+ * only to be longer than any run of backticks inside it (CommonMark 4.5).
+ */
+export function codeBlock(text: string): string {
+    const longest = Math.max(0, ...Array.from(text.matchAll(/`+/g), (run) => run[0].length));
+    const fence = '`'.repeat(Math.max(3, longest + 1));
+    return `${fence}text\n${text}\n${fence}`;
+}
+
 function ontologyKinds(ctx: Context): string {
-    const ontology = loadOntology(ctx);
-    const lines = ['| Kind | Meaning | Target looks like |', '|---|---|---|'];
-    for (const [kind, spec] of Object.entries(ontology.kinds)) {
-        lines.push(
-            `| \`@fence:${kind}\` | ${spec.summary} | \`${spec.target_pattern.replace(/\|/g, '\\|')}\` |`,
-        );
+    const kinds = Object.entries(loadOntology(ctx).kinds);
+    const lines = ['| Kind | Meaning |', '|---|---|'];
+    for (const [kind, spec] of kinds) {
+        lines.push(`| \`@fence:${kind}\` | ${spec.summary} |`);
     }
+    const width = Math.max(...kinds.map(([kind]) => kind.length));
+    const patterns = kinds.map(([kind, spec]) => {
+        if (/[\r\n]/.test(spec.target_pattern)) {
+            throw new Error(`The target pattern of kind '${kind}' spans lines`);
+        }
+        return `${kind.padEnd(width)}  ${spec.target_pattern}`;
+    });
+    lines.push('', "A target must match its kind's pattern:", '', codeBlock(patterns.join('\n')));
     return lines.join('\n');
 }
 

@@ -2,10 +2,12 @@
 # unless all of it succeeds: ci.yml deploys Pages only after it passes on main, and release.yml
 # publishes to npm only after it passes on the tagged commit.
 #
-# Every job installs the toolchain with mise from mise.toml, and every check leg runs
-# `npm run check`, the same single command a contributor runs, so CI and local runs execute
-# identical targets on identical toolchains (ADR-0009, ADR-0011). Two Node lines are tested:
-# the current Active LTS pinned in mise.toml, and the upcoming LTS through MISE_NODE_VERSION.
+# Every job installs the toolchain with mise from mise.toml, every check leg runs
+# `npm run check` and the CodeQL job runs `npm run codeql`, the same commands a contributor and
+# the pre-push hook run, so CI and local runs execute identical targets on identical toolchains
+# (ADR-0009, ADR-0011, ADR-0012). Two Node lines are tested: the current Active LTS pinned in
+# mise.toml, and the upcoming LTS through MISE_NODE_VERSION. Jobs that do not run CodeQL install
+# Node alone (`install_args: node`); the CodeQL CLI is 2.7 GB installed.
 name: Checks
 
 on:
@@ -41,6 +43,7 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: 2026.9.11
+          install_args: node
           cache_key_prefix: mise-node-${{ matrix.node-override || 'mise.toml' }}
       - run: npm ci --ignore-scripts
       - run: npm run check
@@ -62,6 +65,7 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: 2026.9.11
+          install_args: node
           cache_key_prefix: mise-node-mise.toml
       - run: npm ci --ignore-scripts
       - run: npm run build
@@ -99,6 +103,7 @@ jobs:
       - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
           version: 2026.9.11
+          install_args: node
           cache_key_prefix: mise-node-${{ matrix.node-override || 'mise.toml' }}
       - name: Put the toolchain's Node on PATH for directories outside the project
         run: dirname "$(mise which node)" >> "$GITHUB_PATH"
@@ -123,8 +128,10 @@ jobs:
             console.log('require(esm) ok on', process.version);"
 
   codeql:
-    # Uploads results to code scanning and fails on any finding, so an alert stops deployment
-    # and publishing like any other failed check.
+    # `npm run codeql` with the CLI mise.toml pins (ADR-0012). The SARIF goes to code scanning
+    # whether or not it holds findings, and any finding fails the job, so an alert stops deployment
+    # and publishing like any other failed check. No mise cache: a 2.7 GB CodeQL install would
+    # crowd the Node installs out of the repository's 10 GB Actions cache.
     name: CodeQL
     runs-on: ubuntu-latest
     permissions:
@@ -135,17 +142,14 @@ jobs:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
-      - uses: github/codeql-action/init@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
+      - uses: jdx/mise-action@c2a87611a18de5b3828c5652fe268e992400cb5c # v4.3.0
         with:
-          languages: javascript-typescript
-          queries: +security-and-quality
-      - uses: github/codeql-action/analyze@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
+          version: 2026.9.11
+          cache: false
+      - run: npm run codeql -- --sarif "$RUNNER_TEMP/codeql/javascript.sarif"
+      - name: Upload the results to code scanning
+        if: ${{ !cancelled() }}
+        uses: github/codeql-action/upload-sarif@1c5b675653bb5c22dbe9b12b556ec555138e09fd # v4.38.1
         with:
+          sarif_file: ${{ runner.temp }}/codeql/javascript.sarif
           category: /language:javascript-typescript
-          output: ${{ runner.temp }}/codeql
-      - name: Fail on any finding
-        run: |
-          count=$(jq -s '[.[].runs[].results[]] | length' "$RUNNER_TEMP"/codeql/*.sarif)
-          jq -r '.runs[].results[] | "::error file=\(.locations[0].physicalLocation.artifactLocation.uri),line=\(.locations[0].physicalLocation.region.startLine)::\(.ruleId): \(.message.text)"' "$RUNNER_TEMP"/codeql/*.sarif
-          echo "CodeQL findings: $count"
-          test "$count" -eq 0

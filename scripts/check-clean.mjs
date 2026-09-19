@@ -1,7 +1,8 @@
-// `npm run check:clean`: runs `npm run check` on exactly the committed tree, the way CI does: the
-// HEAD commit exported with `git archive`, dependencies installed with `npm ci`, nothing from the
-// working tree (uncommitted edits, untracked or ignored files, dist/, node_modules) carried over.
-// The pre-push hook runs it, so what is pushed has passed the check CI will run (ADR-0009).
+// `npm run check:clean`: runs `npm run check` and `npm run codeql` on exactly the committed tree,
+// the way CI does: the HEAD commit exported with `git archive`, dependencies installed with
+// `npm ci`, nothing from the working tree (uncommitted edits, untracked or ignored files, dist/,
+// node_modules) carried over. The pre-push hook runs it, so what is pushed has passed the checks
+// CI will run (ADR-0009, ADR-0012).
 import { execFileSync } from 'node:child_process';
 import { mkdtempSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
@@ -24,7 +25,8 @@ try {
         directory,
     );
     run('npm', ['run', 'check'], directory);
-    console.log(`check:clean: ${commit} passes npm run check in a clean export`);
+    run('npm', ['run', 'codeql'], directory);
+    console.log(`check:clean: ${commit} passes npm run check and npm run codeql in a clean export`);
 } finally {
     rmSync(directory, { recursive: true, force: true });
 }

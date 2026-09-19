@@ -20,7 +20,7 @@ Node 24+ and evergreen browsers.
 ```sh
 git clone https://github.com/<you>/fence.js.git
 cd fence.js
-mise trust && mise install    # the pinned Node
+mise trust && mise install    # the pinned Node and CodeQL (2.7 GB; needs mise ≥ 2026.9.11)
 mise exec -- npm install      # also installs the git hooks (simple-git-hooks)
 mise exec -- npm run check    # everything CI runs, in the same order
 ```
@@ -30,21 +30,22 @@ LTS line; run it locally with `MISE_NODE_VERSION=26.9.0 mise exec -- npm run che
 
 ## Scripts
 
-| Script                   | What it does                                                                                     |
-| ------------------------ | ------------------------------------------------------------------------------------------------ |
-| `npm test`               | Runs the Vitest suite once, type-level tests included (`npm run test:watch` to watch)            |
-| `npm run test:coverage`  | Same, with v8 coverage; thresholds are 95% across the board                                      |
-| `npm run typecheck`      | `tsc --noEmit` over `src` and `test`                                                             |
-| `npm run lint`           | ESLint with `typescript-eslint` strict, type-checked rules                                       |
-| `npm run format`         | Prettier (`format:check` only verifies)                                                          |
-| `npm run build`          | Compiles `src` to `dist` (ESM + `.d.ts`) with `tsc`                                              |
-| `npm run examples`       | Builds `dist/`, then type-checks and runs every example in `examples/` against the built package |
-| `npm run check:package`  | `publint` and `@arethetypeswrong/cli` against the packed tarball                                 |
-| `npm run bench`          | Compares fence.js with validate.js and Joi (informational)                                       |
-| `npm run docs`           | Generates the API reference into `docs/` with TypeDoc                                            |
-| `npm run verify:install` | Fails when `node_modules` differs from `package-lock.json` (run `npm ci`); first step of `check` |
-| `npm run check:clean`    | `npm run check` on the HEAD commit in a clean export with `npm ci`; the pre-push hook runs it    |
-| `npm run check`          | Everything CI runs, in the same order                                                            |
+| Script                   | What it does                                                                                                       |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------ |
+| `npm test`               | Runs the Vitest suite once, type-level tests included (`npm run test:watch` to watch)                              |
+| `npm run test:coverage`  | Same, with v8 coverage; thresholds are 95% across the board                                                        |
+| `npm run typecheck`      | `tsc --noEmit` over `src` and `test`                                                                               |
+| `npm run lint`           | ESLint with `typescript-eslint` strict, type-checked rules                                                         |
+| `npm run format`         | Prettier (`format:check` only verifies)                                                                            |
+| `npm run build`          | Compiles `src` to `dist` (ESM + `.d.ts`) with `tsc`                                                                |
+| `npm run examples`       | Builds `dist/`, then type-checks and runs every example in `examples/` against the built package                   |
+| `npm run check:package`  | `publint` and `@arethetypeswrong/cli` against the packed tarball                                                   |
+| `npm run bench`          | Compares fence.js with validate.js and Joi (informational)                                                         |
+| `npm run docs`           | Generates the API reference into `docs/` with TypeDoc                                                              |
+| `npm run verify:install` | Fails when `node_modules` differs from `package-lock.json` (run `npm ci`); first step of `check`                   |
+| `npm run codeql`         | CodeQL with the CLI and queries CI uses, over the files a commit would contain; fails on any finding               |
+| `npm run check:clean`    | `npm run check` and `npm run codeql` on the HEAD commit in a clean export with `npm ci`; the pre-push hook runs it |
+| `npm run check`          | Everything CI runs, in the same order                                                                              |
 
 ## Layout
 
@@ -83,13 +84,15 @@ docs/           the documentation graph: index, toolchain and governance, decisi
   `TypeError` is reserved for arguments of the wrong JavaScript type (constructors, the `base`
   argument of `fromJSON`).
 - Prettier, ESLint and the related Vitest files run on staged files in the pre-commit hook; the
-  pre-push hook runs `npm run check:clean`, the whole chain on the commit being pushed.
+  pre-push hook runs `npm run check:clean`, the whole chain and CodeQL on the commit being pushed.
 
 ## Releasing
 
 Maintainers release from `main`: add the `## [X.Y.Z] - YYYY-MM-DD` section to
-`CHANGELOG.md`, then run `npm run release`, which runs the full check, bumps the version,
-verifies the changelog section exists, commits, tags `vX.Y.Z` and pushes. Pushing the tag
+`CHANGELOG.md`, then run `npm run release`, which runs the full check and CodeQL, bumps the
+version, verifies the changelog section exists, commits and tags `vX.Y.Z`, and does not push.
+Push `main` first and wait for CI to pass on the release commit, then push the tag
+([release process](docs/toolchain/release-process.md#steps)). Pushing the tag
 triggers `.github/workflows/release.yml`, which publishes to npm with provenance (npm trusted
 publishing, no token) under `latest`, or `next` for prereleases, and creates the GitHub
 release with that changelog section as its notes.

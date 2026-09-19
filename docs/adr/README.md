@@ -11,7 +11,7 @@ Create with `npm run adr -- new --title "..."`. A record is `proposed` until the
 
 <!-- prettier-ignore-start -->
 <!-- BEGIN GENERATED: adr-index -->
-_12 decision records. Generated from front matter; run `npm run gates:fix`._
+_13 decision records. Generated from front matter; run `npm run gates:fix`._
 
 | id | title | status | date | tags |
 |---|---|---|---|---|
@@ -27,5 +27,6 @@ _12 decision records. Generated from front matter; run `npm run gates:fix`._
 | [ADR-0009](ADR-0009-hermetic-targets-every-check-depends-only-on-the-tracked-tre.md) | Hermetic targets: every check depends only on the tracked tree and the pinned toolchain | accepted | 2026-09-19 | toolchain, ci, reproducibility |
 | [ADR-0010](ADR-0010-one-reusable-check-workflow-gates-pages-deployment-and-npm-p.md) | One reusable check workflow gates Pages deployment and npm publishing; main is the default branch | accepted | 2026-09-19 | ci, release, pages, process |
 | [ADR-0011](ADR-0011-mise-manages-the-toolchain-the-active-lts-node-is-the-defaul.md) | mise manages the toolchain; the Active LTS Node is the default and the upcoming LTS the only other line tested | accepted | 2026-09-19 | toolchain, ci, node, mise |
+| [ADR-0012](ADR-0012-codeql-is-a-local-target-with-the-cli-pinned-by-mise-run-by.md) | CodeQL is a local target with the CLI pinned by mise, run by the pre-push hook and by CI | accepted | 2026-09-19 | toolchain, ci, security, codeql, mise |
 <!-- END GENERATED: adr-index -->
 <!-- prettier-ignore-end -->
